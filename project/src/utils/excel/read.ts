@@ -1,7 +1,8 @@
+import { ChurchObject } from "@/types/excel";
 import * as XLSX from "xlsx";
 
 // 브라우저용 (File 객체)
-export const readExcelFile = (file: File): Promise<Record<string, unknown>[]> => {
+export const readExcelFile = (file: File): Promise<ChurchObject[]> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -16,7 +17,7 @@ export const readExcelFile = (file: File): Promise<Record<string, unknown>[]> =>
 
         // JSON 데이터로 변환
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
-        resolve(jsonData as Record<string, unknown>[]);
+        resolve(jsonData as ChurchObject[]);
       } catch (error) {
         reject(error);
       }
