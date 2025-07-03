@@ -13,11 +13,10 @@ const InputSection = () => {
     // 파일 형식 변환
     if (excelFile) {
       readExcelFile(excelFile).then((data: ChurchObject[]) => {
-        const formattedData : FormattedExcelData = formatExcelData(data);
+        const formattedData: FormattedExcelData = formatExcelData(data);
 
-
-        console.log("\n\n남자 데이터",formattedData.maleDataArray,"\n\n")
-        console.log("\n\n여자 데이터",formattedData.femaleDataArray,"\n\n")
+        console.log("\n\n남자 데이터", formattedData.maleDataArray, "\n\n");
+        console.log("\n\n여자 데이터", formattedData.femaleDataArray, "\n\n");
       });
     }
   }, [excelFile]);
