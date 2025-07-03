@@ -1,4 +1,4 @@
-import { createTheme, Theme } from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -67,7 +67,7 @@ export const muiTheme = createTheme({
   palette: {
     primary: {
       dark: "#222222",
-      main: "#444444",
+      main: "#000000",
       light: "#666666",
       contrastText: "#FFFFFF",
     },
@@ -140,7 +140,7 @@ export const muiTheme = createTheme({
     },
 
     background: {
-      default: "#000000",
+      default: "#FFFFFF",
       paper: "#666666",
       0: "#ffffff",
       100: "#CCCCCC",
@@ -153,23 +153,11 @@ export const muiTheme = createTheme({
     },
 
     text: {
-      primary: "#FFFFFF",
+      primary: "#000000",
       secondary: "#AAAAAA",
       disabled: "#666666",
       white: "#FFFFFF",
       black: "#000000",
-    },
-  },
-  components: {
-    MuiInputLabel: {
-      styleOverrides: {
-        root: ({ theme }: { theme: Theme }) => ({
-          color: theme.palette.text.secondary,
-          "&.Mui-focused": {
-            color: theme.palette.text.primary,
-          },
-        }),
-      },
     },
   },
 });
