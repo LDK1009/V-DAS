@@ -48,7 +48,7 @@ const initialFloor: FloorType = {
 const initialDormitory: DormitoryType = {
   floors: Array.from({ length: 9 }, (_, index) => ({
       ...initialFloor,
-      floorNumber: index + 1,
+      floorNumber: index,
   })),
 };
 
@@ -61,7 +61,7 @@ export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
   initDormitoryData: () => set({ dormitoryData: initialDormitory }),
 
   // 현재 보고있는 층
-  currentFloor: 1,
+  currentFloor: 0,
   // 현재 보고있는 층 변경
   setCurrentFloor: (floor) => set({ currentFloor: floor }),
 }));

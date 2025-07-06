@@ -14,11 +14,11 @@ const ChangeFloorButtonGroup = () => {
       {floors?.map((el) => {
         return (
           <button key={el.floorNumber} onClick={() => setCurrentFloor(el.floorNumber)}>
-            {el.floorNumber}
+            {el.floorNumber + 1}
           </button>
         );
       })}
-      <div>현재 층 : {currentFloor}</div>
+      <div>현재 층 : {currentFloor + 1}</div>
       <button onClick={() => setIsModalOpen(true)}>층 수정</button>
       <ChangeFloorModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
     </div>
