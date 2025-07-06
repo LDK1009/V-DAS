@@ -34,8 +34,8 @@ const FloorView = () => {
 
               return (
                 <RoomContainer key={roomIndex}>
+                  <div>{`${currentFloor + 1}${String(roomNumber).padStart(2, "0")}호`}</div>
                   <PeopleContainer>
-                    <div>{`${currentFloor + 1}${String(roomNumber).padStart(2, "0")}호`}</div>
                     <div>최대 인원 : {room.max}</div>
                     <div>현재 인원 : {room.current}</div>
                     <div>남은 인원 : {room.remain}</div>
