@@ -1,13 +1,11 @@
-type AssignedChurchType = {
-  name: string;
-  people: number;
-};
+import { ChurchType } from "./currentChurchType";
+
 
 type RoomType = {
   max: number;
   current: number;
   remain: number;
-  assignedChurchArray: AssignedChurchType[];
+  assignedChurchArray: ChurchType[];
 };
 
 type LineType = {

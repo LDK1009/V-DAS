@@ -1,4 +1,5 @@
 import { checkLineAssign, getAssignableInDormitory } from "@/hooks/assign/checkAssignAvailability";
+import { useAssign } from "@/hooks/assign/useAssign";
 import { useCurrentChurchStore } from "@/store/church/churchStore";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { useExcelStore } from "@/store/excel/excelStore";
@@ -12,6 +13,7 @@ const ChurchListContainer = () => {
   const { currentChurchMaleArray, currentChurchFemaleArray, setCurrentChurchMaleArray, setCurrentChurchFemaleArray } =
     useCurrentChurchStore();
   const { dormitoryData } = useDormitoryStore();
+  const { assign } = useAssign();
 
   useEffect(() => {
     // 파일 형식 변환
@@ -43,10 +45,18 @@ const ChurchListContainer = () => {
     }
   }
 
+
+  function testFunc3() {
+    if (currentChurchMaleArray && currentChurchFemaleArray && dormitoryData) {
+      assign({ church: currentChurchMaleArray[1], count: 1, floorIndex: 0, lineIndex: 0, roomIndex: 0 });
+    }
+  }
+
   return (
     <div>
       <button onClick={testFunc}>테스트</button>
       <button onClick={testFunc2}>테스트2</button>
+      <button onClick={testFunc3}>테스트3</button>
       <pre>{JSON.stringify(currentChurchMaleArray, null, 2)}</pre>
       <pre>{JSON.stringify(currentChurchFemaleArray, null, 2)}</pre>
     </div>

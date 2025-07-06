@@ -1,17 +1,7 @@
 import { DormitoryType, FloorType, LineType, RoomType } from "@/types/dormitory";
 import { create } from "zustand";
-
-// Zustand 스토어 정의
-
-type DormitoryStoreType = {
-  ////////// 기숙사 데이터 관련
-  dormitoryData: DormitoryType | null;
-  setDormitoryData: (dormitoryData: DormitoryType | null) => void;
-  initDormitoryData: () => void;
-  ////////// 현재 층 관련
-  currentFloor: number;
-  setCurrentFloor: (floor: number) => void;
-};
+import { produce } from "immer";
+import { ChurchType } from "@/types/currentChurchType";
 
 ////////// 방 초기화
 const initialRoom: RoomType = {
@@ -47,9 +37,30 @@ const initialFloor: FloorType = {
 ////////// 기숙사 초기화
 const initialDormitory: DormitoryType = {
   floors: Array.from({ length: 9 }, (_, index) => ({
-      ...initialFloor,
-      floorNumber: index,
+    ...initialFloor,
+    floorNumber: index,
   })),
+};
+
+type AssignRoomParamsType = {
+  church: ChurchType;
+  count: number;
+  floorIndex: number;
+  lineIndex: number;
+  roomIndex: number;
+};
+
+////////// Zustand 스토어 정의
+type DormitoryStoreType = {
+  // 기숙사 데이터 관련
+  dormitoryData: DormitoryType | null;
+  setDormitoryData: (dormitoryData: DormitoryType | null) => void;
+  initDormitoryData: () => void;
+  // 현재 층 관련
+  currentFloor: number;
+  setCurrentFloor: (floor: number) => void;
+  // 방 인원 빼기 관련
+  assignRoom: ({ church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) => void;
 };
 
 export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
@@ -59,6 +70,26 @@ export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
   setDormitoryData: (dormitoryData) => set({ dormitoryData }),
   // 기숙사 데이터 초기화
   initDormitoryData: () => set({ dormitoryData: initialDormitory }),
+
+  // 방 배정
+  assignRoom: ({ church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) => {
+    set(
+      produce((state) => {
+        const dormitoryData = state.dormitoryData;
+        if (dormitoryData) {
+          const roomRemain = dormitoryData.floors[floorIndex].lines[lineIndex].rooms[roomIndex].remain - count;
+          const roomCurrent = dormitoryData.floors[floorIndex].lines[lineIndex].rooms[roomIndex].current + count;
+          if (roomRemain < 0 || roomCurrent > 7) {
+            return;
+          } else {
+            dormitoryData.floors[floorIndex].lines[lineIndex].rooms[roomIndex].remain = roomRemain;
+            dormitoryData.floors[floorIndex].lines[lineIndex].rooms[roomIndex].current = roomCurrent;
+            dormitoryData.floors[floorIndex].lines[lineIndex].rooms[roomIndex].assignedChurchArray.push(church);
+          }
+        }
+      })
+    );
+  },
 
   // 현재 보고있는 층
   currentFloor: 0,
