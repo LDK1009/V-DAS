@@ -1,12 +1,14 @@
-export type CurrentChurchMaleArrayType = MaleDataType[];
-export type CurrentChurchFemaleArrayType = FemaleDataType[];
+export type CurrentChurchMaleArrayType = ChurchMaleType[];
+export type CurrentChurchFemaleArrayType = ChurchFemaleType[];
 
-type MaleDataType = {
+export type ChurchType = ChurchMaleType | ChurchFemaleType;
+
+export type ChurchMaleType = {
   churchName: string;
   male: number;
 };
 
-type FemaleDataType = {
+export type ChurchFemaleType = {
   churchName: string;
   female: number;
 };
