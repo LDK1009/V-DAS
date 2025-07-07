@@ -101,6 +101,8 @@ const ChurchListContainer = () => {
         // 배정 라인
         const assignLineIndex = assignableFloorIndexArray[0].lineIndexArray[0];
 
+        console.log("배정 위치 : ", church.churchName, assignFloorIndex, assignLineIndex);
+        
         // 라인배정
         assignLine({
           sex: "male",

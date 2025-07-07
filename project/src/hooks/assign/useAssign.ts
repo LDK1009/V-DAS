@@ -35,9 +35,14 @@ export const useAssign = () => {
 
   ////////// 라인 배정
   function assignLine({ sex, church, floorIndex, lineIndex }: AssignLineParamsType) {
-    const targetLine = dormitoryData?.floors[floorIndex].lines[lineIndex];
+    const currentDormitory = useDormitoryStore.getState().dormitoryData;
+
+    const targetLine = currentDormitory?.floors[floorIndex].lines[lineIndex];
     const targetLineRooms = targetLine?.rooms as RoomType[];
+    
     let churchPeople = church.people;
+
+    console.log(`${church.churchName} 교회 인원 : ${churchPeople}`);
 
     for (const [roomIndex, room] of targetLineRooms.entries()) {
       const roomRemain = room.remain;

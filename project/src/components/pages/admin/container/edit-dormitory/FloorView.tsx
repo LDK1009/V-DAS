@@ -45,9 +45,7 @@ const FloorView = () => {
                     {room.assignedChurchArray.map((church, churchIndex) => {
                       return (
                         <div key={`${currentFloor}-${lineIndex}-${roomIndex}-${churchIndex}`}>
-                          {churchIndex + 1}
-                          {church.churchName}
-                          {church.people}명
+                          {churchIndex + 1}. | {church.churchName} | {church.people}명
                         </div>
                       );
                     })}
@@ -91,6 +89,6 @@ const PeopleContainer = styled(Stack)`
 `;
 
 const ChurchContainer = styled(Stack)`
-  ${mixinFlex("column", "center", "center")}
+  ${mixinFlex("column", "center", "start")}
   column-gap: 8px;
 `;
