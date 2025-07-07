@@ -13,16 +13,8 @@ function checkLineAssign({ church, line }: CheckLineAssignParamsType): boolean {
     lineRemain += room.remain;
   });
 
-  if ("male" in church) {
-    if (lineRemain < church.male) {
-      return false;
-    }
-  }
-
-  if ("female" in church) {
-    if (lineRemain < church.female) {
-      return false;
-    }
+  if (lineRemain < church.people) {
+    return false;
   }
 
   return true;

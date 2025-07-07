@@ -5,17 +5,17 @@ export const formatExcelData = (data: ChurchObject[]) : FormattedExcelData => {
   .filter(el => el["남자"] > 0)
   .map(el => ({
     churchName: el["단체명"],
-    male: el["남자"],
+    people: el["남자"],
   }))
-  .sort((a, b) => b.male - a.male);
+  .sort((a, b) => b.people - a.people);
 
   const femaleData = data
   .filter(el => el["여자"] > 0)
   .map(el => ({
     churchName: el["단체명"],
-    female: el["여자"],
+    people: el["여자"],
   }))
-  .sort((a, b) => b.female - a.female);
+  .sort((a, b) => b.people - a.people);
 
-  return { maleDataArray: maleData, femaleDataArray: femaleData };
+  return { churchMaleArray: maleData, churchFemaleArray: femaleData };
 };

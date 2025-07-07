@@ -76,15 +76,19 @@ export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
     set(
       produce((state) => {
         const dormitoryData = state.dormitoryData;
+        const targetRoom = dormitoryData?.floors[floorIndex].lines[lineIndex].rooms[roomIndex];
+        const roomRemain = targetRoom.remain - count;
+        const roomCurrent = targetRoom.current + count;
+
+        // 데이터 존재 여부 확인
         if (dormitoryData) {
-          const roomRemain = dormitoryData.floors[floorIndex].lines[lineIndex].rooms[roomIndex].remain - count;
-          const roomCurrent = dormitoryData.floors[floorIndex].lines[lineIndex].rooms[roomIndex].current + count;
+          // 최대 인원 초과 시 배정 불가
           if (roomRemain < 0 || roomCurrent > 7) {
             return;
           } else {
             dormitoryData.floors[floorIndex].lines[lineIndex].rooms[roomIndex].remain = roomRemain;
             dormitoryData.floors[floorIndex].lines[lineIndex].rooms[roomIndex].current = roomCurrent;
-            dormitoryData.floors[floorIndex].lines[lineIndex].rooms[roomIndex].assignedChurchArray.push(church);
+            targetRoom.assignedChurchArray.push({ ...church, people: count });
           }
         }
       })

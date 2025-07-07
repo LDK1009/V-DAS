@@ -16,12 +16,6 @@ export const useAssign = () => {
   };
 
   function assign({ church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) {
-    if ("male" in church) {
-      subtractChurchMale(church.churchName, count);
-    }
-    if ("female" in church) {
-      subtractChurchFemale(church.churchName, count);
-    }
     assignRoom({ church, count, floorIndex, lineIndex, roomIndex });
   }
 

@@ -1,13 +1,13 @@
-import { CurrentChurchMaleArrayType, CurrentChurchFemaleArrayType } from "@/types/currentChurchType";
+import { ChurchArrayType } from "@/types/currentChurchType";
 import { create } from "zustand";
 
 // Zustand 스토어 정의
 
 type CurrentChurchStoreType = {
-  currentChurchMaleArray: CurrentChurchMaleArrayType | null;
-  currentChurchFemaleArray: CurrentChurchFemaleArrayType | null;
-  setCurrentChurchMaleArray: (currentChurchMaleArray: CurrentChurchMaleArrayType | null) => void;
-  setCurrentChurchFemaleArray: (currentChurchFemaleArray: CurrentChurchFemaleArrayType | null) => void;
+  churchMaleArray: ChurchArrayType | null;
+  churchFemaleArray: ChurchArrayType | null;
+  setCurrentChurchMaleArray: (churchMaleArray: ChurchArrayType | null) => void;
+  setCurrentChurchFemaleArray: (churchArray: ChurchArrayType | null) => void;
   initCurrentChurch: () => void;
 
   subtractChurchMale: (churchName: string, count: number) => void;
@@ -15,23 +15,24 @@ type CurrentChurchStoreType = {
 };
 
 export const useCurrentChurchStore = create<CurrentChurchStoreType>()((set) => ({
-  currentChurchMaleArray: null,
-  currentChurchFemaleArray: null,
-  setCurrentChurchMaleArray: (currentChurchMaleArray) => set({ currentChurchMaleArray }),
-  setCurrentChurchFemaleArray: (currentChurchFemaleArray) => set({ currentChurchFemaleArray }),
-  initCurrentChurch: () => set({ currentChurchMaleArray: null, currentChurchFemaleArray: null }),
+  churchMaleArray: null,
+  churchFemaleArray: null,
+  setCurrentChurchMaleArray: (churchMaleArray) => set({ churchMaleArray }),
+  setCurrentChurchFemaleArray: (churchFemaleArray) => set({ churchFemaleArray }),
+  initCurrentChurch: () => set({ churchMaleArray: null, churchFemaleArray: null }),
 
   subtractChurchMale: (churchName, count) => {
     set((state) => ({
-      currentChurchMaleArray: state.currentChurchMaleArray?.map((church) =>
-        church.churchName === churchName ? { ...church, male: church.male - count } : church
+      churchMaleArray: state.churchMaleArray?.map((church) =>
+        church.churchName === churchName ? { ...church, people: church.people - count } : church
       ),
     }));
   },
+
   subtractChurchFemale: (churchName, count) => {
     set((state) => ({
-      currentChurchFemaleArray: state.currentChurchFemaleArray?.map((church) =>
-        church.churchName === churchName ? { ...church, female: church.female - count } : church
+      churchFemaleArray: state.churchFemaleArray?.map((church) =>
+        church.churchName === churchName ? { ...church, people: church.people - count } : church
       ),
     }));
   },
