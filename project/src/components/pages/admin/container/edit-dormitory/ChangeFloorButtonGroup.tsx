@@ -3,7 +3,7 @@ import { Modal, Stack, styled } from "@mui/material";
 import React, { useState } from "react";
 
 const ChangeFloorButtonGroup = () => {
-  const { dormitoryData, currentFloor, setCurrentFloor } = useDormitoryStore();
+  const { dormitoryData, currentFloor, setCurrentFloor, maxFloor } = useDormitoryStore();
 
   const floors = dormitoryData?.floors;
 
@@ -11,7 +11,7 @@ const ChangeFloorButtonGroup = () => {
 
   return (
     <div>
-      {floors?.map((el) => {
+      {floors?.slice(0, maxFloor).map((el) => {
         return (
           <button key={el.floorNumber} onClick={() => setCurrentFloor(el.floorNumber)}>
             {el.floorNumber + 1}

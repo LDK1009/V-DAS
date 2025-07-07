@@ -37,7 +37,7 @@ const initialFloor: FloorType = {
 ////////// 기숙사 초기화
 const initialDormitory: DormitoryType = {
   // floors: Array.from({ length: 9 }, (_, index) => ({
-  floors: Array.from({ length: 2 }, (_, index) => ({
+  floors: Array.from({ length: 9 }, (_, index) => ({
     ...initialFloor,
     floorNumber: index,
   })),

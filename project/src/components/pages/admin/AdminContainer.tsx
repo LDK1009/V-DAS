@@ -5,12 +5,14 @@ import InputSection from "./container/InputSection";
 import EditDormitoryContainer from "./container/edit-dormitory/EditDormitoryContainer";
 import { Grid2, Stack, styled } from "@mui/material";
 import ChurchListContainer from "./container/church-list/ChurchListContainer";
+import EditFloorCount from "./container/edit-dormitory/EditFloorCount";
 
 const AdminContainer = () => {
   return (
     <div>
       <h1>AdminContainer</h1>
       <InputSection />
+      <EditFloorCount/>
       <BodyArea container>
         <Grid2 size={4}>
           <ChurchListContainer />

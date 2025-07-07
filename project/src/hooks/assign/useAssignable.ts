@@ -7,7 +7,7 @@ type CheckLineAssignParamsType = {
   line: LineType;
 };
 
-function checkLineAssign({ church, line }: CheckLineAssignParamsType): boolean {
+function checkLineAssign({ church, line }: CheckLineAssignParamsType): { isAssignable: boolean; lineRemain: number } {
   let lineRemain = 0;
 
   line.rooms.forEach((room) => {
@@ -15,10 +15,10 @@ function checkLineAssign({ church, line }: CheckLineAssignParamsType): boolean {
   });
 
   if (lineRemain < church.people) {
-    return false;
+    return { isAssignable: false, lineRemain: lineRemain };
   }
 
-  return true;
+  return { isAssignable: true, lineRemain: 0 };
 }
 
 type GetAssignableInFloorParamsType = {
@@ -26,21 +26,26 @@ type GetAssignableInFloorParamsType = {
   floorIndex: number;
 };
 
+type LineInfoType = {
+  lineIndex: number;
+  lineRemain: number;
+};
+
 function getAssignableInFloor({ church, floorIndex }: GetAssignableInFloorParamsType) {
   const currentDormitory = useDormitoryStore.getState().dormitoryData;
   const { lines } = currentDormitory?.floors[floorIndex] as FloorType;
 
-  const assignableLineIndexArray: number[] = [];
+  const assignableLineInfoArray: LineInfoType[] = [];
 
   lines.forEach((line, lineIndex) => {
-    const isAssignable = checkLineAssign({ church, line });
+    const { isAssignable, lineRemain } = checkLineAssign({ church, line });
 
     if (isAssignable) {
-      assignableLineIndexArray.push(lineIndex);
+      assignableLineInfoArray.push({ lineIndex: lineIndex, lineRemain: lineRemain });
     }
   });
 
-  return assignableLineIndexArray;
+  return assignableLineInfoArray;
 }
 
 type GetAssignableInDormitoryParamsType = {
@@ -52,13 +57,13 @@ function getAssignableInDormitory({ church }: GetAssignableInDormitoryParamsType
   const currentDormitory = useDormitoryStore.getState().dormitoryData;
 
   const { floors } = currentDormitory as DormitoryType;
-  const assignableFloorIndexArray: { floorIndex: number; lineIndexArray: number[] }[] = [];
+  const assignableFloorIndexArray: { floorIndex: number; lineInfoArray: LineInfoType[] }[] = [];
 
   floors.forEach((_, floorIndex) => {
     const assignableLineIndexArray = getAssignableInFloor({ church, floorIndex });
 
     if (assignableLineIndexArray.length > 0) {
-      assignableFloorIndexArray.push({ floorIndex: floorIndex, lineIndexArray: assignableLineIndexArray });
+      assignableFloorIndexArray.push({ floorIndex: floorIndex, lineInfoArray: assignableLineIndexArray });
     }
   });
 

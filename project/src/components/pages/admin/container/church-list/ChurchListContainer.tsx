@@ -12,7 +12,7 @@ const ChurchListContainer = () => {
   const { excelFile } = useExcelStore();
   const { churchMaleArray, churchFemaleArray, setCurrentChurchMaleArray, setCurrentChurchFemaleArray } =
     useCurrentChurchStore();
-  const { dormitoryData } = useDormitoryStore();
+  const { dormitoryData, maxRoomPeople } = useDormitoryStore();
   const { assignRoom, assignLine } = useAssign();
 
   useEffect(() => {
@@ -76,7 +76,7 @@ const ChurchListContainer = () => {
         church: church,
       });
       const assignFloorIndex = assignableFloorIndexArray[0].floorIndex;
-      const assignLineIndex = assignableFloorIndexArray[0].lineIndexArray[0];
+      const assignLineIndex = assignableFloorIndexArray[0].lineInfoArray[0].lineIndex;
 
       alert(
         `${churchMaleArray[0].churchName} 배정 가능 라인 조회 결과 : \n ${assignFloorIndex}층 ${assignLineIndex}라인`
@@ -99,10 +99,34 @@ const ChurchListContainer = () => {
         // 배정 층
         const assignFloorIndex = assignableFloorIndexArray[0].floorIndex;
         // 배정 라인
-        const assignLineIndex = assignableFloorIndexArray[0].lineIndexArray[0];
+        const assignLineIndex = assignableFloorIndexArray[0].lineInfoArray[0].lineIndex;
+        // 교회 인원
+        const churchPeople = church.people;
 
         console.log("배정 위치 : ", church.churchName, assignFloorIndex, assignLineIndex);
         
+        // 교회 인원이 방 최대 인원보다 작으면 찢어지지 않는 라인에 배정(maxRoomPeople로 나누어 떨어지는 라인)
+        if (maxRoomPeople > churchPeople) {
+          let shouldBreak = false; // 플래그 변수 선언
+          for (const floorInfo of assignableFloorIndexArray) {
+            for (const lineInfo of floorInfo.lineInfoArray) {
+              if (lineInfo.lineRemain % maxRoomPeople === 0) {
+                assignLine({
+                  sex: "male",
+                  church: church,
+                  floorIndex: floorInfo.floorIndex,
+                  lineIndex: lineInfo.lineIndex,
+                });
+                shouldBreak = true; 
+                break; 
+              }
+            }
+            if (shouldBreak) break; // 플래그가 true이면 외부 반복문도 종료
+          }
+
+          continue;
+        }
+
         // 라인배정
         assignLine({
           sex: "male",
