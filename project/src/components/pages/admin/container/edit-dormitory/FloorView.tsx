@@ -33,7 +33,7 @@ const FloorView = () => {
               const roomNumber = startRoomNumber + roomIndex;
 
               return (
-                <RoomContainer key={roomIndex}>
+                <RoomContainer key={`${currentFloor}-${lineIndex}-${roomIndex}`}>
                   <div>{`${currentFloor + 1}${String(roomNumber).padStart(2, "0")}호`}</div>
                   <PeopleContainer>
                     <div>최대 인원 : {room.max}</div>
@@ -42,10 +42,11 @@ const FloorView = () => {
                   </PeopleContainer>
                   <ChurchContainer>
                     <h5>참여 교회</h5>
-                    {room.assignedChurchArray.map((church) => {
+                    {room.assignedChurchArray.map((church, churchIndex) => {
                       return (
-                        <div key={church.name}>
-                          {church.name}
+                        <div key={`${currentFloor}-${lineIndex}-${roomIndex}-${churchIndex}`}>
+                          {churchIndex + 1}
+                          {church.churchName}
                           {church.people}명
                         </div>
                       );
@@ -90,6 +91,6 @@ const PeopleContainer = styled(Stack)`
 `;
 
 const ChurchContainer = styled(Stack)`
-  ${mixinFlex("row", "center", "center")}
+  ${mixinFlex("column", "center", "center")}
   column-gap: 8px;
 `;
