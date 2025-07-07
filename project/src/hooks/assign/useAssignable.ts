@@ -1,3 +1,4 @@
+import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { ChurchType } from "@/types/currentChurchType";
 import { DormitoryType, FloorType, LineType } from "@/types/dormitory";
 
@@ -22,11 +23,13 @@ function checkLineAssign({ church, line }: CheckLineAssignParamsType): boolean {
 
 type GetAssignableInFloorParamsType = {
   church: ChurchType;
-  floor: FloorType;
+  floorIndex: number;
 };
 
-function getAssignableInFloor({ church, floor }: GetAssignableInFloorParamsType) {
-  const { lines } = floor;
+function getAssignableInFloor({ church, floorIndex }: GetAssignableInFloorParamsType) {
+  const currentDormitory = useDormitoryStore.getState().dormitoryData;
+  const { lines } = currentDormitory?.floors[floorIndex] as FloorType;
+
   const assignableLineIndexArray: number[] = [];
 
   lines.forEach((line, lineIndex) => {
@@ -42,15 +45,17 @@ function getAssignableInFloor({ church, floor }: GetAssignableInFloorParamsType)
 
 type GetAssignableInDormitoryParamsType = {
   church: ChurchType;
-  dormitory: DormitoryType;
 };
 
-function getAssignableInDormitory({ church, dormitory }: GetAssignableInDormitoryParamsType) {
-  const { floors } = dormitory;
+function getAssignableInDormitory({ church }: GetAssignableInDormitoryParamsType) {
+  // 실시간 최신 상태 가져오기
+  const currentDormitory = useDormitoryStore.getState().dormitoryData;
+
+  const { floors } = currentDormitory as DormitoryType;
   const assignableFloorIndexArray: { floorIndex: number; lineIndexArray: number[] }[] = [];
 
-  floors.forEach((floor, floorIndex) => {
-    const assignableLineIndexArray = getAssignableInFloor({ church, floor });
+  floors.forEach((_, floorIndex) => {
+    const assignableLineIndexArray = getAssignableInFloor({ church, floorIndex });
 
     if (assignableLineIndexArray.length > 0) {
       assignableFloorIndexArray.push({ floorIndex: floorIndex, lineIndexArray: assignableLineIndexArray });

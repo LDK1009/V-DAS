@@ -42,7 +42,6 @@ const ChurchListContainer = () => {
     if (churchMaleArray && churchFemaleArray && dormitoryData) {
       const assignableFloorIndexArray = getAssignableInDormitory({
         church: churchMaleArray[1],
-        dormitory: dormitoryData,
       });
       console.log(assignableFloorIndexArray);
     }
@@ -58,24 +57,62 @@ const ChurchListContainer = () => {
     if (churchMaleArray && churchFemaleArray && dormitoryData) {
       const assignableFloorIndexArray = getAssignableInDormitory({
         church: churchMaleArray[0],
-        dormitory: dormitoryData,
       });
-      console.log(`${churchMaleArray[0].churchName} 배정 가능 조회 결과 : \n ${JSON.stringify(assignableFloorIndexArray, null, 2)}`);
+      console.log(
+        `${churchMaleArray[0].churchName} 배정 가능 조회 결과 : \n ${JSON.stringify(
+          assignableFloorIndexArray,
+          null,
+          2
+        )}`
+      );
     }
   }
 
-  function testFunc5() {
+  function testFunc5(index: number) {
     if (churchMaleArray && churchFemaleArray && dormitoryData) {
+      const church = churchMaleArray[index];
       // 배정 가능 라인 조회
       const assignableFloorIndexArray = getAssignableInDormitory({
-        church: churchMaleArray[0],
-        dormitory: dormitoryData,
+        church: church,
       });
       const assignFloorIndex = assignableFloorIndexArray[0].floorIndex;
       const assignLineIndex = assignableFloorIndexArray[0].lineIndexArray[0];
 
-      alert(`${churchMaleArray[0].churchName} 배정 가능 라인 조회 결과 : \n ${assignFloorIndex}층 ${assignLineIndex}라인`);
-      assignLine({ sex: "male", church: churchMaleArray[0], floorIndex: assignFloorIndex, lineIndex: assignLineIndex });
+      alert(
+        `${churchMaleArray[0].churchName} 배정 가능 라인 조회 결과 : \n ${assignFloorIndex}층 ${assignLineIndex}라인`
+      );
+      assignLine({ sex: "male", church: church, floorIndex: assignFloorIndex, lineIndex: assignLineIndex });
+    }
+  }
+
+  function testFunc6() {
+    if (churchMaleArray && churchFemaleArray && dormitoryData) {
+      for (const church of churchMaleArray) {
+        console.log("==========", church.churchName, "배정 시작==========");
+        // 배정 가능라인 조회
+        const assignableFloorIndexArray = getAssignableInDormitory({
+          church: church,
+        });
+
+        console.log("배정 가능 배열 조회 결과 : ", assignableFloorIndexArray);
+
+        // 배정 층
+        const assignFloorIndex = assignableFloorIndexArray[0].floorIndex;
+        // 배정 라인
+        const assignLineIndex = assignableFloorIndexArray[0].lineIndexArray[0];
+
+        // 라인배정
+        assignLine({
+          sex: "male",
+          church: church,
+          floorIndex: assignFloorIndex,
+          lineIndex: assignLineIndex,
+        });
+
+        // 콘솔
+        console.log(`배정 위치 : ${church.churchName} ${assignFloorIndex}층 ${assignLineIndex}라인`);
+        console.log("==========", church.churchName, "배정 완료==========");
+      }
     }
   }
 
@@ -86,12 +123,12 @@ const ChurchListContainer = () => {
   return (
     <div>
       <div style={{ display: "flex", gap: "10px" }}>
-
-      <button onClick={testFunc}>배정 가능 여부 확인</button>
-      <button onClick={testFunc2}>배정 가능 층 조회</button>
-      <button onClick={testFunc3}>방 배정</button>
-      <button onClick={testFunc4}>배정 가능 라인 조회</button>
-      <button onClick={testFunc5}>라인 자동 배정</button>
+        <button onClick={testFunc}>배정 가능 여부 확인</button>
+        <button onClick={testFunc2}>배정 가능 층 조회</button>
+        <button onClick={testFunc3}>방 배정</button>
+        <button onClick={testFunc4}>배정 가능 라인 조회</button>
+        <button onClick={() => testFunc5(0)}>라인 자동 배정</button>
+        <button onClick={testFunc6}>전체 교회 자동 배정</button>
       </div>
       <h1>남자</h1>
       <pre>{JSON.stringify(churchMaleArray, null, 2)}</pre>

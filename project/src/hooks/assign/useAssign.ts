@@ -16,6 +16,7 @@ export const useAssign = () => {
     roomIndex: number;
   };
 
+  ////////// 방 배정
   function assignRoom({ sex, church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) {
     if (sex === "male") {
       evacuateChurchMale(church.churchName, count);
@@ -32,6 +33,7 @@ export const useAssign = () => {
     lineIndex: number;
   };
 
+  ////////// 라인 배정
   function assignLine({ sex, church, floorIndex, lineIndex }: AssignLineParamsType) {
     const targetLine = dormitoryData?.floors[floorIndex].lines[lineIndex];
     const targetLineRooms = targetLine?.rooms as RoomType[];
@@ -50,6 +52,8 @@ export const useAssign = () => {
         }
       }
     }
+
+    return dormitoryData;
   }
 
   return { assignRoom, assignLine };
