@@ -88,11 +88,19 @@ const ChurchListContainer = () => {
   function testFunc6() {
     if (churchMaleArray && churchFemaleArray && dormitoryData) {
       for (const church of churchMaleArray) {
-        console.log("==========", church.churchName, "배정 시작==========");
+        console.log("\n\n\n\n==========", `${church.churchName}(${church.people})`, "배정 시작==========");
         // 배정 가능라인 조회
         const assignableFloorIndexArray = getAssignableInDormitory({
           church: church,
         });
+
+        const divisibleAssignableFloorIndexArray = getAssignableInDormitory({
+          church: church,
+          divisible: true,
+        });
+
+        // console.log("assignableFloorIndexArray", assignableFloorIndexArray);
+        // console.log("divisibleAssignableFloorIndexArray", divisibleAssignableFloorIndexArray);
 
         console.log("배정 가능 배열 조회 결과 : ", assignableFloorIndexArray);
 
@@ -103,29 +111,27 @@ const ChurchListContainer = () => {
         // 교회 인원
         const churchPeople = church.people;
 
-        console.log("배정 위치 : ", church.churchName, assignFloorIndex, assignLineIndex);
-        
         // 교회 인원이 방 최대 인원보다 작으면 찢어지지 않는 라인에 배정(maxRoomPeople로 나누어 떨어지는 라인)
         if (maxRoomPeople > churchPeople) {
-          let shouldBreak = false; // 플래그 변수 선언
-          for (const floorInfo of assignableFloorIndexArray) {
-            for (const lineInfo of floorInfo.lineInfoArray) {
-              if (lineInfo.lineRemain % maxRoomPeople === 0) {
-                assignLine({
-                  sex: "male",
-                  church: church,
-                  floorIndex: floorInfo.floorIndex,
-                  lineIndex: lineInfo.lineIndex,
-                });
-                shouldBreak = true; 
-                break; 
-              }
-            }
-            if (shouldBreak) break; // 플래그가 true이면 외부 반복문도 종료
+          if (divisibleAssignableFloorIndexArray.length > 0) {
+            const divisibleAssignFloorIndex = divisibleAssignableFloorIndexArray[0].floorIndex;
+            const divisibleAssignLineIndex = divisibleAssignableFloorIndexArray[0].lineInfoArray[0].lineIndex;
+
+            console.log("배정 위치 : ", church.churchName, divisibleAssignFloorIndex, divisibleAssignLineIndex);
+
+            assignLine({
+              sex: "male",
+              church: church,
+              floorIndex: divisibleAssignFloorIndex,
+              lineIndex: divisibleAssignLineIndex,
+            });
           }
 
+          console.log("==========", church.churchName, "배정 완료(찢어지지 않는 라인)==========");
           continue;
         }
+
+        console.log("배정 위치 : ", church.churchName, assignFloorIndex, assignLineIndex);
 
         // 라인배정
         assignLine({

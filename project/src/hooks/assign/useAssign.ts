@@ -42,8 +42,6 @@ export const useAssign = () => {
     
     let churchPeople = church.people;
 
-    console.log(`${church.churchName} 교회 인원 : ${churchPeople}`);
-
     for (const [roomIndex, room] of targetLineRooms.entries()) {
       const roomRemain = room.remain;
 

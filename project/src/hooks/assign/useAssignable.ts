@@ -18,7 +18,7 @@ function checkLineAssign({ church, line }: CheckLineAssignParamsType): { isAssig
     return { isAssignable: false, lineRemain: lineRemain };
   }
 
-  return { isAssignable: true, lineRemain: 0 };
+  return { isAssignable: true, lineRemain: lineRemain };
 }
 
 type GetAssignableInFloorParamsType = {
@@ -50,14 +50,17 @@ function getAssignableInFloor({ church, floorIndex }: GetAssignableInFloorParams
 
 type GetAssignableInDormitoryParamsType = {
   church: ChurchType;
+  divisible?: boolean;
 };
 
-function getAssignableInDormitory({ church }: GetAssignableInDormitoryParamsType) {
+type AssignableFloorIndexArrayType = { floorIndex: number; lineInfoArray: LineInfoType[] }[];
+function getAssignableInDormitory({ church, divisible = false }: GetAssignableInDormitoryParamsType) {
   // 실시간 최신 상태 가져오기
   const currentDormitory = useDormitoryStore.getState().dormitoryData;
+  const { maxRoomPeople } = useDormitoryStore.getState();
 
   const { floors } = currentDormitory as DormitoryType;
-  const assignableFloorIndexArray: { floorIndex: number; lineInfoArray: LineInfoType[] }[] = [];
+  const assignableFloorIndexArray: AssignableFloorIndexArrayType = [];
 
   floors.forEach((_, floorIndex) => {
     const assignableLineIndexArray = getAssignableInFloor({ church, floorIndex });
@@ -66,6 +69,23 @@ function getAssignableInDormitory({ church }: GetAssignableInDormitoryParamsType
       assignableFloorIndexArray.push({ floorIndex: floorIndex, lineInfoArray: assignableLineIndexArray });
     }
   });
+
+  if (divisible) {
+    const divisibleAssignableFloorIndexArray: AssignableFloorIndexArrayType = assignableFloorIndexArray.map(
+      (floorInfo) => {
+        return {
+          floorIndex: floorInfo.floorIndex,
+          lineInfoArray: floorInfo.lineInfoArray.filter((lineInfo) => {
+            return lineInfo.lineRemain > 0 && lineInfo.lineRemain % maxRoomPeople === 0;
+          }),
+        };
+      }
+    ).filter((floorInfo) => {
+      return floorInfo.lineInfoArray.length > 0;
+    });
+
+    return divisibleAssignableFloorIndexArray;
+  }
 
   return assignableFloorIndexArray;
 }
