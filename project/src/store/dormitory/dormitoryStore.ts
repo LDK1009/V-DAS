@@ -36,7 +36,8 @@ const initialFloor: FloorType = {
 
 ////////// 기숙사 초기화
 const initialDormitory: DormitoryType = {
-  floors: Array.from({ length: 9 }, (_, index) => ({
+  // floors: Array.from({ length: 9 }, (_, index) => ({
+  floors: Array.from({ length: 2 }, (_, index) => ({
     ...initialFloor,
     floorNumber: index,
   })),
@@ -59,6 +60,12 @@ type DormitoryStoreType = {
   // 현재 층 관련
   currentFloor: number;
   setCurrentFloor: (floor: number) => void;
+  // 설정값 관련
+  maxRoomPeople: number;
+  setMaxRoomPeople: (maxRoomPeople: number) => void;
+  maxFloor: number;
+  setMaxFloor: (maxFloor: number) => void;
+
   // 방 인원 빼기 관련
   updateRoomCurrentAndRemain: ({ church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) => void;
 };
@@ -93,6 +100,12 @@ export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
       })
     );
   },
+
+  // 설정값 관련
+  maxRoomPeople: 7,
+  setMaxRoomPeople: (maxRoomPeople: number) => set({ maxRoomPeople }),
+  maxFloor: 9,
+  setMaxFloor: (maxFloor: number) => set({ maxFloor }),
 
   // 현재 보고있는 층
   currentFloor: 0,
