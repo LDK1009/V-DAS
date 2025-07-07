@@ -60,7 +60,7 @@ type DormitoryStoreType = {
   currentFloor: number;
   setCurrentFloor: (floor: number) => void;
   // 방 인원 빼기 관련
-  assignRoom: ({ church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) => void;
+  updateRoomCurrentAndRemain: ({ church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) => void;
 };
 
 export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
@@ -71,8 +71,7 @@ export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
   // 기숙사 데이터 초기화
   initDormitoryData: () => set({ dormitoryData: initialDormitory }),
 
-  // 방 배정
-  assignRoom: ({ church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) => {
+  updateRoomCurrentAndRemain: ({ church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) => {
     set(
       produce((state) => {
         const dormitoryData = state.dormitoryData;

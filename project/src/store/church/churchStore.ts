@@ -10,8 +10,8 @@ type CurrentChurchStoreType = {
   setCurrentChurchFemaleArray: (churchArray: ChurchArrayType | null) => void;
   initCurrentChurch: () => void;
 
-  subtractChurchMale: (churchName: string, count: number) => void;
-  subtractChurchFemale: (churchName: string, count: number) => void;
+  evacuateChurchMale: (churchName: string, count: number) => void;
+  evacuateChurchFemale: (churchName: string, count: number) => void;
 };
 
 export const useCurrentChurchStore = create<CurrentChurchStoreType>()((set) => ({
@@ -21,19 +21,35 @@ export const useCurrentChurchStore = create<CurrentChurchStoreType>()((set) => (
   setCurrentChurchFemaleArray: (churchFemaleArray) => set({ churchFemaleArray }),
   initCurrentChurch: () => set({ churchMaleArray: null, churchFemaleArray: null }),
 
-  subtractChurchMale: (churchName, count) => {
-    set((state) => ({
-      churchMaleArray: state.churchMaleArray?.map((church) =>
+  evacuateChurchMale: (churchName, count) => {
+    set((state) => {
+      const currentChurchMaleCount = state.churchMaleArray?.find((church) => church.churchName === churchName)?.people;
+
+      if (currentChurchMaleCount === 0) return state;
+
+      const newChurchMaleArray = state.churchMaleArray?.map((church) =>
         church.churchName === churchName ? { ...church, people: church.people - count } : church
-      ),
-    }));
+      );
+
+      return {
+        churchMaleArray: newChurchMaleArray,
+      };
+    });
   },
 
-  subtractChurchFemale: (churchName, count) => {
-    set((state) => ({
-      churchFemaleArray: state.churchFemaleArray?.map((church) =>
+  evacuateChurchFemale: (churchName, count) => {
+    set((state) => {
+      const currentChurchFemaleCount = state.churchFemaleArray?.find((church) => church.churchName === churchName)?.people;
+
+      if (currentChurchFemaleCount === 0) return state;
+
+      const newChurchFemaleArray = state.churchFemaleArray?.map((church) =>
         church.churchName === churchName ? { ...church, people: church.people - count } : church
-      ),
-    }));
+      );
+
+      return {
+        churchFemaleArray: newChurchFemaleArray,
+      };
+    });
   },
 }));

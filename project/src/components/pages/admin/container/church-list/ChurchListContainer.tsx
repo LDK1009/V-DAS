@@ -1,4 +1,4 @@
-import { checkLineAssign, getAssignableInDormitory } from "@/hooks/assign/useCheckAssign";
+import { checkLineAssign, getAssignableInDormitory } from "@/hooks/assign/useAssignable";
 import { useAssign } from "@/hooks/assign/useAssign";
 import { useCurrentChurchStore } from "@/store/church/churchStore";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
@@ -13,7 +13,7 @@ const ChurchListContainer = () => {
   const { churchMaleArray, churchFemaleArray, setCurrentChurchMaleArray, setCurrentChurchFemaleArray } =
     useCurrentChurchStore();
   const { dormitoryData } = useDormitoryStore();
-  const { assign } = useAssign();
+  const { assignRoom, assignLine } = useAssign();
 
   useEffect(() => {
     // 파일 형식 변환
@@ -50,7 +50,32 @@ const ChurchListContainer = () => {
 
   function testFunc3() {
     if (churchMaleArray && churchFemaleArray && dormitoryData) {
-      assign({ church: churchMaleArray[0], count: 1, floorIndex: 0, lineIndex: 0, roomIndex: 0 });
+      assignRoom({ sex: "male", church: churchMaleArray[0], count: 1, floorIndex: 0, lineIndex: 0, roomIndex: 0 });
+    }
+  }
+
+  function testFunc4() {
+    if (churchMaleArray && churchFemaleArray && dormitoryData) {
+      const assignableFloorIndexArray = getAssignableInDormitory({
+        church: churchMaleArray[0],
+        dormitory: dormitoryData,
+      });
+      console.log(`${churchMaleArray[0].churchName} 배정 가능 조회 결과 : \n ${JSON.stringify(assignableFloorIndexArray, null, 2)}`);
+    }
+  }
+
+  function testFunc5() {
+    if (churchMaleArray && churchFemaleArray && dormitoryData) {
+      // 배정 가능 라인 조회
+      const assignableFloorIndexArray = getAssignableInDormitory({
+        church: churchMaleArray[0],
+        dormitory: dormitoryData,
+      });
+      const assignFloorIndex = assignableFloorIndexArray[0].floorIndex;
+      const assignLineIndex = assignableFloorIndexArray[0].lineIndexArray[0];
+
+      alert(`${churchMaleArray[0].churchName} 배정 가능 라인 조회 결과 : \n ${assignFloorIndex}층 ${assignLineIndex}라인`);
+      assignLine({ sex: "male", church: churchMaleArray[0], floorIndex: assignFloorIndex, lineIndex: assignLineIndex });
     }
   }
 
@@ -60,9 +85,14 @@ const ChurchListContainer = () => {
 
   return (
     <div>
-      <button onClick={testFunc}>테스트</button>
-      <button onClick={testFunc2}>테스트2</button>
-      <button onClick={testFunc3}>테스트3</button>
+      <div style={{ display: "flex", gap: "10px" }}>
+
+      <button onClick={testFunc}>배정 가능 여부 확인</button>
+      <button onClick={testFunc2}>배정 가능 층 조회</button>
+      <button onClick={testFunc3}>방 배정</button>
+      <button onClick={testFunc4}>배정 가능 라인 조회</button>
+      <button onClick={testFunc5}>라인 자동 배정</button>
+      </div>
       <h1>남자</h1>
       <pre>{JSON.stringify(churchMaleArray, null, 2)}</pre>
       <h1>여자</h1>

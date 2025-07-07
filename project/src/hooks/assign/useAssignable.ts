@@ -47,13 +47,13 @@ type GetAssignableInDormitoryParamsType = {
 
 function getAssignableInDormitory({ church, dormitory }: GetAssignableInDormitoryParamsType) {
   const { floors } = dormitory;
-  const assignableFloorIndexArray: { index: number; lineIndexArray: number[] }[] = [];
+  const assignableFloorIndexArray: { floorIndex: number; lineIndexArray: number[] }[] = [];
 
   floors.forEach((floor, floorIndex) => {
     const assignableLineIndexArray = getAssignableInFloor({ church, floor });
 
     if (assignableLineIndexArray.length > 0) {
-      assignableFloorIndexArray.push({ index: floorIndex, lineIndexArray: assignableLineIndexArray });
+      assignableFloorIndexArray.push({ floorIndex: floorIndex, lineIndexArray: assignableLineIndexArray });
     }
   });
 
