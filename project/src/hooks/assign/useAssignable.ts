@@ -99,19 +99,24 @@ function getAssignableInDormitory({ church }: GetAssignableInDormitoryParamsType
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////// 기숙사 내 모든 배정 가능 중 나머지가 남지 않는 라인 조회
-function getAssignableNoTailLine({ church }: GetAssignableInDormitoryParamsType) {
+type GetAssignableFloorsWithNoTailLineParamsType = {
+  church: ChurchType;
+};
+
+function getAssignableFloorsWithNoTailLine({ church }: GetAssignableFloorsWithNoTailLineParamsType) {
   const assignableFloors = getAssignableInDormitory({ church }) as AssignableFloorIndexArrayType;
   const { maxRoomPeople } = useDormitoryStore.getState();
   const churchPeople = church.people;
   const churchRemain = churchPeople % maxRoomPeople;
 
-  const assignableNoTailFloors = assignableFloors
+  const assignableFloorsWithNoTailLine = assignableFloors
     .map((floorInfo) => {
       const lineInfos = floorInfo.lineInfoArray;
       const newLineInfos = lineInfos.filter((lineInfo) => {
         const { lineRemain } = lineInfo;
-        const isCombination = lineRemain % maxRoomPeople === churchRemain;
-        const isLineNoTail = lineRemain % maxRoomPeople === 0;
+        const lineRemainMod = lineRemain % maxRoomPeople;
+        const isCombination = lineRemainMod === churchRemain;
+        const isLineNoTail = lineRemainMod === 0;
 
         return isLineNoTail || isCombination;
       });
@@ -125,7 +130,43 @@ function getAssignableNoTailLine({ church }: GetAssignableInDormitoryParamsType)
       return floorInfo.lineInfoArray.length > 0;
     });
 
-  return assignableNoTailFloors;
+  return assignableFloorsWithNoTailLine;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////// 기숙사 내 모든 배정 가능 중 나머지가 남지 않는 라인 조회
+
+type GetAssignableFloorsByCombinationDifferenceParamsType = {
+  church: ChurchType;
+  difference: number;
+};
+
+function getAssignableFloorsByCombinationDifference({ church, difference }: GetAssignableFloorsByCombinationDifferenceParamsType) {
+  const assignableFloors = getAssignableInDormitory({ church }) as AssignableFloorIndexArrayType;
+  const { maxRoomPeople } = useDormitoryStore.getState();
+  const churchPeople = church.people;
+  const churchRemain = churchPeople % maxRoomPeople;
+
+  const assignableFloorsByCombinationDifference = assignableFloors
+    .map((floorInfo) => {
+      const lineInfos = floorInfo.lineInfoArray;
+      const newLineInfos = lineInfos.filter((lineInfo) => {
+        const { lineRemain } = lineInfo;
+        const lineRemainMod = lineRemain % maxRoomPeople;
+        const combinationDifference = maxRoomPeople - (lineRemainMod + churchRemain);
+
+        return combinationDifference === difference;
+      });
+
+      return {
+        floorIndex: floorInfo.floorIndex,
+        lineInfoArray: newLineInfos,
+      };
+    })
+    .filter((floorInfo) => {
+      return floorInfo.lineInfoArray.length > 0;
+    });
+
+  return assignableFloorsByCombinationDifference;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////// 추천 배정 위치 조회
@@ -343,7 +384,8 @@ export {
   checkLineAssign,
   getAssignableInFloor,
   getAssignableInDormitory,
-  getAssignableNoTailLine,
+  getAssignableFloorsWithNoTailLine,
+  getAssignableFloorsByCombinationDifference,
   getRecommendedAssignmentPoint,
   getFitAssignPoint,
 };
