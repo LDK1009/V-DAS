@@ -1,4 +1,4 @@
-import { checkLineAssign, getAssignableInDormitory } from "@/hooks/assign/useAssignable";
+import { checkLineAssign, getAssignableInDormitory, getRecommendedAssignmentPoint } from "@/hooks/assign/useAssignable";
 import { useAssign } from "@/hooks/assign/useAssign";
 import { useCurrentChurchStore } from "@/store/church/churchStore";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
@@ -89,6 +89,9 @@ const ChurchListContainer = () => {
     if (churchMaleArray && churchFemaleArray && dormitoryData) {
       for (const church of churchMaleArray) {
         console.log("\n\n\n\n==========", `${church.churchName}(${church.people})`, "배정 시작==========");
+
+        const churchPeople = church.people;
+
         // 배정 가능라인 조회
         const assignableFloorIndexArray = getAssignableInDormitory({
           church: church,
@@ -104,45 +107,57 @@ const ChurchListContainer = () => {
 
         console.log("배정 가능 배열 조회 결과 : ", assignableFloorIndexArray);
 
-        // 배정 층
-        const assignFloorIndex = assignableFloorIndexArray[0].floorIndex;
-        // 배정 라인
-        const assignLineIndex = assignableFloorIndexArray[0].lineInfoArray[0].lineIndex;
-        // 교회 인원
-        const churchPeople = church.people;
+        // /////////////////////////////////////////////////////////
 
-        // 교회 인원이 방 최대 인원보다 작으면 찢어지지 않는 라인에 배정(maxRoomPeople로 나누어 떨어지는 라인)
-        if (maxRoomPeople > churchPeople) {
-          if (divisibleAssignableFloorIndexArray.length > 0) {
-            const divisibleAssignFloorIndex = divisibleAssignableFloorIndexArray[0].floorIndex;
-            const divisibleAssignLineIndex = divisibleAssignableFloorIndexArray[0].lineInfoArray[0].lineIndex;
+        // 추천 배정 지점
+        const recommendedAssignmentPoint = getRecommendedAssignmentPoint({ church });
 
-            console.log("배정 위치 : ", church.churchName, divisibleAssignFloorIndex, divisibleAssignLineIndex);
-
-            assignLine({
-              sex: "male",
-              church: church,
-              floorIndex: divisibleAssignFloorIndex,
-              lineIndex: divisibleAssignLineIndex,
-            });
-          }
-
-          console.log("==========", church.churchName, "배정 완료(찢어지지 않는 라인)==========");
-          continue;
-        }
-
-        console.log("배정 위치 : ", church.churchName, assignFloorIndex, assignLineIndex);
-
-        // 라인배정
         assignLine({
           sex: "male",
           church: church,
-          floorIndex: assignFloorIndex,
-          lineIndex: assignLineIndex,
+          floorIndex: recommendedAssignmentPoint.floorIndex,
+          lineIndex: recommendedAssignmentPoint.lineIndex,
         });
 
+        // /////////////////////////////////////////////////////////
+        // 배정 층
+        // const assignFloorIndex = assignableFloorIndexArray[0].floorIndex;
+        // 배정 라인
+        // const assignLineIndex = assignableFloorIndexArray[0].lineInfoArray[0].lineIndex;
+        // 교회 인원
+
+        // 교회 인원이 방 최대 인원보다 작으면 찢어지지 않는 라인에 배정(maxRoomPeople로 나누어 떨어지는 라인)
+        // if (maxRoomPeople > churchPeople) {
+        //   if (divisibleAssignableFloorIndexArray.length > 0) {
+        //     const divisibleAssignFloorIndex = divisibleAssignableFloorIndexArray[0].floorIndex;
+        //     const divisibleAssignLineIndex = divisibleAssignableFloorIndexArray[0].lineInfoArray[0].lineIndex;
+
+        //     console.log("배정 위치 : ", church.churchName, divisibleAssignFloorIndex, divisibleAssignLineIndex);
+
+        //     assignLine({
+        //       sex: "male",
+        //       church: church,
+        //       floorIndex: divisibleAssignFloorIndex,
+        //       lineIndex: divisibleAssignLineIndex,
+        //     });
+        //   }
+
+        //   console.log("==========", church.churchName, "배정 완료(찢어지지 않는 라인)==========");
+        //   continue;
+        // }
+
+        // 라인배정
+        // assignLine({
+        //   sex: "male",
+        //   church: church,
+        //   floorIndex: assignFloorIndex,
+        //   lineIndex: assignLineIndex,
+        // });
+
         // 콘솔
-        console.log(`배정 위치 : ${church.churchName} ${assignFloorIndex}층 ${assignLineIndex}라인`);
+        console.log(
+          `${church.churchName} 배정 위치 : ${recommendedAssignmentPoint.floorIndex}층 ${recommendedAssignmentPoint.lineIndex}라인`
+        );
         console.log("==========", church.churchName, "배정 완료==========");
       }
     }

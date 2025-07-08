@@ -54,6 +54,7 @@ type GetAssignableInDormitoryParamsType = {
 };
 
 type AssignableFloorIndexArrayType = { floorIndex: number; lineInfoArray: LineInfoType[] }[];
+
 function getAssignableInDormitory({ church, divisible = false }: GetAssignableInDormitoryParamsType) {
   // 실시간 최신 상태 가져오기
   const currentDormitory = useDormitoryStore.getState().dormitoryData;
@@ -71,18 +72,18 @@ function getAssignableInDormitory({ church, divisible = false }: GetAssignableIn
   });
 
   if (divisible) {
-    const divisibleAssignableFloorIndexArray: AssignableFloorIndexArrayType = assignableFloorIndexArray.map(
-      (floorInfo) => {
+    const divisibleAssignableFloorIndexArray: AssignableFloorIndexArrayType = assignableFloorIndexArray
+      .map((floorInfo) => {
         return {
           floorIndex: floorInfo.floorIndex,
           lineInfoArray: floorInfo.lineInfoArray.filter((lineInfo) => {
             return lineInfo.lineRemain > 0 && lineInfo.lineRemain % maxRoomPeople === 0;
           }),
         };
-      }
-    ).filter((floorInfo) => {
-      return floorInfo.lineInfoArray.length > 0;
-    });
+      })
+      .filter((floorInfo) => {
+        return floorInfo.lineInfoArray.length > 0;
+      });
 
     return divisibleAssignableFloorIndexArray;
   }
@@ -90,4 +91,20 @@ function getAssignableInDormitory({ church, divisible = false }: GetAssignableIn
   return assignableFloorIndexArray;
 }
 
-export { checkLineAssign, getAssignableInFloor, getAssignableInDormitory };
+type GetRecommendedAssignmentPointParamsType = {
+  church: ChurchType;
+};
+
+function getRecommendedAssignmentPoint({ church }: GetRecommendedAssignmentPointParamsType) {
+  const assignableFloorIndexArray = getAssignableInDormitory({ church });
+
+  // 추천 배정 위치(저층의 마지막 라인)
+  const recommendedAssignmentPoint = {
+    floorIndex: assignableFloorIndexArray[0].floorIndex,
+    lineIndex: assignableFloorIndexArray[0].lineInfoArray.slice(-1)[0].lineIndex,
+  };
+
+  return recommendedAssignmentPoint;
+}
+
+export { checkLineAssign, getAssignableInFloor, getAssignableInDormitory, getRecommendedAssignmentPoint };
