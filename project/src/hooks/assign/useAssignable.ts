@@ -133,14 +133,17 @@ function getAssignableFloorsWithNoTailLine({ church }: GetAssignableFloorsWithNo
   return assignableFloorsWithNoTailLine;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////// 기숙사 내 모든 배정 가능 중 나머지가 남지 않는 라인 조회
+//////////////////////////////////////////////////////////////////////////////////////////////////// 기숙사 내 모든 배정 가능 중 조합의 차이값에 따른 라인 조회
 
 type GetAssignableFloorsByCombinationDifferenceParamsType = {
   church: ChurchType;
   difference: number;
 };
 
-function getAssignableFloorsByCombinationDifference({ church, difference }: GetAssignableFloorsByCombinationDifferenceParamsType) {
+function getAssignableFloorsByCombinationDifference({
+  church,
+  difference,
+}: GetAssignableFloorsByCombinationDifferenceParamsType) {
   const assignableFloors = getAssignableInDormitory({ church }) as AssignableFloorIndexArrayType;
   const { maxRoomPeople } = useDormitoryStore.getState();
   const churchPeople = church.people;
@@ -167,6 +170,45 @@ function getAssignableFloorsByCombinationDifference({ church, difference }: GetA
     });
 
   return assignableFloorsByCombinationDifference;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////// 기숙사 내 모든 배정 가능 중 조합의 차이값에 따른 라인 조회
+
+function separateAssignFloorsToFiveLinesAndOthers( assignableFloors : AssignableFloorIndexArrayType) {
+  const fiveLines = assignableFloors.map((floorInfo) => {
+    const { floorIndex, lineInfoArray } = floorInfo;
+    const lineFives = lineInfoArray.filter((lineInfo) => {
+      const { lineIndex } = lineInfo;
+      return lineIndex === 4;
+    });
+
+    return {
+      floorIndex: floorIndex,
+      lineInfoArray: lineFives,
+    };
+  }).filter((floorInfo) => {
+    return floorInfo.lineInfoArray.length > 0;
+  });
+
+  const otherLines = assignableFloors.map((floorInfo) => {
+    const { floorIndex, lineInfoArray } = floorInfo;
+    const lineFives = lineInfoArray.filter((lineInfo) => {
+      const { lineIndex } = lineInfo;
+      return lineIndex !== 4;
+    });
+
+    return {
+      floorIndex: floorIndex,
+      lineInfoArray: lineFives,
+    };
+  }).filter((floorInfo) => {
+    return floorInfo.lineInfoArray.length > 0;
+  });
+
+  return {
+    fiveLines: fiveLines.length === 0 ? null : fiveLines,
+    otherLines: otherLines.length === 0 ? null : otherLines,
+  };
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////// 추천 배정 위치 조회
@@ -379,13 +421,14 @@ function getFitAssignPoint({ church }: GetFitAssignPointParamsType) {
   return null;
 }
 
-export {
+export {  
   getLineRemain,
   checkLineAssign,
   getAssignableInFloor,
   getAssignableInDormitory,
   getAssignableFloorsWithNoTailLine,
   getAssignableFloorsByCombinationDifference,
+  separateAssignFloorsToFiveLinesAndOthers,
   getRecommendedAssignmentPoint,
   getFitAssignPoint,
 };

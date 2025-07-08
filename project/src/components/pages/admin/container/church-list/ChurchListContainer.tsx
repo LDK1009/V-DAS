@@ -5,6 +5,7 @@ import {
   getFitAssignPoint,
   getRecommendedAssignmentPoint,
   getAssignableFloorsByCombinationDifference,
+  separateAssignFloorsToFiveLinesAndOthers,
 } from "@/hooks/assign/useAssignable";
 import { useAssign } from "@/hooks/assign/useAssign";
 import { useCurrentChurchStore } from "@/store/church/churchStore";
@@ -104,12 +105,20 @@ const ChurchListContainer = () => {
           church: church,
         });
 
-        // const assignableFloorsWithNoTailLine = getAssignableFloorsWithNoTailLine({ church });
-        const assignableFloorsWithNoTailLine1 = getAssignableFloorsByCombinationDifference({ church, difference: 2 });
-        const assignableFloorsWithNoTailLine2 = getAssignableFloorsByCombinationDifference({ church, difference: 1 });
 
-        console.log(`${church.churchName} 차이가 1인 라인 \n ${JSON.stringify(assignableFloorsWithNoTailLine1, null, 2)}`);
-        console.log(`${church.churchName} 차이가 2인 라인 \n ${JSON.stringify(assignableFloorsWithNoTailLine2, null, 2)}`);
+        const assignableFloorsWithNoTailLine = getAssignableFloorsWithNoTailLine({ church });
+
+        const { fiveLines, otherLines } = separateAssignFloorsToFiveLinesAndOthers(assignableFloorsWithNoTailLine);
+
+        console.log("assignableFloorsWithNoTailLine", assignableFloorsWithNoTailLine);
+        console.log("fiveLines", fiveLines);
+        console.log("otherLines", otherLines);
+
+        // const assignableFloorsWithNoTailLine1 = getAssignableFloorsByCombinationDifference({ church, difference: 2 });
+        // const assignableFloorsWithNoTailLine2 = getAssignableFloorsByCombinationDifference({ church, difference: 1 });
+
+        // console.log(`${church.churchName} 차이가 1인 라인 \n ${JSON.stringify(assignableFloorsWithNoTailLine1, null, 2)}`);
+        // console.log(`${church.churchName} 차이가 2인 라인 \n ${JSON.stringify(assignableFloorsWithNoTailLine2, null, 2)}`);
 
         // console.log(`${church.churchName} 배정 가능 라인 \n ${JSON.stringify(assignableFloorsWithNoTailLine, null, 2)}`);
 
