@@ -71,12 +71,11 @@ function getAssignableInFloor({ church, floorIndex }: GetAssignableInFloorParams
 
 type GetAssignableInDormitoryParamsType = {
   church: ChurchType;
-  divisible?: boolean;
 };
 
 type AssignableFloorIndexArrayType = { floorIndex: number; lineInfoArray: LineInfoType[] }[];
 
-function getAssignableInDormitory({ church, divisible = false }: GetAssignableInDormitoryParamsType) {
+function getAssignableInDormitory({ church }: GetAssignableInDormitoryParamsType) {
   // 실시간 최신 상태 가져오기
   const currentDormitory = useDormitoryStore.getState().dormitoryData;
   const { maxRoomPeople } = useDormitoryStore.getState();
@@ -96,24 +95,37 @@ function getAssignableInDormitory({ church, divisible = false }: GetAssignableIn
     return null;
   }
 
-  if (divisible) {
-    const divisibleAssignableFloorIndexArray: AssignableFloorIndexArrayType = assignableFloorIndexArray
-      .map((floorInfo) => {
-        return {
-          floorIndex: floorInfo.floorIndex,
-          lineInfoArray: floorInfo.lineInfoArray.filter((lineInfo) => {
-            return lineInfo.lineRemain > 0 && lineInfo.lineRemain % maxRoomPeople === 0;
-          }),
-        };
-      })
-      .filter((floorInfo) => {
-        return floorInfo.lineInfoArray.length > 0;
+  return assignableFloorIndexArray;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////// 기숙사 내 모든 배정 가능 중 나머지가 남지 않는 라인 조회
+function getAssignableNoTailLine({ church }: GetAssignableInDormitoryParamsType) {
+  const assignableFloors = getAssignableInDormitory({ church }) as AssignableFloorIndexArrayType;
+  const { maxRoomPeople } = useDormitoryStore.getState();
+  const churchPeople = church.people;
+  const churchRemain = churchPeople % maxRoomPeople;
+
+  const assignableNoTailFloors = assignableFloors
+    .map((floorInfo) => {
+      const lineInfos = floorInfo.lineInfoArray;
+      const newLineInfos = lineInfos.filter((lineInfo) => {
+        const { lineRemain } = lineInfo;
+        const isCombination = lineRemain % maxRoomPeople === churchRemain;
+        const isLineNoTail = lineRemain % maxRoomPeople === 0;
+
+        return isLineNoTail || isCombination;
       });
 
-    return divisibleAssignableFloorIndexArray;
-  }
+      return {
+        floorIndex: floorInfo.floorIndex,
+        lineInfoArray: newLineInfos,
+      };
+    })
+    .filter((floorInfo) => {
+      return floorInfo.lineInfoArray.length > 0;
+    });
 
-  return assignableFloorIndexArray;
+  return assignableNoTailFloors;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////// 추천 배정 위치 조회
@@ -331,6 +343,7 @@ export {
   checkLineAssign,
   getAssignableInFloor,
   getAssignableInDormitory,
+  getAssignableNoTailLine,
   getRecommendedAssignmentPoint,
   getFitAssignPoint,
 };

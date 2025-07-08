@@ -1,6 +1,7 @@
 import {
   checkLineAssign,
   getAssignableInDormitory,
+  getAssignableNoTailLine,
   getFitAssignPoint,
   getRecommendedAssignmentPoint,
 } from "@/hooks/assign/useAssignable";
@@ -101,6 +102,10 @@ const ChurchListContainer = () => {
         const assignableFloorIndexArray = getAssignableInDormitory({
           church: church,
         });
+
+        const assignableNoTailLine = getAssignableNoTailLine({ church });
+
+        console.log(`${church.churchName} 배정 가능 라인 \n ${JSON.stringify(assignableNoTailLine, null, 2)}`);
 
         // const divisibleAssignableFloorIndexArray = getAssignableInDormitory({
         //   church: church,
