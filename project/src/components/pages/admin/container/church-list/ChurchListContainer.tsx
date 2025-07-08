@@ -1,4 +1,9 @@
-import { checkLineAssign, getAssignableInDormitory, getRecommendedAssignmentPoint } from "@/hooks/assign/useAssignable";
+import {
+  checkLineAssign,
+  getAssignableInDormitory,
+  getFitAssignPoint,
+  getRecommendedAssignmentPoint,
+} from "@/hooks/assign/useAssignable";
 import { useAssign } from "@/hooks/assign/useAssign";
 import { useCurrentChurchStore } from "@/store/church/churchStore";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
@@ -13,7 +18,7 @@ const ChurchListContainer = () => {
   const { churchMaleArray, churchFemaleArray, setCurrentChurchMaleArray, setCurrentChurchFemaleArray } =
     useCurrentChurchStore();
   const { dormitoryData, maxRoomPeople } = useDormitoryStore();
-  const { assignRoom, assignLine } = useAssign();
+  const { assignRoom, assignLine, assignLineStartFromNextRoom } = useAssign();
 
   useEffect(() => {
     // 파일 형식 변환
@@ -97,20 +102,61 @@ const ChurchListContainer = () => {
           church: church,
         });
 
-        const divisibleAssignableFloorIndexArray = getAssignableInDormitory({
-          church: church,
-          divisible: true,
-        });
+        // const divisibleAssignableFloorIndexArray = getAssignableInDormitory({
+        //   church: church,
+        //   divisible: true,
+        // });
 
         // console.log("assignableFloorIndexArray", assignableFloorIndexArray);
         // console.log("divisibleAssignableFloorIndexArray", divisibleAssignableFloorIndexArray);
 
-        console.log("배정 가능 배열 조회 결과 : ", assignableFloorIndexArray);
-
         // /////////////////////////////////////////////////////////
+
+        // 인원이 7미만이면 핏한 방 배정
+        if (churchPeople < maxRoomPeople) {
+          console.log("핏한 방 배정 시작");
+          const fitAssignPoint = getFitAssignPoint({ church });
+          const { assignType, floorIndex, lineIndex } = fitAssignPoint;
+
+          if(assignType === "sequence") {
+            assignLine({
+              sex: "male",
+              church: church,
+              floorIndex,
+              lineIndex,
+            });
+            continue;
+          }
+          
+          if(assignType === "next") {
+            assignLineStartFromNextRoom({
+              sex: "male",
+              church: church,
+              floorIndex,
+              lineIndex,
+            });
+            continue;
+          }
+
+
+
+          console.log(
+            `핏한 방 배정 성공 ${church.churchName}${fitAssignPoint.floorIndex}층 ${fitAssignPoint.lineIndex}라인`
+          );
+
+          console.log("핏한 방 배정 완료");
+          continue;
+        }
+
+        console.log("추천 배정 시작");
 
         // 추천 배정 지점
         const recommendedAssignmentPoint = getRecommendedAssignmentPoint({ church });
+
+        if (!recommendedAssignmentPoint) {
+          console.log("추천 배정 실패");
+          continue;
+        }
 
         assignLine({
           sex: "male",
@@ -118,6 +164,12 @@ const ChurchListContainer = () => {
           floorIndex: recommendedAssignmentPoint.floorIndex,
           lineIndex: recommendedAssignmentPoint.lineIndex,
         });
+
+        console.log(
+          `추천 배정 성공 ${church.churchName} ${recommendedAssignmentPoint.floorIndex}층 ${recommendedAssignmentPoint.lineIndex}라인`
+        );
+        console.log("추천 배정 완료");
+        continue;
 
         // /////////////////////////////////////////////////////////
         // 배정 층
