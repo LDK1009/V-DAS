@@ -27,6 +27,39 @@ function getAssignableRoomWithRemain(remain: number) {
   return null;
 }
 
+//////////////////// 마지막으로 배정된 방 인덱스 조회
+function getLastAssignedRoomIndex(floorIndex: number, lineIndex: number) {
+  const { dormitoryData } = useDormitoryStore.getState();
+  const { lines } = dormitoryData?.floors[floorIndex] as FloorType;
+  const { rooms } = lines[lineIndex];
+
+  for (const [roomIndex, room] of [...rooms].reverse().entries()) {
+    if (room.current > 0) {
+      return rooms.length - 1 - roomIndex;
+    }
+  }
+
+  return 0;
+}
+
+//////////////////// 마지막으로 배정된 방 이후의 남은 인원 조회
+function getLastAssignedRoomRemainAfter(floorIndex: number, lineIndex: number) {
+  const { dormitoryData } = useDormitoryStore.getState();
+  const { lines } = dormitoryData?.floors[floorIndex] as FloorType;
+  const { rooms } = lines[lineIndex];
+  const startRoomIndex = getLastAssignedRoomIndex(floorIndex, lineIndex);
+
+  let remain = 0;
+
+  for (const [roomIndex, room] of rooms.entries()) {
+    if (roomIndex >= startRoomIndex) {
+      remain += room.remain;
+    }
+  }
+
+  return remain;
+}
+
 //////////////////// 마지막 배정된 방 남은 인원 조회
 type GetLastAssignedRoomRemainParamsType = {
   floorIndex: number;
@@ -34,26 +67,12 @@ type GetLastAssignedRoomRemainParamsType = {
 };
 
 function getLastAssignedRoomRemain({ floorIndex, lineIndex }: GetLastAssignedRoomRemainParamsType) {
+  const lastAssignedRoomIndex = getLastAssignedRoomIndex(floorIndex, lineIndex);
   const { dormitoryData } = useDormitoryStore.getState();
-  const { maxRoomPeople } = useDormitoryStore.getState();
-  const line = dormitoryData?.floors[floorIndex].lines[lineIndex] as LineType;
-  const reverseRooms = [...line.rooms].reverse();
+  const lastAssignedRoom = dormitoryData?.floors[floorIndex].lines[lineIndex].rooms[lastAssignedRoomIndex];
+  const lastAssignedRoomRemain = lastAssignedRoom?.remain;
 
-  // 마지막 방부터 인원이 배정된 방이 있는지 확인 후 남은 인원 반환
-  for (const [index, room] of reverseRooms.entries()) {
-    const { current, remain } = room;
-    // 해당 방에 배정된 인원이 0보다 크다면
-    if (current > 0) {
-      // 해당 방에 배정된 인원이 최대 인원과 같다면
-      if (current === maxRoomPeople) {
-        return index + 1 < line.rooms.length ? line.rooms[index + 1].remain : 0;
-      }
-
-      return remain;
-    }
-  }
-
-  return 0;
+  return lastAssignedRoomRemain;
 }
 
 //////////////////// 라인 잔여 인원 조회
@@ -146,17 +165,19 @@ function getAssignableFloorsByCombinationDifference({
   difference,
 }: GetAssignableFloorsByCombinationDifferenceParamsType) {
   const assignableFloors = getAssignableInDormitory({ church }) as AssignableFloorIndexArrayType;
+
+  console.log("전체 배정 가능 라인", assignableFloors);
   const { maxRoomPeople } = useDormitoryStore.getState();
   const churchPeople = church.people;
-  const churchRemain = churchPeople % maxRoomPeople;
+  const churchMod = churchPeople % maxRoomPeople;
 
   const assignableFloorsByCombinationDifference = assignableFloors
     .map((floorInfo) => {
       const lineInfos = floorInfo.lineInfoArray;
       const newLineInfos = lineInfos.filter((lineInfo) => {
         const { lineRemain } = lineInfo;
-        const lineRemainMod = lineRemain % maxRoomPeople;
-        const combinationDifference = maxRoomPeople - (lineRemainMod + churchRemain);
+        const lineMod = lineRemain % maxRoomPeople;
+        const combinationDifference = lineMod - churchMod;
 
         return combinationDifference === difference;
       });
@@ -170,12 +191,19 @@ function getAssignableFloorsByCombinationDifference({
       return floorInfo.lineInfoArray.length > 0;
     });
 
-  return assignableFloorsByCombinationDifference;
+  return assignableFloorsByCombinationDifference.length > 0 ? assignableFloorsByCombinationDifference : null;
 }
 
 //////////////////// 조회값을 5라인과 나머지로 분리
 
 function separateAssignFloorsToFiveLinesAndOthers(assignableFloors: AssignableFloorIndexArrayType) {
+  if (!assignableFloors || assignableFloors.length === 0) {
+    return {
+      fiveLines: null,
+      otherLines: null,
+    };
+  }
+
   const fiveLines = assignableFloors
     .map((floorInfo) => {
       const { floorIndex, lineInfoArray } = floorInfo;
@@ -268,7 +296,7 @@ function getAssignablePointByCombinationDifference({
   difference,
 }: GetAssignablePointByCombinationDifferenceParamsType) {
   const assignableData = getAssignableFloorsByCombinationDifference({ church, difference });
-  const seperatedData = separateAssignFloorsToFiveLinesAndOthers(assignableData);
+  const seperatedData = separateAssignFloorsToFiveLinesAndOthers(assignableData as AssignableFloorIndexArrayType);
   const assignPoint = getAssignPoint(seperatedData);
 
   if (assignPoint) {
@@ -336,21 +364,33 @@ function getPartnerChurch({ sex, floorIndex, lineIndex }: GetPartnerChurchParams
 
 type CheckLineAssignParamsType = {
   church: ChurchType;
-  line: LineType;
+  floorIndex: number;
+  lineIndex: number;
 };
 
-function checkLineAssign({ church, line }: CheckLineAssignParamsType): { isAssignable: boolean; lineRemain: number } {
-  let lineRemain = 0;
+function checkLineAssign({ church, floorIndex, lineIndex }: CheckLineAssignParamsType): { isAssignable: boolean; lineRemain: number } {
+  const churchPeople = church.people;
+  const lastAssignedRoomRemainAfter = getLastAssignedRoomRemainAfter(floorIndex, lineIndex);
 
-  line.rooms.forEach((room) => {
-    lineRemain += room.remain;
-  });
-
-  if (lineRemain < church.people) {
-    return { isAssignable: false, lineRemain: lineRemain };
+  if(churchPeople > lastAssignedRoomRemainAfter){
+    return { isAssignable: false, lineRemain: lastAssignedRoomRemainAfter };
   }
 
-  return { isAssignable: true, lineRemain: lineRemain };
+  return { isAssignable: true, lineRemain: lastAssignedRoomRemainAfter };
+
+
+  /////////////////////////////////////
+  // let lineRemain = 0;
+
+  // line.rooms.forEach((room) => {
+  //   lineRemain += room.remain;
+  // });
+
+  // if (lineRemain < church.people) {
+  //   return { isAssignable: false, lineRemain: lineRemain };
+  // }
+
+  // return { isAssignable: true, lineRemain: lineRemain };
 }
 
 //////////////////// 배정 가능 층 조회
@@ -372,7 +412,7 @@ function getAssignableInFloor({ church, floorIndex }: GetAssignableInFloorParams
   const assignableLineInfoArray: LineInfoType[] = [];
 
   lines.forEach((line, lineIndex) => {
-    const { isAssignable, lineRemain } = checkLineAssign({ church, line });
+    const { isAssignable, lineRemain } = checkLineAssign({ church, floorIndex, lineIndex });
 
     if (isAssignable) {
       assignableLineInfoArray.push({ lineIndex: lineIndex, lineRemain: lineRemain });

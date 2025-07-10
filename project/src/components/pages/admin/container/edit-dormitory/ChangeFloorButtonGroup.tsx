@@ -11,14 +11,16 @@ const ChangeFloorButtonGroup = () => {
 
   return (
     <div>
-      {floors?.slice(0, maxFloor).map((el) => {
-        return (
-          <button key={el.floorNumber} onClick={() => setCurrentFloor(el.floorNumber)}>
-            {el.floorNumber + 1}
-          </button>
-        );
-      })}
-      <div>현재 층 : {currentFloor + 1}</div>
+      <div>
+        {floors?.slice(0, maxFloor).map((el) => {
+          return (
+            <button key={el.floorNumber} onClick={() => setCurrentFloor(el.floorNumber)}>
+              {el.floorNumber + 1}
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ color: "white" }}>현재 층 : {currentFloor + 1}</div>
       <button onClick={() => setIsModalOpen(true)}>층 수정</button>
       <ChangeFloorModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
     </div>

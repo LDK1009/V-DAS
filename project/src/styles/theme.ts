@@ -66,10 +66,10 @@ declare module "@mui/material/styles" {
 export const muiTheme = createTheme({
   palette: {
     primary: {
-      dark: "#222222",
-      main: "#000000",
-      light: "#666666",
-      contrastText: "#FFFFFF",
+      dark: "#DEE2FA",
+      main: "#DEE2FA",
+      light: "#DEE2FA",
+      contrastText: "#000000",
     },
 
     secondary: {

@@ -47,6 +47,7 @@ export const useAssign = () => {
     const targetLine = currentDormitory?.floors[floorIndex].lines[lineIndex];
     const targetLineRooms = targetLine?.rooms as RoomType[];
 
+    
     let churchPeople = church.people;
 
     for (const [roomIndex, room] of targetLineRooms.entries()) {
@@ -117,7 +118,11 @@ export const useAssign = () => {
     const assignPoint = getAssignPointWithNoTailLine({ church });
 
     if (assignPoint) {
-      console.log(`[꼬리 없는 배정] ${church.churchName} 배정 위치 : ${assignPoint.floorIndex + 1}층 ${assignPoint.lineIndex + 1}라인`);
+      console.log(
+        `[꼬리 없는 배정] ${church.churchName} 배정 위치 : ${assignPoint.floorIndex + 1}층 ${
+          assignPoint.lineIndex + 1
+        }라인`
+      );
       assignLine({ sex, church, floorIndex: assignPoint.floorIndex, lineIndex: assignPoint.lineIndex });
 
       ////////// 짝꿍 교회 배정
@@ -140,10 +145,9 @@ export const useAssign = () => {
     }
 
     const assignPointByCombinationDifference1 = getAssignablePointByCombinationDifference({ church, difference: 1 });
-
+    console.log("조합하여 6명이 되는 배정", assignPointByCombinationDifference1);
     ////////// 조합하여 6명이 되는 배정
     if (assignPointByCombinationDifference1) {
-      console.log(`[조합하여 6명이 되는 배정] ${church.churchName} 배정 위치 : ${assignPointByCombinationDifference1.floorIndex + 1}층 ${assignPointByCombinationDifference1.lineIndex + 1}라인`);
       assignLine({
         sex,
         church,
@@ -157,9 +161,9 @@ export const useAssign = () => {
     ////////// 조합하여 5명이 되는 배정
 
     const assignPointByCombinationDifference2 = getAssignablePointByCombinationDifference({ church, difference: 2 });
+    console.log("조합하여 5명이 되는 배정", assignPointByCombinationDifference2);
 
     if (assignPointByCombinationDifference2) {
-      console.log(`[조합하여 5명이 되는 배정] ${church.churchName} 배정 위치 : ${assignPointByCombinationDifference2.floorIndex + 1}층 ${assignPointByCombinationDifference2.lineIndex + 1}라인`);
       assignLine({
         sex,
         church,
@@ -175,9 +179,21 @@ export const useAssign = () => {
   function assignSmallChurch({ sex, church }: { sex: "male" | "female"; church: ChurchType }) {
     const assignableRoomPoint = getAssignableRoomWithRemain(church.people);
 
-    if (assignableRoomPoint) {
-      assignRoom({ sex, church, count: church.people, floorIndex: assignableRoomPoint.floorIndex, lineIndex: assignableRoomPoint.lineIndex, roomIndex: assignableRoomPoint.roomIndex });
+    if (!assignableRoomPoint) {
+      console.log(`[작은 교회 배정] ${church.churchName} 배정 위치 : 배정 불가능`);
+      return;
     }
+
+    console.log(`[작은 교회 배정] ${church.churchName} 배정 위치 : 배정 불가능`);
+
+    assignRoom({
+      sex,
+      church,
+      count: church.people,
+      floorIndex: assignableRoomPoint.floorIndex,
+      lineIndex: assignableRoomPoint.lineIndex,
+      roomIndex: assignableRoomPoint.roomIndex,
+    });
   }
 
   return {

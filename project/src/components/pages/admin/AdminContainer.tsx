@@ -1,25 +1,27 @@
 "use client";
 
 import React from "react";
-import InputSection from "./container/InputSection";
 import EditDormitoryContainer from "./container/edit-dormitory/EditDormitoryContainer";
-import { Grid2, Stack, styled } from "@mui/material";
+import { Stack, styled } from "@mui/material";
 import ChurchListContainer from "./container/church-list/ChurchListContainer";
-import EditFloorCount from "./container/edit-dormitory/EditFloorCount";
+import ButtonSection from "./container/button/ButtonSection";
+import Header from "./container/etc/Header";
+import { mixinFlex } from "@/styles/mixins";
+import ChurchListHeader from "./container/church-list/ChurchListHeader";
 
 const AdminContainer = () => {
   return (
     <div>
-      <h1>AdminContainer</h1>
-      <InputSection />
-      <EditFloorCount/>
-      <BodyArea container>
-        <Grid2 size={4}>
+      <Header />
+      <ButtonSection />
+      <BodyArea>
+        <BodyLeft>
+          <ChurchListHeader />
           <ChurchListContainer />
-        </Grid2>
-        <Grid2 size={8}>
+        </BodyLeft>
+        <BodyRight>
           <EditDormitoryContainer />
-        </Grid2>
+        </BodyRight>
       </BodyArea>
     </div>
   );
@@ -27,6 +29,19 @@ const AdminContainer = () => {
 
 export default AdminContainer;
 
-const BodyArea = styled(Grid2)`
-  padding: 32px;
+const BodyArea = styled(Stack)`
+  ${mixinFlex("row", "start", "start")}
+  width: 100%;
+  height: 100%;
+`;
+
+const BodyLeft = styled(Stack)`
+  min-width: 256px;
+  width: 256px;
+  height: 100%;
+`;
+
+const BodyRight = styled(Stack)`
+  width: 100%;
+  height: 100%;
 `;
