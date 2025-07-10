@@ -1,9 +1,62 @@
+import { useCurrentChurchStore } from "@/store/church/churchStore";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { ChurchType } from "@/types/currentChurchType";
 import { DormitoryType, FloorType, LineType } from "@/types/dormitory";
+//////////////////////////////////////////////////////////////////////////////// 사용중 ////////////////////////////////////////////////////////////////////////////////
+//////////////////// 남은 배정 가능 인원을 통한 기숙사 내 모든 방 조회
+function getAssignableRoomWithRemain(remain: number) {
+  const { dormitoryData } = useDormitoryStore.getState();
+  const { floors } = dormitoryData as DormitoryType;
 
-//////////////////////////////////////////////////////////////////////////////////////////////////// 라인 잔여 인원 조회
+  for (const floor of floors) {
+    const { lines } = floor;
+    for (const [lineIndex, line] of lines.entries()) {
+      const { rooms } = line;
+      for (const [roomIndex, room] of rooms.entries()) {
+        if (room.remain === remain) {
+          return {
+            floorIndex: floor.floorNumber,
+            lineIndex: lineIndex,
+            roomIndex: roomIndex,
+          };
+        }
+      }
+    }
+  }
 
+  return null;
+}
+
+//////////////////// 마지막 배정된 방 남은 인원 조회
+type GetLastAssignedRoomRemainParamsType = {
+  floorIndex: number;
+  lineIndex: number;
+};
+
+function getLastAssignedRoomRemain({ floorIndex, lineIndex }: GetLastAssignedRoomRemainParamsType) {
+  const { dormitoryData } = useDormitoryStore.getState();
+  const { maxRoomPeople } = useDormitoryStore.getState();
+  const line = dormitoryData?.floors[floorIndex].lines[lineIndex] as LineType;
+  const reverseRooms = [...line.rooms].reverse();
+
+  // 마지막 방부터 인원이 배정된 방이 있는지 확인 후 남은 인원 반환
+  for (const [index, room] of reverseRooms.entries()) {
+    const { current, remain } = room;
+    // 해당 방에 배정된 인원이 0보다 크다면
+    if (current > 0) {
+      // 해당 방에 배정된 인원이 최대 인원과 같다면
+      if (current === maxRoomPeople) {
+        return index + 1 < line.rooms.length ? line.rooms[index + 1].remain : 0;
+      }
+
+      return remain;
+    }
+  }
+
+  return 0;
+}
+
+//////////////////// 라인 잔여 인원 조회
 type GetLineRemainParamsType = {
   line: LineType;
 };
@@ -17,58 +70,7 @@ function getLineRemain({ line }: GetLineRemainParamsType) {
   return lineRemain;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////// 라인 배정 가능 여부 조회
-
-type CheckLineAssignParamsType = {
-  church: ChurchType;
-  line: LineType;
-};
-
-function checkLineAssign({ church, line }: CheckLineAssignParamsType): { isAssignable: boolean; lineRemain: number } {
-  let lineRemain = 0;
-
-  line.rooms.forEach((room) => {
-    lineRemain += room.remain;
-  });
-
-  if (lineRemain < church.people) {
-    return { isAssignable: false, lineRemain: lineRemain };
-  }
-
-  return { isAssignable: true, lineRemain: lineRemain };
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////// 배정 가능 층 조회
-
-type GetAssignableInFloorParamsType = {
-  church: ChurchType;
-  floorIndex: number;
-};
-
-type LineInfoType = {
-  lineIndex: number;
-  lineRemain: number;
-};
-
-function getAssignableInFloor({ church, floorIndex }: GetAssignableInFloorParamsType) {
-  const currentDormitory = useDormitoryStore.getState().dormitoryData;
-  const { lines } = currentDormitory?.floors[floorIndex] as FloorType;
-
-  const assignableLineInfoArray: LineInfoType[] = [];
-
-  lines.forEach((line, lineIndex) => {
-    const { isAssignable, lineRemain } = checkLineAssign({ church, line });
-
-    if (isAssignable) {
-      assignableLineInfoArray.push({ lineIndex: lineIndex, lineRemain: lineRemain });
-    }
-  });
-
-  return assignableLineInfoArray;
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////// 기숙사 내 모든 배정 가능 라인 조회
-
+//////////////////// 기숙사 내 모든 배정 가능 라인 조회
 type GetAssignableInDormitoryParamsType = {
   church: ChurchType;
 };
@@ -78,7 +80,6 @@ type AssignableFloorIndexArrayType = { floorIndex: number; lineInfoArray: LineIn
 function getAssignableInDormitory({ church }: GetAssignableInDormitoryParamsType) {
   // 실시간 최신 상태 가져오기
   const currentDormitory = useDormitoryStore.getState().dormitoryData;
-  const { maxRoomPeople } = useDormitoryStore.getState();
 
   const { floors } = currentDormitory as DormitoryType;
   const assignableFloorIndexArray: AssignableFloorIndexArrayType = [];
@@ -98,7 +99,7 @@ function getAssignableInDormitory({ church }: GetAssignableInDormitoryParamsType
   return assignableFloorIndexArray;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////// 기숙사 내 모든 배정 가능 중 나머지가 남지 않는 라인 조회
+//////////////////// 기숙사 내 모든 배정 가능 중 나머지가 남지 않는 라인 조회
 type GetAssignableFloorsWithNoTailLineParamsType = {
   church: ChurchType;
 };
@@ -130,10 +131,10 @@ function getAssignableFloorsWithNoTailLine({ church }: GetAssignableFloorsWithNo
       return floorInfo.lineInfoArray.length > 0;
     });
 
-  return assignableFloorsWithNoTailLine;
+  return assignableFloorsWithNoTailLine.length > 0 ? assignableFloorsWithNoTailLine : null;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////// 기숙사 내 모든 배정 가능 중 조합의 차이값에 따른 라인 조회
+//////////////////// 기숙사 내 모든 배정 가능 중 조합의 차이값에 따른 라인 조회
 
 type GetAssignableFloorsByCombinationDifferenceParamsType = {
   church: ChurchType;
@@ -172,38 +173,42 @@ function getAssignableFloorsByCombinationDifference({
   return assignableFloorsByCombinationDifference;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////// 기숙사 내 모든 배정 가능 중 조합의 차이값에 따른 라인 조회
+//////////////////// 조회값을 5라인과 나머지로 분리
 
-function separateAssignFloorsToFiveLinesAndOthers( assignableFloors : AssignableFloorIndexArrayType) {
-  const fiveLines = assignableFloors.map((floorInfo) => {
-    const { floorIndex, lineInfoArray } = floorInfo;
-    const lineFives = lineInfoArray.filter((lineInfo) => {
-      const { lineIndex } = lineInfo;
-      return lineIndex === 4;
+function separateAssignFloorsToFiveLinesAndOthers(assignableFloors: AssignableFloorIndexArrayType) {
+  const fiveLines = assignableFloors
+    .map((floorInfo) => {
+      const { floorIndex, lineInfoArray } = floorInfo;
+      const lineFives = lineInfoArray.filter((lineInfo) => {
+        const { lineIndex } = lineInfo;
+        return lineIndex === 4;
+      });
+
+      return {
+        floorIndex: floorIndex,
+        lineInfoArray: lineFives,
+      };
+    })
+    .filter((floorInfo) => {
+      return floorInfo.lineInfoArray.length > 0;
     });
 
-    return {
-      floorIndex: floorIndex,
-      lineInfoArray: lineFives,
-    };
-  }).filter((floorInfo) => {
-    return floorInfo.lineInfoArray.length > 0;
-  });
+  const otherLines = assignableFloors
+    .map((floorInfo) => {
+      const { floorIndex, lineInfoArray } = floorInfo;
+      const lineFives = lineInfoArray.filter((lineInfo) => {
+        const { lineIndex } = lineInfo;
+        return lineIndex !== 4;
+      });
 
-  const otherLines = assignableFloors.map((floorInfo) => {
-    const { floorIndex, lineInfoArray } = floorInfo;
-    const lineFives = lineInfoArray.filter((lineInfo) => {
-      const { lineIndex } = lineInfo;
-      return lineIndex !== 4;
+      return {
+        floorIndex: floorIndex,
+        lineInfoArray: lineFives,
+      };
+    })
+    .filter((floorInfo) => {
+      return floorInfo.lineInfoArray.length > 0;
     });
-
-    return {
-      floorIndex: floorIndex,
-      lineInfoArray: lineFives,
-    };
-  }).filter((floorInfo) => {
-    return floorInfo.lineInfoArray.length > 0;
-  });
 
   return {
     fiveLines: fiveLines.length === 0 ? null : fiveLines,
@@ -211,7 +216,173 @@ function separateAssignFloorsToFiveLinesAndOthers( assignableFloors : Assignable
   };
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////// 추천 배정 위치 조회
+//////////////////// 배정 위치 얻기
+type GetAssignPointParamsType = {
+  fiveLines: AssignableFloorIndexArrayType | null;
+  otherLines: AssignableFloorIndexArrayType | null;
+};
+
+function getAssignPoint({ fiveLines, otherLines }: GetAssignPointParamsType) {
+  if (fiveLines) {
+    return {
+      floorIndex: fiveLines[0].floorIndex,
+      lineIndex: fiveLines[0].lineInfoArray[0].lineIndex,
+    };
+  }
+
+  if (otherLines) {
+    return {
+      floorIndex: otherLines[0].floorIndex,
+      lineIndex: otherLines[0].lineInfoArray.slice(-1)[0].lineIndex,
+    };
+  }
+
+  return null;
+}
+
+//////////////////// 꼬리 없는 배정 위치 얻기
+type GetAssignPointWithNoTailLineParamsType = {
+  church: ChurchType;
+};
+
+function getAssignPointWithNoTailLine({ church }: GetAssignPointWithNoTailLineParamsType) {
+  const assignableData = getAssignableFloorsWithNoTailLine({ church });
+  const seperatedData = separateAssignFloorsToFiveLinesAndOthers(assignableData as AssignableFloorIndexArrayType);
+  const assignPoint = getAssignPoint(seperatedData);
+
+  if (assignPoint) {
+    return assignPoint;
+  }
+
+  return null;
+}
+
+//////////////////// 조합 차이값에 따른 배정 위치 조회
+type GetAssignablePointByCombinationDifferenceParamsType = {
+  church: ChurchType;
+  difference: number;
+};
+
+function getAssignablePointByCombinationDifference({
+  church,
+  difference,
+}: GetAssignablePointByCombinationDifferenceParamsType) {
+  const assignableData = getAssignableFloorsByCombinationDifference({ church, difference });
+  const seperatedData = separateAssignFloorsToFiveLinesAndOthers(assignableData);
+  const assignPoint = getAssignPoint(seperatedData);
+
+  if (assignPoint) {
+    return assignPoint;
+  }
+
+  return null;
+}
+
+//////////////////// 짝꿍 교회 조회
+
+type GetPartnerChurchParamsType = {
+  sex: "male" | "female";
+  floorIndex: number;
+  lineIndex: number;
+};
+
+function getPartnerChurch({ sex, floorIndex, lineIndex }: GetPartnerChurchParamsType) {
+  const { churchMaleArray, churchFemaleArray } = useCurrentChurchStore.getState();
+  const { maxRoomPeople } = useDormitoryStore.getState();
+
+  const lineRemain = getLastAssignedRoomRemain({ floorIndex, lineIndex });
+  const lineNeed = lineRemain % maxRoomPeople;
+
+  if (sex === "male") {
+    if (!churchMaleArray || churchMaleArray.length === 0) {
+      return null;
+    }
+
+    const filteredChurchs = churchMaleArray.filter((church) => {
+      const churchMod = church.people % maxRoomPeople;
+      return churchMod === lineNeed;
+    });
+
+    if (filteredChurchs.length > 0) {
+      const church = filteredChurchs[0];
+      console.log(`라인 남은 인원 : ${lineRemain} | 라인 필요 인원 : ${lineNeed}`);
+      console.log(
+        `[짝꿍 교회] : ${church.churchName} | 인원 : ${church.people} | 나머지 : ${church.people % maxRoomPeople}`
+      );
+    }
+
+    return filteredChurchs.length > 0 ? filteredChurchs[0] : null;
+  }
+
+  if (sex === "female") {
+    if (!churchFemaleArray || churchFemaleArray.length === 0) {
+      return null;
+    }
+
+    const filteredChurchs = churchFemaleArray?.filter((church) => {
+      const churchMod = church.people % maxRoomPeople;
+      return churchMod === lineNeed;
+    });
+
+    return filteredChurchs.length > 0 ? filteredChurchs[0] : null;
+  }
+
+  return null;
+}
+
+//////////////////////////////////////////////////////////////////////////////// 미사용중 ////////////////////////////////////////////////////////////////////////////////
+
+//////////////////// 라인 배정 가능 여부 조회
+
+type CheckLineAssignParamsType = {
+  church: ChurchType;
+  line: LineType;
+};
+
+function checkLineAssign({ church, line }: CheckLineAssignParamsType): { isAssignable: boolean; lineRemain: number } {
+  let lineRemain = 0;
+
+  line.rooms.forEach((room) => {
+    lineRemain += room.remain;
+  });
+
+  if (lineRemain < church.people) {
+    return { isAssignable: false, lineRemain: lineRemain };
+  }
+
+  return { isAssignable: true, lineRemain: lineRemain };
+}
+
+//////////////////// 배정 가능 층 조회
+
+type GetAssignableInFloorParamsType = {
+  church: ChurchType;
+  floorIndex: number;
+};
+
+type LineInfoType = {
+  lineIndex: number;
+  lineRemain: number;
+};
+
+function getAssignableInFloor({ church, floorIndex }: GetAssignableInFloorParamsType) {
+  const currentDormitory = useDormitoryStore.getState().dormitoryData;
+  const { lines } = currentDormitory?.floors[floorIndex] as FloorType;
+
+  const assignableLineInfoArray: LineInfoType[] = [];
+
+  lines.forEach((line, lineIndex) => {
+    const { isAssignable, lineRemain } = checkLineAssign({ church, line });
+
+    if (isAssignable) {
+      assignableLineInfoArray.push({ lineIndex: lineIndex, lineRemain: lineRemain });
+    }
+  });
+
+  return assignableLineInfoArray;
+}
+
+//////////////////// 추천 배정 위치 조회
 
 type GetRecommendedAssignmentPointParamsType = {
   church: ChurchType;
@@ -233,7 +404,7 @@ function getRecommendedAssignmentPoint({ church }: GetRecommendedAssignmentPoint
   return null;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////// 핏한 배정 위치 조회
+//////////////////// 핏한 배정 위치 조회
 
 type GetFitAssignPointParamsType = {
   church: ChurchType;
@@ -241,7 +412,7 @@ type GetFitAssignPointParamsType = {
 
 function getFitAssignPoint({ church }: GetFitAssignPointParamsType) {
   // 방 최대 인원 가져오기
-  const { maxRoomPeople, dormitoryData } = useDormitoryStore.getState();
+  const { maxRoomPeople } = useDormitoryStore.getState();
   // 교회의 나머지 인원
   const churchRemain = church.people % maxRoomPeople;
 
@@ -336,92 +507,10 @@ function getFitAssignPoint({ church }: GetFitAssignPointParamsType) {
   }
 
   return null;
-
-  /////////////////////////////////////////////////////////////////////
-  // 핏한 라인만 추출
-  const fitLineInfoArray = lineModArray
-    .map((floorInfo) => {
-      const floorIndex = floorInfo.floorIndex;
-      // 빈방이거나 방의 수용 가능 인원이 교회의 나머지 인원과 같은 경우
-      const newLineInfoArray = floorInfo.lineInfoArray.filter((lineInfo) => {
-        const lineMod = lineInfo.lineMod;
-        return lineMod >= churchRemain;
-      });
-
-      if (newLineInfoArray.length > 0) {
-        return {
-          floorIndex: floorIndex,
-          lineInfoArray: newLineInfoArray,
-        };
-      }
-    })
-    .filter((floorInfo) => {
-      return floorInfo !== undefined;
-    });
-
-  console.log(`${church.churchName} 나머지 인원 : ${churchRemain}`);
-  console.log(`${church.churchName} 핏한 라인 \n ${JSON.stringify(fitLineInfoArray, null, 2)}`);
-
-  // 핏한 배정 위치
-  if (fitLineInfoArray.length > 0) {
-    // const fitAssignPoint = {
-    //   floorIndex: fitLineInfoArray[0].floorIndex,
-    //   lineIndex: fitLineInfoArray[0].lineInfoArray[0].lineIndex,
-    // };
-
-    let fitAssignPoint;
-
-    // 핏한 위치
-    for (const floorInfo of fitLineInfoArray) {
-      const { lineInfoArray } = floorInfo;
-      for (const lineInfo of lineInfoArray) {
-        const { lineMod } = lineInfo;
-        if (lineMod === churchRemain) {
-          return {
-            isFit: true,
-            floorIndex: floorInfo.floorIndex,
-            lineIndex: lineInfo.lineIndex,
-          };
-        }
-      }
-    }
-
-    // 핏하지 않지만 다음방이 있는 라인
-    for (const floorInfo of fitLineInfoArray) {
-      const { lineInfoArray } = floorInfo;
-      for (const lineInfo of lineInfoArray) {
-        const { lineMod } = lineInfo;
-        if (lineMod > churchRemain) {
-          return {
-            floorIndex: floorInfo.floorIndex,
-            lineIndex: lineInfo.lineIndex,
-          };
-        }
-      }
-    }
-    // 나누어 떨어지는 라인
-    for (const floorInfo of fitLineInfoArray) {
-      const { lineInfoArray } = floorInfo;
-      for (const lineInfo of lineInfoArray) {
-        const { lineMod } = lineInfo;
-        if (lineMod === 0) {
-          return {
-            floorIndex: floorInfo.floorIndex,
-            lineIndex: lineInfo.lineIndex,
-          };
-        }
-      }
-    }
-
-    console.log(`${church.churchName} 핏한 배정 위치 \n ${JSON.stringify(fitAssignPoint, null, 2)}`);
-
-    return fitAssignPoint;
-  }
-
-  return null;
 }
 
-export {  
+export {
+  getLastAssignedRoomRemain,
   getLineRemain,
   checkLineAssign,
   getAssignableInFloor,
@@ -429,6 +518,11 @@ export {
   getAssignableFloorsWithNoTailLine,
   getAssignableFloorsByCombinationDifference,
   separateAssignFloorsToFiveLinesAndOthers,
+  getPartnerChurch,
+  getAssignPoint,
+  getAssignPointWithNoTailLine,
+  getAssignablePointByCombinationDifference,
   getRecommendedAssignmentPoint,
   getFitAssignPoint,
+  getAssignableRoomWithRemain,
 };

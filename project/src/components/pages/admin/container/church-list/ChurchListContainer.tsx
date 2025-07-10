@@ -1,11 +1,7 @@
 import {
   checkLineAssign,
   getAssignableInDormitory,
-  getAssignableFloorsWithNoTailLine,
-  getFitAssignPoint,
-  getRecommendedAssignmentPoint,
-  getAssignableFloorsByCombinationDifference,
-  separateAssignFloorsToFiveLinesAndOthers,
+  getLastAssignedRoomRemain,
 } from "@/hooks/assign/useAssignable";
 import { useAssign } from "@/hooks/assign/useAssign";
 import { useCurrentChurchStore } from "@/store/church/churchStore";
@@ -20,8 +16,8 @@ const ChurchListContainer = () => {
   const { excelFile } = useExcelStore();
   const { churchMaleArray, churchFemaleArray, setCurrentChurchMaleArray, setCurrentChurchFemaleArray } =
     useCurrentChurchStore();
-  const { dormitoryData, maxRoomPeople } = useDormitoryStore();
-  const { assignRoom, assignLine, assignLineStartFromNextRoom } = useAssign();
+  const { dormitoryData } = useDormitoryStore();
+  const { assignRoom, assignLine, autoAssign, assignSmallChurch } = useAssign();
 
   useEffect(() => {
     // 파일 형식 변환
@@ -83,156 +79,64 @@ const ChurchListContainer = () => {
       const assignableFloorIndexArray = getAssignableInDormitory({
         church: church,
       });
-      const assignFloorIndex = assignableFloorIndexArray[0].floorIndex;
-      const assignLineIndex = assignableFloorIndexArray[0].lineInfoArray[0].lineIndex;
 
-      alert(
-        `${churchMaleArray[0].churchName} 배정 가능 라인 조회 결과 : \n ${assignFloorIndex}층 ${assignLineIndex}라인`
-      );
+      let assignFloorIndex = 0;
+      let assignLineIndex = 0;
+
+      if (assignableFloorIndexArray) {
+        assignFloorIndex = assignableFloorIndexArray[0].floorIndex;
+        assignLineIndex = assignableFloorIndexArray[0].lineInfoArray[0].lineIndex;
+      }
+
+      alert(`${church.churchName} 배정 가능 라인 조회 결과 : \n ${assignFloorIndex}층 ${assignLineIndex}라인`);
       assignLine({ sex: "male", church: church, floorIndex: assignFloorIndex, lineIndex: assignLineIndex });
     }
   }
 
   function testFunc6() {
+    const { dormitoryData, maxRoomPeople } = useDormitoryStore.getState();
+    const { churchMaleArray, churchFemaleArray } = useCurrentChurchStore.getState();
+
     if (churchMaleArray && churchFemaleArray && dormitoryData) {
-      for (const church of churchMaleArray) {
-        console.log("\n\n\n\n==========", `${church.churchName}(${church.people})`, "배정 시작==========");
+      if (!churchMaleArray) {
+        return;
+      }
 
-        const churchPeople = church.people;
+      for (const { churchName, people } of churchMaleArray) {
+        console.log("\n\n\n\n==========", `${churchName}(${people})`, "배정 시작==========");
+        const { churchMaleArray: currentChurchMaleArray } = useCurrentChurchStore.getState();
 
-        // 배정 가능라인 조회
-        const assignableFloorIndexArray = getAssignableInDormitory({
-          church: church,
-        });
-
-
-        const assignableFloorsWithNoTailLine = getAssignableFloorsWithNoTailLine({ church });
-
-        const { fiveLines, otherLines } = separateAssignFloorsToFiveLinesAndOthers(assignableFloorsWithNoTailLine);
-
-        console.log("assignableFloorsWithNoTailLine", assignableFloorsWithNoTailLine);
-        console.log("fiveLines", fiveLines);
-        console.log("otherLines", otherLines);
-
-        // const assignableFloorsWithNoTailLine1 = getAssignableFloorsByCombinationDifference({ church, difference: 2 });
-        // const assignableFloorsWithNoTailLine2 = getAssignableFloorsByCombinationDifference({ church, difference: 1 });
-
-        // console.log(`${church.churchName} 차이가 1인 라인 \n ${JSON.stringify(assignableFloorsWithNoTailLine1, null, 2)}`);
-        // console.log(`${church.churchName} 차이가 2인 라인 \n ${JSON.stringify(assignableFloorsWithNoTailLine2, null, 2)}`);
-
-        // console.log(`${church.churchName} 배정 가능 라인 \n ${JSON.stringify(assignableFloorsWithNoTailLine, null, 2)}`);
-
-        // const divisibleAssignableFloorIndexArray = getAssignableInDormitory({
-        //   church: church,
-        //   divisible: true,
-        // });
-
-        // console.log("assignableFloorIndexArray", assignableFloorIndexArray);
-        // console.log("divisibleAssignableFloorIndexArray", divisibleAssignableFloorIndexArray);
-
-        // /////////////////////////////////////////////////////////
-
-        // 인원이 7미만이면 핏한 방 배정
-        if (churchPeople < maxRoomPeople) {
-          console.log("핏한 방 배정 시작");
-          const fitAssignPoint = getFitAssignPoint({ church });
-          const { assignType, floorIndex, lineIndex } = fitAssignPoint;
-
-          if(assignType === "sequence") {
-            assignLine({
-              sex: "male",
-              church: church,
-              floorIndex,
-              lineIndex,
-            });
-            continue;
-          }
-          
-          if(assignType === "next") {
-            assignLineStartFromNextRoom({
-              sex: "male",
-              church: church,
-              floorIndex,
-              lineIndex,
-            });
-            continue;
-          }
-
-
-
-          console.log(
-            `핏한 방 배정 성공 ${church.churchName}${fitAssignPoint.floorIndex}층 ${fitAssignPoint.lineIndex}라인`
-          );
-
-          console.log("핏한 방 배정 완료");
+        if (!currentChurchMaleArray) {
           continue;
         }
 
-        console.log("추천 배정 시작");
+        const targetChurch = currentChurchMaleArray.filter((el) => el.churchName === churchName)[0];
 
-        // 추천 배정 지점
-        const recommendedAssignmentPoint = getRecommendedAssignmentPoint({ church });
-
-        if (!recommendedAssignmentPoint) {
-          console.log("추천 배정 실패");
+        if (!targetChurch) {
           continue;
         }
 
-        assignLine({
-          sex: "male",
-          church: church,
-          floorIndex: recommendedAssignmentPoint.floorIndex,
-          lineIndex: recommendedAssignmentPoint.lineIndex,
-        });
+        if (targetChurch.people <= 0) {
+          console.log(`${targetChurch.churchName} | ${targetChurch.people} 인원이 0명 이하입니다. 배정 불가능`);
+          continue;
+        }
 
-        console.log(
-          `추천 배정 성공 ${church.churchName} ${recommendedAssignmentPoint.floorIndex}층 ${recommendedAssignmentPoint.lineIndex}라인`
-        );
-        console.log("추천 배정 완료");
+        if (targetChurch.people < maxRoomPeople) {
+          assignSmallChurch({ sex: "male", church: targetChurch });
+          continue;
+        }
+
+        // 자동배정
+        autoAssign({ sex: "male", church: targetChurch });
+
         continue;
-
-        // /////////////////////////////////////////////////////////
-        // 배정 층
-        // const assignFloorIndex = assignableFloorIndexArray[0].floorIndex;
-        // 배정 라인
-        // const assignLineIndex = assignableFloorIndexArray[0].lineInfoArray[0].lineIndex;
-        // 교회 인원
-
-        // 교회 인원이 방 최대 인원보다 작으면 찢어지지 않는 라인에 배정(maxRoomPeople로 나누어 떨어지는 라인)
-        // if (maxRoomPeople > churchPeople) {
-        //   if (divisibleAssignableFloorIndexArray.length > 0) {
-        //     const divisibleAssignFloorIndex = divisibleAssignableFloorIndexArray[0].floorIndex;
-        //     const divisibleAssignLineIndex = divisibleAssignableFloorIndexArray[0].lineInfoArray[0].lineIndex;
-
-        //     console.log("배정 위치 : ", church.churchName, divisibleAssignFloorIndex, divisibleAssignLineIndex);
-
-        //     assignLine({
-        //       sex: "male",
-        //       church: church,
-        //       floorIndex: divisibleAssignFloorIndex,
-        //       lineIndex: divisibleAssignLineIndex,
-        //     });
-        //   }
-
-        //   console.log("==========", church.churchName, "배정 완료(찢어지지 않는 라인)==========");
-        //   continue;
-        // }
-
-        // 라인배정
-        // assignLine({
-        //   sex: "male",
-        //   church: church,
-        //   floorIndex: assignFloorIndex,
-        //   lineIndex: assignLineIndex,
-        // });
-
-        // 콘솔
-        console.log(
-          `${church.churchName} 배정 위치 : ${recommendedAssignmentPoint.floorIndex}층 ${recommendedAssignmentPoint.lineIndex}라인`
-        );
-        console.log("==========", church.churchName, "배정 완료==========");
       }
     }
+  }
+
+  function testFunc7() {
+    const lastAssignedRoomRemain = getLastAssignedRoomRemain({ floorIndex: 6, lineIndex: 4 });
+    console.log(lastAssignedRoomRemain);
   }
 
   useEffect(() => {
@@ -248,6 +152,7 @@ const ChurchListContainer = () => {
         <button onClick={testFunc4}>배정 가능 라인 조회</button>
         <button onClick={() => testFunc5(0)}>라인 자동 배정</button>
         <button onClick={testFunc6}>전체 교회 자동 배정</button>
+        <button onClick={testFunc7}>마지막 배정된 방 남은 인원 조회</button>
       </div>
       <h1>남자</h1>
       <pre>{JSON.stringify(churchMaleArray, null, 2)}</pre>
