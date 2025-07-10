@@ -318,7 +318,7 @@ function getPartnerChurch({ sex, floorIndex, lineIndex }: GetPartnerChurchParams
   const { churchMaleArray, churchFemaleArray } = useCurrentChurchStore.getState();
   const { maxRoomPeople } = useDormitoryStore.getState();
 
-  const lineRemain = getLastAssignedRoomRemain({ floorIndex, lineIndex });
+  const lineRemain = getLastAssignedRoomRemainAfter(floorIndex, lineIndex);
   const lineNeed = lineRemain % maxRoomPeople;
 
   if (sex === "male") {
@@ -328,7 +328,7 @@ function getPartnerChurch({ sex, floorIndex, lineIndex }: GetPartnerChurchParams
 
     const filteredChurchs = churchMaleArray.filter((church) => {
       const churchMod = church.people % maxRoomPeople;
-      return churchMod === lineNeed;
+      return church.people > 0 && lineRemain > church.people && churchMod === lineNeed;
     });
 
     if (filteredChurchs.length > 0) {
@@ -368,16 +368,18 @@ type CheckLineAssignParamsType = {
   lineIndex: number;
 };
 
-function checkLineAssign({ church, floorIndex, lineIndex }: CheckLineAssignParamsType): { isAssignable: boolean; lineRemain: number } {
+function checkLineAssign({ church, floorIndex, lineIndex }: CheckLineAssignParamsType): {
+  isAssignable: boolean;
+  lineRemain: number;
+} {
   const churchPeople = church.people;
   const lastAssignedRoomRemainAfter = getLastAssignedRoomRemainAfter(floorIndex, lineIndex);
 
-  if(churchPeople > lastAssignedRoomRemainAfter){
+  if (churchPeople > lastAssignedRoomRemainAfter) {
     return { isAssignable: false, lineRemain: lastAssignedRoomRemainAfter };
   }
 
   return { isAssignable: true, lineRemain: lastAssignedRoomRemainAfter };
-
 
   /////////////////////////////////////
   // let lineRemain = 0;
