@@ -6,6 +6,7 @@ import ChangeFloorButtonGroup from "../edit-dormitory/ChangeFloorButtonGroup";
 const ChurchListHeader = () => {
   return (
     <Container>
+      <h4>검색바 들어올 예정</h4>
       <ChangeFloorButtonGroup />
     </Container>
   );
@@ -16,6 +17,6 @@ export default ChurchListHeader;
 const Container = styled(Stack)`
   ${mixinFlex("column", "center", "center")}
   width: 100%;
-  height: 60px;
-  background-color: #000000;
+  height: 85px;
+  border-bottom: 1px solid black;
 `;

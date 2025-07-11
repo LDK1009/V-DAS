@@ -7,6 +7,7 @@ import { readExcelFile } from "@/utils/excel/read";
 import React, { useEffect } from "react";
 import ChurchItem from "./ChurchItem";
 import { Stack, styled } from "@mui/material";
+import { mixinFlex, mixinHideScrollbar } from "@/styles/mixins";
 
 const ChurchListContainer = () => {
   const { excelFile } = useExcelStore();
@@ -42,10 +43,11 @@ const ChurchListContainer = () => {
 export default ChurchListContainer;
 
 const ChurchList = styled(Stack)`
+  ${mixinFlex("column", "start", "center")}
   width: 100%;
   height: 100%;
-  padding-left: 18px;
-  padding-top: 26px;
-  background-color: #d4d4d4;
+  padding: 26px 18px;
   row-gap: 14px;
+  overflow-y: auto;
+  ${mixinHideScrollbar}
 `;

@@ -11,7 +11,7 @@ import ChurchListHeader from "./container/church-list/ChurchListHeader";
 
 const AdminContainer = () => {
   return (
-    <div>
+    <Container>
       <Header />
       <ButtonSection />
       <BodyArea>
@@ -23,22 +23,33 @@ const AdminContainer = () => {
           <EditDormitoryContainer />
         </BodyRight>
       </BodyArea>
-    </div>
+    </Container>
   );
 };
 
 export default AdminContainer;
 
+const Container = styled(Stack)`
+  width: 100vw;
+  height: 100vh;
+  ${mixinFlex("column", "start", "start")}
+  overflow: hidden;
+`;
+
 const BodyArea = styled(Stack)`
   ${mixinFlex("row", "start", "start")}
   width: 100%;
   height: 100%;
+  border-top: 1px solid black;
 `;
 
 const BodyLeft = styled(Stack)`
-  min-width: 256px;
   width: 256px;
   height: 100%;
+  min-width: 256px;
+  max-width: 256px;
+  flex: 1;
+  border-right: 1px solid black;
 `;
 
 const BodyRight = styled(Stack)`

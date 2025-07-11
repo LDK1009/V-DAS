@@ -66,8 +66,8 @@ declare module "@mui/material/styles" {
 export const muiTheme = createTheme({
   palette: {
     primary: {
-      dark: "#DEE2FA",
-      main: "#DEE2FA",
+      dark: "#FFA600",
+      main: "#FFC300",
       light: "#DEE2FA",
       contrastText: "#000000",
     },

@@ -328,7 +328,7 @@ function getPartnerChurch({ sex, floorIndex, lineIndex }: GetPartnerChurchParams
 
     const filteredChurchs = churchMaleArray.filter((church) => {
       const churchMod = church.people % maxRoomPeople;
-      return church.people > 0 && lineRemain > church.people && churchMod === lineNeed;
+      return churchMod !== 0 && church.people > 0 && lineRemain > church.people && churchMod === lineNeed;
     });
 
     if (filteredChurchs.length > 0) {

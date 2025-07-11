@@ -1,11 +1,16 @@
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
+import { mixinFlex } from "@/styles/mixins";
 import { RoomType } from "@/types/dormitory";
+import { Stack, styled } from "@mui/material";
 import React from "react";
+import ChurchItem from "../church-list/ChurchItem";
+import { shouldForwardProp } from "@/utils/mui";
 
-const Room = ({ lineIndex, room, roomIndex }: { lineIndex: number; room: RoomType; roomIndex: number }) => {
+const Room = ({ lineIndex, room, roomIndex, customRoomNumber }: { lineIndex: number; room: RoomType; roomIndex: number; customRoomNumber?: number }) => {
   const { currentFloor } = useDormitoryStore();
-  let startRoomNumber = 1; // 기본값 설정
+  const { maxRoomPeople } = useDormitoryStore.getState();
 
+  let startRoomNumber = 1; // 기본값 설정
   // 라인별 방 번호 시작 번호
   if (lineIndex === 0) {
     startRoomNumber = 1;
@@ -21,26 +26,66 @@ const Room = ({ lineIndex, room, roomIndex }: { lineIndex: number; room: RoomTyp
 
   const roomNumber = startRoomNumber + roomIndex;
 
+  function getRoomStatus(current: number) {
+    if (current > maxRoomPeople) return "exceed";
+    if (current === maxRoomPeople) return "full";
+    if (current < maxRoomPeople) return "insufficient";
+    return "insufficient";
+  }
+
   return (
-    <div>
-      <div>{`${currentFloor + 1}${String(roomNumber).padStart(2, "0")}호`}</div>
-      <div>
-        <div>최대 인원 : {room.max}</div>
-        <div>현재 인원 : {room.current}</div>
-        <div>남은 인원 : {room.remain}</div>
-      </div>
-      <div>
-        <h5>참여 교회</h5>
+    <Container>
+      <RoomNumberContainer>{`${currentFloor + 1}${String(customRoomNumber || roomNumber).padStart(2, "0")}`}</RoomNumberContainer>
+
+      <ChurchContainer>
         {room.assignedChurchArray.map((church, churchIndex) => {
-          return (
-            <div key={`${currentFloor}-${lineIndex}-${roomIndex}-${churchIndex}`}>
-              {churchIndex + 1}. | {church.churchName} | {church.people}명
-            </div>
-          );
+          return <ChurchItem church={church} key={`${currentFloor}-${lineIndex}-${roomNumber}-${churchIndex}`} />;
         })}
-      </div>
-    </div>
+      </ChurchContainer>
+      <RoomCurrentContainer $status={getRoomStatus(room.current)}>{room.current}</RoomCurrentContainer>
+    </Container>
   );
 };
 
 export default Room;
+
+const Container = styled(Stack)`
+  ${mixinFlex("row", "start", "center")}
+  width: 100%;
+  height: 100%;
+  border: 1px solid black;
+  border-radius: 8px;
+  overflow: hidden;
+`;
+
+const RoomNumberContainer = styled(Stack)`
+  ${mixinFlex("column", "center", "center")}
+  width: 40px;
+  height: 55px;
+  min-width: 40px;
+  min-height: 55px;
+  font-size: 14px;
+`;
+
+const ChurchContainer = styled(Stack)`
+  ${mixinFlex("column", "center", "center")}
+  min-width: 172px;
+  height: 55px;
+  border: 1px solid black;
+  border-top: none;
+  border-bottom: none;
+  padding: 6px 4px;
+  row-gap: 4px;
+`;
+
+type RoomCurrentContainerPropsType = {
+  $status: "exceed" | "full" | "insufficient";
+};
+const RoomCurrentContainer = styled(RoomNumberContainer, { shouldForwardProp })<RoomCurrentContainerPropsType>`
+  font-size: 16px;
+  background-color: ${({ $status }) => {
+    if ($status === "exceed") return "blue";
+    if ($status === "full") return "transparent";
+    if ($status === "insufficient") return "yellow";
+  }};
+`;

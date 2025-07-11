@@ -1,4 +1,5 @@
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
+import { mixinFlex } from "@/styles/mixins";
 import { Modal, Stack, styled } from "@mui/material";
 import React, { useState } from "react";
 
@@ -10,7 +11,7 @@ const ChangeFloorButtonGroup = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div>
+    <Container>
       <div>
         {floors?.slice(0, maxFloor).map((el) => {
           return (
@@ -20,14 +21,23 @@ const ChangeFloorButtonGroup = () => {
           );
         })}
       </div>
-      <div style={{ color: "white" }}>현재 층 : {currentFloor + 1}</div>
+      <div>현재 층 : {currentFloor + 1}</div>
       <button onClick={() => setIsModalOpen(true)}>층 수정</button>
       <ChangeFloorModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
-    </div>
+    </Container>
   );
 };
 
 export default ChangeFloorButtonGroup;
+////////////////////////////////////////////////// 스타일 컴포넌트 //////////////////////////////////////////////////
+const Container = styled(Stack)`
+  ${mixinFlex("row", "center", "center")}
+  width: 100%;
+  height: 100%;
+  column-gap: 16px;
+`;
+
+////////////////////////////////////////////////// 모달 컴포넌트 //////////////////////////////////////////////////
 
 type ChangeFloorModalPropsType = {
   isModalOpen: boolean;

@@ -1,13 +1,18 @@
-import FloorView from "./FloorView";
 import { Stack, styled } from "@mui/system";
 import { mixinFlex } from "@/styles/mixins";
-import Line from "./Line";
+import LineColumn from "./LineColumn";
+import LineColumn4 from "./LineColumn4";
+import Footer from "../etc/Footer";
 
 const EditDormitory = () => {
   return (
     <Container>
-      <Line lineIndex={0} />
-      <FloorView />
+      <LineColumnContainer>
+        <LineColumn lineIndexs={[0, 1]} />
+        <LineColumn lineIndexs={[2, 3]} />
+        <LineColumn4 />
+      </LineColumnContainer>
+      <Footer />
     </Container>
   );
 };
@@ -18,5 +23,12 @@ const Container = styled(Stack)`
   width: 100%;
   height: 100%;
   ${mixinFlex("column", "center", "center")}
-  padding: 0px 12px 12px 12px;
+  height: 100%;
+`;
+
+const LineColumnContainer = styled(Stack)`
+  ${mixinFlex("row", "center", "start")}
+  width: 100%;
+  height: 100%;
+  column-gap: 12px;
 `;
