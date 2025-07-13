@@ -1,65 +1,54 @@
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { mixinFlex } from "@/styles/mixins";
-import { Modal, Stack, styled } from "@mui/material";
-import React, { useState } from "react";
+import { Button, Stack, styled } from "@mui/material";
+import React from "react";
 
 const ChangeFloorButtonGroup = () => {
   const { dormitoryData, currentFloor, setCurrentFloor, maxFloor } = useDormitoryStore();
+  const floors = dormitoryData?.male?.floors;
 
-  const floors = dormitoryData?.floors;
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  if (!floors) return null;
 
   return (
     <Container>
-      <div>
-        {floors?.slice(0, maxFloor).map((el) => {
-          return (
-            <button key={el.floorNumber} onClick={() => setCurrentFloor(el.floorNumber)}>
-              {el.floorNumber + 1}
-            </button>
-          );
-        })}
-      </div>
-      <div>현재 층 : {currentFloor + 1}</div>
-      <button onClick={() => setIsModalOpen(true)}>층 수정</button>
-      <ChangeFloorModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      <ButtonGroup>
+        {floors.slice(0, maxFloor).map((el) => (
+          <FloorButton
+            key={el.floorNumber}
+            variant={currentFloor === el.floorNumber ? "contained" : "outlined"}
+            onClick={() => setCurrentFloor(el.floorNumber)}
+          >
+            {el.floorNumber + 1}
+          </FloorButton>
+        ))}
+      </ButtonGroup>
+      <CurrentFloor>현재 층 : {currentFloor + 1}</CurrentFloor>
     </Container>
   );
 };
 
 export default ChangeFloorButtonGroup;
-////////////////////////////////////////////////// 스타일 컴포넌트 //////////////////////////////////////////////////
+
 const Container = styled(Stack)`
-  ${mixinFlex("row", "center", "center")}
+  ${mixinFlex("column", "center", "center")}
   width: 100%;
-  height: 100%;
-  column-gap: 16px;
+  row-gap: 10px;
+  padding: 20px;
 `;
 
-////////////////////////////////////////////////// 모달 컴포넌트 //////////////////////////////////////////////////
+const ButtonGroup = styled(Stack)`
+  ${mixinFlex("row", "center", "center")}
+  gap: 8px;
+  flex-wrap: wrap;
+`;
 
-type ChangeFloorModalPropsType = {
-  isModalOpen: boolean;
-  setIsModalOpen: (isModalOpen: boolean) => void;
-};
+const FloorButton = styled(Button)`
+  min-width: 40px;
+  height: 40px;
+  padding: 0;
+`;
 
-const ChangeFloorModal = ({ isModalOpen, setIsModalOpen }: ChangeFloorModalPropsType) => {
-  return (
-    <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
-      <ModalContainer>
-        <h1>층 수정</h1>
-      </ModalContainer>
-    </Modal>
-  );
-};
-
-const ModalContainer = styled(Stack)`
-  width: 500px;
-  height: 500px;
-  background-color: white;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+const CurrentFloor = styled("div")`
+  font-size: 16px;
+  font-weight: 600;
 `;

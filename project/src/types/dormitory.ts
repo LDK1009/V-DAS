@@ -1,6 +1,5 @@
 import { ChurchArrayType } from "./currentChurchType";
 
-
 type RoomType = {
   max: number;
   current: number;
@@ -17,10 +16,15 @@ type FloorType = {
   lines: LineType[];
 };
 
-type DormitoryType = {
+type DormitorySexType = {
   sex: "male" | "female";
   useFloorNumbers: number[];
   floors: FloorType[];
 };
 
-export type { RoomType, LineType, FloorType, DormitoryType };
+type DormitoryType = {
+  male: DormitorySexType;
+  female: DormitorySexType;
+};
+
+export type { RoomType, LineType, FloorType, DormitorySexType, DormitoryType };

@@ -5,11 +5,13 @@ import Room from "./Room";
 
 const Line = ({ lineIndex }: { lineIndex: number }) => {
   const { dormitoryData, currentFloor } = useDormitoryStore();
-  const lineData = dormitoryData?.floors[currentFloor].lines[lineIndex];
+  const lineData = dormitoryData?.male?.floors[currentFloor]?.lines[lineIndex];
+
+  if (!lineData) return null;
 
   return (
     <Container>
-      {lineData?.rooms.map((room, roomIndex) => {
+      {lineData.rooms.map((room, roomIndex) => {
         return (
           <Room
             lineIndex={lineIndex}

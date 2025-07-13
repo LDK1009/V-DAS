@@ -1,52 +1,17 @@
-import { DormitoryType, FloorType, LineType, RoomType } from "@/types/dormitory";
+import { DormitoryType } from "@/types/dormitory";
 import { create } from "zustand";
 import { produce } from "immer";
 import { ChurchType } from "@/types/currentChurchType";
 import { getDormitory } from "@/utils/dormitory/make";
 
-////////// 방 초기화
-const initialRoom: RoomType = {
-  max: 7,
-  current: 0,
-  remain: 7,
-  assignedChurchArray: [],
-};
-
-////////// 라인 초기화
-const initialLine1: LineType = {
-  rooms: Array.from({ length: 6 }, () => ({ ...initialRoom })),
-};
-const initialLine2: LineType = {
-  rooms: Array.from({ length: 4 }, () => ({ ...initialRoom })),
-};
-const initialLine3: LineType = {
-  rooms: Array.from({ length: 5 }, () => ({ ...initialRoom })),
-};
-const initialLine4: LineType = {
-  rooms: Array.from({ length: 6 }, () => ({ ...initialRoom })),
-};
-const initialLine5: LineType = {
-  rooms: Array.from({ length: 16 }, () => ({ ...initialRoom })),
-};
-
-////////// 층 초기화
-const initialFloor: FloorType = {
-  floorNumber: 0,
-  lines: [initialLine1, initialLine2, initialLine3, initialLine4, initialLine5],
-};
-
 ////////// 기숙사 초기화
 const initialDormitory: DormitoryType = {
-  sex: "male",
-  useFloorNumbers: [0, 1, 2, 3, 4, 5, 6, 7, 8],
-  // floors: Array.from({ length: 9 }, (_, index) => ({
-  floors: Array.from({ length: 9 }, (_, index) => ({
-    ...initialFloor,
-    floorNumber: index,
-  })),
+  male: getDormitory({ sex: "male", useFloorNumbers: [0, 1, 2, 3] }),
+  female: getDormitory({ sex: "female", useFloorNumbers: [4, 5, 6, 7] }),
 };
 
 type AssignRoomParamsType = {
+  sex: "male" | "female";
   church: ChurchType;
   count: number;
   floorIndex: number;
@@ -66,26 +31,26 @@ type DormitoryStoreType = {
   // 설정값 관련
   maxRoomPeople: number;
   setMaxRoomPeople: (maxRoomPeople: number) => void;
-  maxFloor: number;
+  maxFloor: number; 
   setMaxFloor: (maxFloor: number) => void;
 
   // 방 인원 빼기 관련
-  updateRoomCurrentAndRemain: ({ church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) => void;
+  updateRoomCurrentAndRemain: ({ sex,   church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) => void;
 };
 
 export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
   // 기숙사 데이터
-  dormitoryData: getDormitory({ sex: "male", useFloorNumbers: [0, 1, 2, 3, 4, 5, 6, 7, 8] }),
+  dormitoryData: initialDormitory,
   // 기숙사 데이터 설정
   setDormitoryData: (dormitoryData) => set({ dormitoryData }),
   // 기숙사 데이터 초기화
   initDormitoryData: () => set({ dormitoryData: initialDormitory }),
 
-  updateRoomCurrentAndRemain: ({ church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) => {
+  updateRoomCurrentAndRemain: ({ sex, church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) => {
     set(
       produce((state) => {
         const dormitoryData = state.dormitoryData;
-        const targetRoom = dormitoryData?.floors[floorIndex].lines[lineIndex].rooms[roomIndex];
+        const targetRoom = dormitoryData?.[sex].floors[floorIndex].lines[lineIndex].rooms[roomIndex];
         const roomRemain = targetRoom.remain - count;
         const roomCurrent = targetRoom.current + count;
 
@@ -95,8 +60,8 @@ export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
           if (roomRemain < 0 || roomCurrent > 7) {
             return;
           } else {
-            dormitoryData.floors[floorIndex].lines[lineIndex].rooms[roomIndex].remain = roomRemain;
-            dormitoryData.floors[floorIndex].lines[lineIndex].rooms[roomIndex].current = roomCurrent;
+            dormitoryData[sex].floors[floorIndex].lines[lineIndex].rooms[roomIndex].remain = roomRemain;
+            dormitoryData[sex].floors[floorIndex].lines[lineIndex].rooms[roomIndex].current = roomCurrent;
             targetRoom.assignedChurchArray.push({ ...church, people: count });
           }
         }

@@ -6,7 +6,7 @@ import React from "react";
 
 const FloorView = () => {
   const { dormitoryData, currentFloor } = useDormitoryStore();
-  const lines: LineType[] = dormitoryData?.floors[currentFloor].lines || [];
+  const lines: LineType[] = dormitoryData?.male?.floors[currentFloor]?.lines || [];
 
   return (
     <Container>
@@ -63,32 +63,36 @@ const FloorView = () => {
 export default FloorView;
 
 const Container = styled(Stack)`
-  ${mixinFlex("row", "center", "start")}
-  column-gap: 16px;
+  ${mixinFlex("column", "flex-start", "flex-start")}
+  width: 100%;
+  height: 100%;
+  row-gap: 20px;
+  padding: 20px;
 `;
 
 const LineContainer = styled(Stack)`
-  ${mixinFlex("column", "center", "start")}
-  padding: 16px;
-  border: 1px solid black;
-  border-radius: 16px;
-  row-gap: 16px;
+  ${mixinFlex("column", "flex-start", "flex-start")}
+  width: 100%;
+  row-gap: 10px;
 `;
 
 const RoomContainer = styled(Stack)`
-  ${mixinFlex("column", "center", "start")}
-  padding: 16px;
-  border: 1px solid black;
-  border-radius: 16px;
-  gap: 8px;
+  ${mixinFlex("column", "flex-start", "flex-start")}
+  width: 100%;
+  row-gap: 10px;
+  padding: 10px;
+  border: 1px solid ${({ theme }) => theme.palette.primary.main};
+  border-radius: 8px;
 `;
 
 const PeopleContainer = styled(Stack)`
-  ${mixinFlex("row", "center", "center")}
-  column-gap: 8px;
+  ${mixinFlex("column", "flex-start", "flex-start")}
+  width: 100%;
+  row-gap: 5px;
 `;
 
 const ChurchContainer = styled(Stack)`
-  ${mixinFlex("column", "center", "start")}
-  column-gap: 8px;
+  ${mixinFlex("column", "flex-start", "flex-start")}
+  width: 100%;
+  row-gap: 5px;
 `;

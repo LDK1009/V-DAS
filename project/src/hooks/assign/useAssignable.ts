@@ -1,12 +1,12 @@
 import { useCurrentChurchStore } from "@/store/church/churchStore";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { ChurchType } from "@/types/currentChurchType";
-import { DormitoryType, FloorType, LineType } from "@/types/dormitory";
+import { DormitorySexType, FloorType, LineType } from "@/types/dormitory";
 //////////////////////////////////////////////////////////////////////////////// 사용중 ////////////////////////////////////////////////////////////////////////////////
 //////////////////// 남은 배정 가능 인원을 통한 기숙사 내 모든 방 조회
-function getAssignableRoomWithRemain(remain: number) {
+function getAssignableRoomWithRemain(sex: "male" | "female", remain: number) {
   const { dormitoryData } = useDormitoryStore.getState();
-  const { floors } = dormitoryData as DormitoryType;
+  const { floors } = dormitoryData?.[sex] as DormitorySexType;
 
   for (const floor of floors) {
     const { lines } = floor;
@@ -28,9 +28,9 @@ function getAssignableRoomWithRemain(remain: number) {
 }
 
 //////////////////// 마지막으로 배정된 방 인덱스 조회
-function getLastAssignedRoomIndex(floorIndex: number, lineIndex: number) {
+function getLastAssignedRoomIndex(sex: "male" | "female", floorIndex: number, lineIndex: number) {
   const { dormitoryData } = useDormitoryStore.getState();
-  const { lines } = dormitoryData?.floors[floorIndex] as FloorType;
+  const { lines } = dormitoryData?.[sex].floors[floorIndex] as FloorType;
   const { rooms } = lines[lineIndex];
 
   for (const [roomIndex, room] of [...rooms].reverse().entries()) {
@@ -43,11 +43,11 @@ function getLastAssignedRoomIndex(floorIndex: number, lineIndex: number) {
 }
 
 //////////////////// 마지막으로 배정된 방 이후의 남은 인원 조회
-function getLastAssignedRoomRemainAfter(floorIndex: number, lineIndex: number) {
+function getLastAssignedRoomRemainAfter(sex: "male" | "female", floorIndex: number, lineIndex: number) {
   const { dormitoryData } = useDormitoryStore.getState();
-  const { lines } = dormitoryData?.floors[floorIndex] as FloorType;
+  const { lines } = dormitoryData?.[sex].floors[floorIndex] as FloorType;
   const { rooms } = lines[lineIndex];
-  const startRoomIndex = getLastAssignedRoomIndex(floorIndex, lineIndex);
+  const startRoomIndex = getLastAssignedRoomIndex(sex, floorIndex, lineIndex);
 
   let remain = 0;
 
@@ -62,14 +62,15 @@ function getLastAssignedRoomRemainAfter(floorIndex: number, lineIndex: number) {
 
 //////////////////// 마지막 배정된 방 남은 인원 조회
 type GetLastAssignedRoomRemainParamsType = {
+  sex: "male" | "female";
   floorIndex: number;
   lineIndex: number;
 };
 
-function getLastAssignedRoomRemain({ floorIndex, lineIndex }: GetLastAssignedRoomRemainParamsType) {
-  const lastAssignedRoomIndex = getLastAssignedRoomIndex(floorIndex, lineIndex);
+function getLastAssignedRoomRemain({ sex, floorIndex, lineIndex }: GetLastAssignedRoomRemainParamsType) {
+  const lastAssignedRoomIndex = getLastAssignedRoomIndex(sex, floorIndex, lineIndex);
   const { dormitoryData } = useDormitoryStore.getState();
-  const lastAssignedRoom = dormitoryData?.floors[floorIndex].lines[lineIndex].rooms[lastAssignedRoomIndex];
+  const lastAssignedRoom = dormitoryData?.[sex].floors[floorIndex].lines[lineIndex].rooms[lastAssignedRoomIndex];
   const lastAssignedRoomRemain = lastAssignedRoom?.remain;
 
   return lastAssignedRoomRemain;
@@ -101,7 +102,7 @@ function getAssignableInDormitory({ sex, church }: GetAssignableInDormitoryParam
   // 실시간 최신 상태 가져오기
   const currentDormitory = useDormitoryStore.getState().dormitoryData;
 
-  const { floors } = currentDormitory as DormitoryType;
+  const { floors } = currentDormitory?.[sex] as DormitorySexType;
   const assignableFloorIndexArray: AssignableFloorIndexArrayType = [];
 
   floors.forEach((_, floorIndex) => {
@@ -325,7 +326,7 @@ function getPartnerChurch({ sex, floorIndex, lineIndex }: GetPartnerChurchParams
   const { churchMaleArray, churchFemaleArray } = useCurrentChurchStore.getState();
   const { maxRoomPeople } = useDormitoryStore.getState();
 
-  const lineRemain = getLastAssignedRoomRemainAfter(floorIndex, lineIndex);
+  const lineRemain = getLastAssignedRoomRemainAfter(sex, floorIndex, lineIndex);
   const lineNeed = lineRemain % maxRoomPeople;
 
   if (sex === "male") {
@@ -370,17 +371,18 @@ function getPartnerChurch({ sex, floorIndex, lineIndex }: GetPartnerChurchParams
 //////////////////// 라인 배정 가능 여부 조회
 
 type CheckLineAssignParamsType = {
+  sex: "male" | "female";
   church: ChurchType;
   floorIndex: number;
   lineIndex: number;
 };
 
-function checkLineAssign({ church, floorIndex, lineIndex }: CheckLineAssignParamsType): {
+function checkLineAssign({ sex, church, floorIndex, lineIndex }: CheckLineAssignParamsType): {
   isAssignable: boolean;
   lineRemain: number;
 } {
   const churchPeople = church.people;
-  const lastAssignedRoomRemainAfter = getLastAssignedRoomRemainAfter(floorIndex, lineIndex);
+  const lastAssignedRoomRemainAfter = getLastAssignedRoomRemainAfter(sex, floorIndex, lineIndex);
 
   if (churchPeople > lastAssignedRoomRemainAfter) {
     return { isAssignable: false, lineRemain: lastAssignedRoomRemainAfter };
@@ -417,12 +419,12 @@ type LineInfoType = {
 
 function getAssignableInFloor({ sex, church, floorIndex }: GetAssignableInFloorParamsType) {
   const currentDormitory = useDormitoryStore.getState().dormitoryData;
-  const { lines } = currentDormitory?.floors[floorIndex] as FloorType;
+  const { lines } = currentDormitory?.[sex].floors[floorIndex] as FloorType;
 
   const assignableLineInfoArray: LineInfoType[] = [];
 
   lines.forEach((line, lineIndex) => {
-    const { isAssignable, lineRemain } = checkLineAssign({ church, floorIndex, lineIndex });
+    const { isAssignable, lineRemain } = checkLineAssign({ sex, church, floorIndex, lineIndex });
 
     if (isAssignable) {
       assignableLineInfoArray.push({ lineIndex: lineIndex, lineRemain: lineRemain });

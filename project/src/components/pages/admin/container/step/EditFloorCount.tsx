@@ -8,10 +8,15 @@ const EditFloorCount = () => {
 
   function changeDormitoryFloor(floorCount: number) {
     setMaxFloor(floorCount);
-    const sampleFloor = dormitoryData?.floors[0] as FloorType;
+    const sampleFloor = dormitoryData?.male.floors[0] as FloorType;
 
     const newDormitory = Array.from({ length: floorCount }, (_, index) => ({ ...sampleFloor, floorNumber: index }));
-    setDormitoryData({ ...dormitoryData, floors: newDormitory });
+    const useFloorNumbers = Array.from({ length: floorCount }, (_, i) => i);
+    setDormitoryData({ 
+      ...dormitoryData, 
+      male: { ...dormitoryData?.male, sex: "male", useFloorNumbers, floors: newDormitory },
+      female: { ...dormitoryData?.female, sex: "female", useFloorNumbers, floors: newDormitory }
+    });
   }
 
   return (

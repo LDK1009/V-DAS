@@ -30,7 +30,7 @@ export const useAssign = () => {
     } else {
       evacuateChurchFemale(church.churchName, count);
     }
-    updateRoomCurrentAndRemain({ church, count, floorIndex, lineIndex, roomIndex });
+    updateRoomCurrentAndRemain({ sex, church, count, floorIndex, lineIndex, roomIndex });
   }
 
   type AssignLineParamsType = {
@@ -44,7 +44,7 @@ export const useAssign = () => {
   function assignLine({ sex, church, floorIndex, lineIndex }: AssignLineParamsType) {
     const currentDormitory = useDormitoryStore.getState().dormitoryData;
 
-    const targetLine = currentDormitory?.floors[floorIndex].lines[lineIndex];
+    const targetLine = currentDormitory?.[sex].floors[floorIndex].lines[lineIndex];
     const targetLineRooms = targetLine?.rooms as RoomType[];
 
     
@@ -71,8 +71,8 @@ export const useAssign = () => {
   function assignLineStartFromNextRoom({ sex, church, floorIndex, lineIndex }: AssignLineParamsType) {
     const currentDormitory = useDormitoryStore.getState().dormitoryData;
     const { maxRoomPeople } = useDormitoryStore.getState();
-    const line = currentDormitory?.floors[floorIndex].lines[lineIndex] as LineType;
-    const lineRemain = getLastAssignedRoomRemain({ floorIndex, lineIndex });
+    const line = currentDormitory?.[sex].floors[floorIndex].lines[lineIndex] as LineType;
+    const lineRemain = getLastAssignedRoomRemain({ sex, floorIndex, lineIndex });
     const needRoomCount = Math.ceil(church.people / maxRoomPeople);
 
     const startRoomIndex = line.rooms.length - Math.floor(lineRemain! / maxRoomPeople);
@@ -177,7 +177,7 @@ export const useAssign = () => {
 
   ////////// 작은 교회 배정
   function assignSmallChurch({ sex, church }: { sex: "male" | "female"; church: ChurchType }) {
-    const assignableRoomPoint = getAssignableRoomWithRemain(church.people);
+    const assignableRoomPoint = getAssignableRoomWithRemain(sex, church.people);
 
     if (!assignableRoomPoint) {
       console.log(`[작은 교회 배정] ${church.churchName} 배정 위치 : 배정 불가능`);
