@@ -16,7 +16,7 @@ const EditFloorCount = () => {
 
   return (
     <div>
-      <h5>층 수 설정</h5>
+      <h5>사용하는 층 개수 : {maxFloor}</h5>
       <StyeSlider
         value={maxFloor}
         valueLabelDisplay="auto"

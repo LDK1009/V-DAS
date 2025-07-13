@@ -1,7 +1,7 @@
 import { mixinFlex } from "@/styles/mixins";
 import { Stack, styled } from "@mui/material";
 import React from "react";
-import ChangeFloorButtonGroup from "../edit-dormitory/ChangeFloorButtonGroup";
+import ChangeFloorButtonGroup from "../etc/ChangeFloorButtonGroup";
 
 const ChurchListHeader = () => {
   return (

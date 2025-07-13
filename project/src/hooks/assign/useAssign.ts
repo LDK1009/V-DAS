@@ -75,7 +75,7 @@ export const useAssign = () => {
     const lineRemain = getLastAssignedRoomRemain({ floorIndex, lineIndex });
     const needRoomCount = Math.ceil(church.people / maxRoomPeople);
 
-    const startRoomIndex = line.rooms.length - Math.floor(lineRemain / maxRoomPeople);
+    const startRoomIndex = line.rooms.length - Math.floor(lineRemain! / maxRoomPeople);
     const endRoomIndex = startRoomIndex + needRoomCount;
 
     ///////////////////////////////////////////////////////////////
@@ -115,7 +115,7 @@ export const useAssign = () => {
 
   function autoAssign({ sex, church }: AutoAssignParamsType) {
     ////////// 꼬리 없는 배정
-    const assignPoint = getAssignPointWithNoTailLine({ church });
+    const assignPoint = getAssignPointWithNoTailLine({ sex, church });
 
     if (assignPoint) {
       console.log(
@@ -144,7 +144,7 @@ export const useAssign = () => {
       return;
     }
 
-    const assignPointByCombinationDifference1 = getAssignablePointByCombinationDifference({ church, difference: 1 });
+    const assignPointByCombinationDifference1 = getAssignablePointByCombinationDifference({ sex, church, difference: 1 });
     console.log("조합하여 6명이 되는 배정", assignPointByCombinationDifference1);
     ////////// 조합하여 6명이 되는 배정
     if (assignPointByCombinationDifference1) {
@@ -160,7 +160,7 @@ export const useAssign = () => {
 
     ////////// 조합하여 5명이 되는 배정
 
-    const assignPointByCombinationDifference2 = getAssignablePointByCombinationDifference({ church, difference: 2 });
+    const assignPointByCombinationDifference2 = getAssignablePointByCombinationDifference({ sex, church, difference: 2 });
     console.log("조합하여 5명이 되는 배정", assignPointByCombinationDifference2);
 
     if (assignPointByCombinationDifference2) {

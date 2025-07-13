@@ -2,6 +2,7 @@ import { DormitoryType, FloorType, LineType, RoomType } from "@/types/dormitory"
 import { create } from "zustand";
 import { produce } from "immer";
 import { ChurchType } from "@/types/currentChurchType";
+import { getDormitory } from "@/utils/dormitory/make";
 
 ////////// 방 초기화
 const initialRoom: RoomType = {
@@ -36,6 +37,8 @@ const initialFloor: FloorType = {
 
 ////////// 기숙사 초기화
 const initialDormitory: DormitoryType = {
+  sex: "male",
+  useFloorNumbers: [0, 1, 2, 3, 4, 5, 6, 7, 8],
   // floors: Array.from({ length: 9 }, (_, index) => ({
   floors: Array.from({ length: 9 }, (_, index) => ({
     ...initialFloor,
@@ -72,7 +75,7 @@ type DormitoryStoreType = {
 
 export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
   // 기숙사 데이터
-  dormitoryData: initialDormitory,
+  dormitoryData: getDormitory({ sex: "male", useFloorNumbers: [0, 1, 2, 3, 4, 5, 6, 7, 8] }),
   // 기숙사 데이터 설정
   setDormitoryData: (dormitoryData) => set({ dormitoryData }),
   // 기숙사 데이터 초기화

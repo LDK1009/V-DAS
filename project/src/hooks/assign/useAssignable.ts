@@ -91,12 +91,13 @@ function getLineRemain({ line }: GetLineRemainParamsType) {
 
 //////////////////// 기숙사 내 모든 배정 가능 라인 조회
 type GetAssignableInDormitoryParamsType = {
+  sex: "male" | "female";
   church: ChurchType;
 };
 
 type AssignableFloorIndexArrayType = { floorIndex: number; lineInfoArray: LineInfoType[] }[];
 
-function getAssignableInDormitory({ church }: GetAssignableInDormitoryParamsType) {
+function getAssignableInDormitory({ sex, church }: GetAssignableInDormitoryParamsType) {
   // 실시간 최신 상태 가져오기
   const currentDormitory = useDormitoryStore.getState().dormitoryData;
 
@@ -104,7 +105,7 @@ function getAssignableInDormitory({ church }: GetAssignableInDormitoryParamsType
   const assignableFloorIndexArray: AssignableFloorIndexArrayType = [];
 
   floors.forEach((_, floorIndex) => {
-    const assignableLineIndexArray = getAssignableInFloor({ church, floorIndex });
+    const assignableLineIndexArray = getAssignableInFloor({ sex, church, floorIndex });
 
     if (assignableLineIndexArray.length > 0) {
       assignableFloorIndexArray.push({ floorIndex: floorIndex, lineInfoArray: assignableLineIndexArray });
@@ -120,11 +121,12 @@ function getAssignableInDormitory({ church }: GetAssignableInDormitoryParamsType
 
 //////////////////// 기숙사 내 모든 배정 가능 중 나머지가 남지 않는 라인 조회
 type GetAssignableFloorsWithNoTailLineParamsType = {
+  sex: "male" | "female";
   church: ChurchType;
 };
 
-function getAssignableFloorsWithNoTailLine({ church }: GetAssignableFloorsWithNoTailLineParamsType) {
-  const assignableFloors = getAssignableInDormitory({ church }) as AssignableFloorIndexArrayType;
+function getAssignableFloorsWithNoTailLine({ sex, church }: GetAssignableFloorsWithNoTailLineParamsType) {
+  const assignableFloors = getAssignableInDormitory({ sex, church }) as AssignableFloorIndexArrayType;
   const { maxRoomPeople } = useDormitoryStore.getState();
   const churchPeople = church.people;
   const churchRemain = churchPeople % maxRoomPeople;
@@ -156,15 +158,17 @@ function getAssignableFloorsWithNoTailLine({ church }: GetAssignableFloorsWithNo
 //////////////////// 기숙사 내 모든 배정 가능 중 조합의 차이값에 따른 라인 조회
 
 type GetAssignableFloorsByCombinationDifferenceParamsType = {
+  sex: "male" | "female";
   church: ChurchType;
   difference: number;
 };
 
 function getAssignableFloorsByCombinationDifference({
+  sex,
   church,
   difference,
 }: GetAssignableFloorsByCombinationDifferenceParamsType) {
-  const assignableFloors = getAssignableInDormitory({ church }) as AssignableFloorIndexArrayType;
+  const assignableFloors = getAssignableInDormitory({ sex, church }) as AssignableFloorIndexArrayType;
 
   console.log("전체 배정 가능 라인", assignableFloors);
   const { maxRoomPeople } = useDormitoryStore.getState();
@@ -270,11 +274,12 @@ function getAssignPoint({ fiveLines, otherLines }: GetAssignPointParamsType) {
 
 //////////////////// 꼬리 없는 배정 위치 얻기
 type GetAssignPointWithNoTailLineParamsType = {
+  sex: "male" | "female";
   church: ChurchType;
 };
 
-function getAssignPointWithNoTailLine({ church }: GetAssignPointWithNoTailLineParamsType) {
-  const assignableData = getAssignableFloorsWithNoTailLine({ church });
+function getAssignPointWithNoTailLine({ sex, church }: GetAssignPointWithNoTailLineParamsType) {
+  const assignableData = getAssignableFloorsWithNoTailLine({ sex, church });
   const seperatedData = separateAssignFloorsToFiveLinesAndOthers(assignableData as AssignableFloorIndexArrayType);
   const assignPoint = getAssignPoint(seperatedData);
 
@@ -287,15 +292,17 @@ function getAssignPointWithNoTailLine({ church }: GetAssignPointWithNoTailLinePa
 
 //////////////////// 조합 차이값에 따른 배정 위치 조회
 type GetAssignablePointByCombinationDifferenceParamsType = {
+  sex: "male" | "female";
   church: ChurchType;
   difference: number;
 };
 
 function getAssignablePointByCombinationDifference({
+  sex,
   church,
   difference,
 }: GetAssignablePointByCombinationDifferenceParamsType) {
-  const assignableData = getAssignableFloorsByCombinationDifference({ church, difference });
+  const assignableData = getAssignableFloorsByCombinationDifference({ sex, church, difference });
   const seperatedData = separateAssignFloorsToFiveLinesAndOthers(assignableData as AssignableFloorIndexArrayType);
   const assignPoint = getAssignPoint(seperatedData);
 
@@ -398,6 +405,7 @@ function checkLineAssign({ church, floorIndex, lineIndex }: CheckLineAssignParam
 //////////////////// 배정 가능 층 조회
 
 type GetAssignableInFloorParamsType = {
+  sex: "male" | "female";
   church: ChurchType;
   floorIndex: number;
 };
@@ -407,7 +415,7 @@ type LineInfoType = {
   lineRemain: number;
 };
 
-function getAssignableInFloor({ church, floorIndex }: GetAssignableInFloorParamsType) {
+function getAssignableInFloor({ sex, church, floorIndex }: GetAssignableInFloorParamsType) {
   const currentDormitory = useDormitoryStore.getState().dormitoryData;
   const { lines } = currentDormitory?.floors[floorIndex] as FloorType;
 
@@ -427,11 +435,12 @@ function getAssignableInFloor({ church, floorIndex }: GetAssignableInFloorParams
 //////////////////// 추천 배정 위치 조회
 
 type GetRecommendedAssignmentPointParamsType = {
+  sex: "male" | "female";
   church: ChurchType;
 };
 
-function getRecommendedAssignmentPoint({ church }: GetRecommendedAssignmentPointParamsType) {
-  const assignableFloorIndexArray = getAssignableInDormitory({ church });
+function getRecommendedAssignmentPoint({ sex, church }: GetRecommendedAssignmentPointParamsType) {
+  const assignableFloorIndexArray = getAssignableInDormitory({ sex, church });
 
   // 추천 배정 위치(저층의 마지막 라인)
   if (assignableFloorIndexArray && assignableFloorIndexArray.length > 0) {
@@ -449,10 +458,11 @@ function getRecommendedAssignmentPoint({ church }: GetRecommendedAssignmentPoint
 //////////////////// 핏한 배정 위치 조회
 
 type GetFitAssignPointParamsType = {
+  sex: "male" | "female";
   church: ChurchType;
 };
 
-function getFitAssignPoint({ church }: GetFitAssignPointParamsType) {
+function getFitAssignPoint({ sex, church }: GetFitAssignPointParamsType) {
   // 방 최대 인원 가져오기
   const { maxRoomPeople } = useDormitoryStore.getState();
   // 교회의 나머지 인원
@@ -461,7 +471,7 @@ function getFitAssignPoint({ church }: GetFitAssignPointParamsType) {
   // console.log(`${church.churchName} 모든 배정 가능 라인 \n ${JSON.stringify(assignableFloorIndexArray, null, 2)}`);
 
   // 모든 배정 가능 라인 조회
-  const assignableFloorIndexArray = getAssignableInDormitory({ church });
+  const assignableFloorIndexArray = getAssignableInDormitory({ sex, church });
 
   // 배정 가능 라인이 없을때
   if (!assignableFloorIndexArray || assignableFloorIndexArray.length === 0) {

@@ -46,6 +46,7 @@ const ChurchList = styled(Stack)`
   ${mixinFlex("column", "start", "center")}
   width: 100%;
   height: 100%;
+  max-height: 804px;
   padding: 26px 18px;
   row-gap: 14px;
   overflow-y: auto;

@@ -18,6 +18,8 @@ type FloorType = {
 };
 
 type DormitoryType = {
+  sex: "male" | "female";
+  useFloorNumbers: number[];
   floors: FloorType[];
 };
 

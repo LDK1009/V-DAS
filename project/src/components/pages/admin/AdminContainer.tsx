@@ -4,16 +4,16 @@ import React from "react";
 import EditDormitoryContainer from "./container/edit-dormitory/EditDormitoryContainer";
 import { Stack, styled } from "@mui/material";
 import ChurchListContainer from "./container/church-list/ChurchListContainer";
-import ButtonSection from "./container/button/ButtonSection";
 import Header from "./container/etc/Header";
 import { mixinFlex } from "@/styles/mixins";
 import ChurchListHeader from "./container/church-list/ChurchListHeader";
+import StepSection from "./container/step/StepSection";
 
 const AdminContainer = () => {
   return (
     <Container>
       <Header />
-      <ButtonSection />
+      <StepSection />
       <BodyArea>
         <BodyLeft>
           <ChurchListHeader />
