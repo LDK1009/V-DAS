@@ -1,6 +1,6 @@
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { mixinFlex } from "@/styles/mixins";
-import { Button, Stack, styled } from "@mui/material";
+import { Box, Button, Stack, styled } from "@mui/material";
 import { shouldForwardProp } from "@/utils/mui";
 
 const ChangeFloorButtonGroup = () => {
@@ -14,38 +14,30 @@ const ChangeFloorButtonGroup = () => {
       <ButtonGroup>
         <MaleButtonGroup>
           {maleUseFloorNumbers.map((floorNumber) => (
-            <MaleFloorButton
-              key={floorNumber}
-              $isSelected={currentFloor === floorNumber}
-              variant={currentFloor === floorNumber ? "contained" : "outlined"}
-              onClick={() => setCurrentFloor(floorNumber)}
-            >
-              {floorNumber}
-            </MaleFloorButton>
+            <MaleButtonBorder key={floorNumber} $isSelected={currentFloor === floorNumber}>
+              <MaleFloorButton
+                key={floorNumber}
+                $isSelected={currentFloor === floorNumber}
+                onClick={() => setCurrentFloor(floorNumber)}
+              >
+                {floorNumber}
+              </MaleFloorButton>
+            </MaleButtonBorder>
           ))}
         </MaleButtonGroup>
         <FemaleButtonGroup>
           {femaleUseFloorNumbers.map((floorNumber) => (
-            <FemaleFloorButton
-              key={floorNumber}
-              $isSelected={currentFloor === floorNumber}
-              variant={currentFloor === floorNumber ? "contained" : "outlined"}
-              onClick={() => setCurrentFloor(floorNumber)}
-            >
-              {floorNumber}
-            </FemaleFloorButton>
+            <FemaleButtonBorder key={floorNumber} $isSelected={currentFloor === floorNumber}>
+              <FemaleFloorButton
+                key={floorNumber}
+                $isSelected={currentFloor === floorNumber}
+                onClick={() => setCurrentFloor(floorNumber)}
+              >
+                {floorNumber}
+              </FemaleFloorButton>
+            </FemaleButtonBorder>
           ))}
         </FemaleButtonGroup>
-
-        {/* {useFloorNumbers.map((floorNumber) => (
-          <FloorButton
-            key={floorNumber}
-            variant={currentFloor === floorNumber ? "contained" : "outlined"}
-            onClick={() => setCurrentFloor(floorNumber)}
-          >
-            {floorNumber}
-          </FloorButton>
-        ))} */}
       </ButtonGroup>
     </Container>
   );
@@ -80,16 +72,25 @@ const FloorButton = styled(Button, { shouldForwardProp })<FloorButtonPropsType>`
 
 const MaleButtonGroup = styled(Stack)`
   ${mixinFlex("row", "center", "center")}
-  gap: 8px;
 `;
 
 const FemaleButtonGroup = styled(MaleButtonGroup)``;
 
 const MaleFloorButton = styled(FloorButton, { shouldForwardProp })<FloorButtonPropsType>`
-  background-color: ${({ theme, $isSelected }) => ($isSelected ? theme.palette.primary.main : "#6495ED")};
+  background-color: #6495ed;
   color: ${({ theme }) => theme.palette.text.white};
 `;
 
 const FemaleFloorButton = styled(MaleFloorButton, { shouldForwardProp })<FloorButtonPropsType>`
-  background-color: ${({ theme, $isSelected }) => ($isSelected ? theme.palette.primary.main : "#ff66b2")};
+  background-color: #ff66b2;
+`;
+
+const MaleButtonBorder = styled(Box, { shouldForwardProp })<FloorButtonPropsType>`
+  padding: 4px;
+  border: 1px solid ${({ $isSelected }) => ($isSelected ? "#6495ED" : "transparent")};
+  border-radius: 8px;
+`;
+
+const FemaleButtonBorder = styled(MaleButtonBorder)`
+  border: 1px solid ${({ $isSelected }) => ($isSelected ? "#ff66b2" : "transparent")};
 `;

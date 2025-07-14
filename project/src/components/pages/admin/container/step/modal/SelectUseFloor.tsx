@@ -49,18 +49,10 @@ const SelectUseFloor = () => {
   return (
     <Container>
       <SelectSexButtonContainer>
-        <SelectMaleButton
-          $isSelected={selectedSex === "male"}
-          variant={selectedSex === "male" ? "contained" : "outlined"}
-          onClick={() => setSelectedSex("male")}
-        >
+        <SelectMaleButton $isSelected={selectedSex === "male"} onClick={() => setSelectedSex("male")}>
           남자
         </SelectMaleButton>
-        <SelectFemaleButton
-          $isSelected={selectedSex === "female"}
-          variant={selectedSex === "female" ? "contained" : "outlined"}
-          onClick={() => setSelectedSex("female")}
-        >
+        <SelectFemaleButton $isSelected={selectedSex === "female"} onClick={() => setSelectedSex("female")}>
           여자
         </SelectFemaleButton>
       </SelectSexButtonContainer>
@@ -97,12 +89,14 @@ const SelectSexButton = styled(Button)`
 
 const SelectMaleButton = styled(SelectSexButton, { shouldForwardProp })<SelectSexButtonPropsType>`
   background-color: ${({ $isSelected }) => ($isSelected ? "#6495ED" : "white")};
-  color: ${({ theme, $isSelected }) => ($isSelected ? theme.palette.text.white : theme.palette.primary.main)};
+  color: ${({ theme, $isSelected }) => ($isSelected ? theme.palette.text.white : "#6495ED")};
+  border: 1px solid #6495ed;
 `;
 
 const SelectFemaleButton = styled(SelectSexButton, { shouldForwardProp })<SelectSexButtonPropsType>`
   background-color: ${({ $isSelected }) => ($isSelected ? "#ff66b2" : "white")};
-  color: ${({ theme, $isSelected }) => ($isSelected ? theme.palette.text.white : theme.palette.primary.main)};
+  color: ${({ theme, $isSelected }) => ($isSelected ? theme.palette.text.white : "#ff66b2")};
+  border: 1px solid #ff66b2;
 `;
 
 const FloorSelectButtonContainer = styled(Stack)`
