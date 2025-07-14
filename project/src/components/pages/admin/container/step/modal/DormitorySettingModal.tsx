@@ -1,8 +1,8 @@
-import { Modal, Stack, styled, Typography } from "@mui/material";
+import { Button, Modal, Stack, styled, Typography } from "@mui/material";
 import React from "react";
 import { useEditDormitoryModalStore } from "@/store/ui/editDormitoryModalStore";
 import SelectUseFloor from "./SelectUseFloor";
-import { mixinFlex } from "@/styles/mixins";
+import { mixinFlex, mixinMuiButtonNoShadow } from "@/styles/mixins";
 import SettingMaxPeopleCount from "./SettingMaxPeopleCount";
 
 const DormitorySettingModal = () => {
@@ -12,7 +12,7 @@ const DormitorySettingModal = () => {
       <ModalContainer>
         <Wrapper>
           <Typography variant="h6" textAlign="center">
-           1. 사용 층 선택
+            1. 사용 층 선택
           </Typography>
           <SelectUseFloor />
         </Wrapper>
@@ -22,6 +22,9 @@ const DormitorySettingModal = () => {
           </Typography>
           <SettingMaxPeopleCount />
         </Wrapper>
+        <SaveButton variant="contained" onClick={() => setIsEditDormitoryModalOpen(false)}>
+          저장
+        </SaveButton>
       </ModalContainer>
     </Modal>
   );
@@ -38,11 +41,16 @@ const ModalContainer = styled(Stack)`
   left: 50%;
   transform: translate(-50%, -50%);
   border-radius: 16px;
-  padding: 48px 24px;
-  row-gap: 16px;
+  padding: 48px 32px;
+  row-gap: 32px;
 `;
 
 const Wrapper = styled(Stack)`
   ${mixinFlex("column", "center", "center")}
   row-gap: 8px;
+`;
+
+const SaveButton = styled(Button)`
+  ${mixinMuiButtonNoShadow}
+  color: ${({ theme }) => theme.palette.text.white};
 `;

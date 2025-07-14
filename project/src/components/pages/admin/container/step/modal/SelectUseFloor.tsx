@@ -73,6 +73,7 @@ export default SelectUseFloor;
 
 const Container = styled(Stack)`
   ${mixinFlex("column", "center", "center")}
+  width: 100%;
   row-gap: 16px;
   padding: 32px 16px;
   border: 1px solid ${({ theme }) => theme.palette.primary.main};
