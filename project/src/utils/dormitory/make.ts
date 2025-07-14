@@ -1,4 +1,4 @@
-import { DormitoryType, LineType, FloorType, RoomType } from "@/types/dormitory";
+import { LineType, FloorType, RoomType } from "@/types/dormitory";
 
 ////////// 방 초기화
 const initialRoom: RoomType = {

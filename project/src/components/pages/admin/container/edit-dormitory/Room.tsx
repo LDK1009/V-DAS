@@ -6,7 +6,17 @@ import React from "react";
 import ChurchItem from "../church-list/ChurchItem";
 import { shouldForwardProp } from "@/utils/mui";
 
-const Room = ({ lineIndex, room, roomIndex, customRoomNumber }: { lineIndex: number; room: RoomType; roomIndex: number; customRoomNumber?: number }) => {
+const Room = ({
+  lineIndex,
+  room,
+  roomIndex,
+  customRoomNumber,
+}: {
+  lineIndex: number;
+  room: RoomType;
+  roomIndex: number;
+  customRoomNumber?: number;
+}) => {
   const { currentFloor } = useDormitoryStore();
   const { maxRoomPeople } = useDormitoryStore.getState();
 
@@ -35,7 +45,10 @@ const Room = ({ lineIndex, room, roomIndex, customRoomNumber }: { lineIndex: num
 
   return (
     <Container>
-      <RoomNumberContainer>{`${currentFloor + 1}${String(customRoomNumber || roomNumber).padStart(2, "0")}`}</RoomNumberContainer>
+      <RoomNumberContainer>{`${currentFloor + 1}${String(customRoomNumber || roomNumber).padStart(
+        2,
+        "0"
+      )}`}</RoomNumberContainer>
 
       <ChurchContainer>
         {room.assignedChurchArray.map((church, churchIndex) => {

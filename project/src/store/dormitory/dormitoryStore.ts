@@ -1,4 +1,4 @@
-import { DormitoryType } from "@/types/dormitory";
+import { DormitoryType, FloorType, LineType, RoomType } from "@/types/dormitory";
 import { create } from "zustand";
 import { produce } from "immer";
 import { ChurchType } from "@/types/currentChurchType";
@@ -31,6 +31,7 @@ type DormitoryStoreType = {
   // 현재 층 관련
   currentFloor: number;
   setCurrentFloor: (floor: number) => void;
+
   // 설정값 관련
   maxRoomPeople: number;
   setMaxRoomPeople: (maxRoomPeople: number) => void;
@@ -86,7 +87,37 @@ export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
 
   // 설정값 관련
   maxRoomPeople: 7,
-  setMaxRoomPeople: (maxRoomPeople: number) => set({ maxRoomPeople }),
+  setMaxRoomPeople: (maxRoomPeople: number) => {
+    // 최대 인원 설정
+    set({ maxRoomPeople });
+    // 기숙사 데이터 업데이트
+    set(
+      produce((state) => {
+        const dormitoryData = state.dormitoryData;
+
+        if (dormitoryData) {
+          dormitoryData.male.floors.forEach((floor: FloorType) => {
+            floor.lines.forEach((line: LineType) => {
+              line.rooms.forEach((room: RoomType) => {
+                room.max = maxRoomPeople;
+                room.remain = maxRoomPeople;
+              });
+            });
+          });
+
+          dormitoryData.female.floors.forEach((floor: FloorType) => {
+            floor.lines.forEach((line: LineType) => {
+              line.rooms.forEach((room: RoomType) => {
+                room.max = maxRoomPeople;
+                room.remain = maxRoomPeople;
+              });
+            });
+          });
+        }
+      })
+    );
+  },
+
   maxFloor: 9,
   setMaxFloor: (maxFloor: number) => set({ maxFloor }),
 
