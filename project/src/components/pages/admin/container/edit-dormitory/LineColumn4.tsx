@@ -5,9 +5,13 @@ import Room from "./Room";
 
 const LineColumn4 = () => {
   const { dormitoryData, currentFloor } = useDormitoryStore();
+
+  const anySexFloors = [...(dormitoryData?.male?.floors || []), ...(dormitoryData?.female?.floors || [])];
+  const floors = anySexFloors.filter((floor) => floor.floorNumber === currentFloor)[0];
+
   const splitPoint = 11;
-  const lineData4_1 = dormitoryData?.male?.floors[currentFloor]?.lines[4]?.rooms.slice(0, splitPoint);
-  const lineData4_2 = dormitoryData?.male?.floors[currentFloor]?.lines[4]?.rooms.slice(splitPoint);
+  const lineData4_1 = floors?.lines[4]?.rooms.slice(0, splitPoint);
+  const lineData4_2 = floors?.lines[4]?.rooms.slice(splitPoint);
 
   if (!lineData4_1 || !lineData4_2) return null;
 
@@ -24,7 +28,15 @@ const LineColumn4 = () => {
         <LineContainer>
           {lineData4_2.map((room, roomIndex) => {
             const roomNumber = 33 + roomIndex;
-            return <Room lineIndex={4} room={room} roomIndex={roomIndex} customRoomNumber={roomNumber} key={`${currentFloor}-${4}-${roomNumber}`} />;
+            return (
+              <Room
+                lineIndex={4}
+                room={room}
+                roomIndex={roomIndex}
+                customRoomNumber={roomNumber}
+                key={`${currentFloor}-${4}-${roomNumber}`}
+              />
+            );
           })}
         </LineContainer>
       </Container>
@@ -35,8 +47,7 @@ const LineColumn4 = () => {
 export default LineColumn4;
 
 const Container = styled(Stack)`
-  width: 100%;
-  height: 100%;
+  padding: 12px 8px;
 `;
 
 const LineContainer = styled(Stack)`

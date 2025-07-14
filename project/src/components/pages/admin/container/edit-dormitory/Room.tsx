@@ -45,7 +45,7 @@ const Room = ({
 
   return (
     <Container>
-      <RoomNumberContainer>{`${currentFloor + 1}${String(customRoomNumber || roomNumber).padStart(
+      <RoomNumberContainer>{`${currentFloor}${String(customRoomNumber || roomNumber).padStart(
         2,
         "0"
       )}`}</RoomNumberContainer>
@@ -66,6 +66,7 @@ const Container = styled(Stack)`
   ${mixinFlex("row", "start", "center")}
   width: 100%;
   height: 100%;
+  max-width: 250px;
   border: 1px solid black;
   border-radius: 8px;
   overflow: hidden;

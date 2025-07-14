@@ -6,8 +6,8 @@ import { getDormitory } from "@/utils/dormitory/make";
 
 ////////// 기숙사 초기화
 const initialDormitory: DormitoryType = {
-  male: getDormitory({ sex: "male", useFloorNumbers: [0, 1, 2, 3] }),
-  female: getDormitory({ sex: "female", useFloorNumbers: [4, 5, 6, 7] }),
+  male: getDormitory({ sex: "male", useFloorNumbers: [2, 3, 4, 5] }),
+  female: getDormitory({ sex: "female", useFloorNumbers: [6, 7, 8, 9] }),
 };
 
 type AssignRoomParamsType = {
@@ -122,7 +122,7 @@ export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
   setMaxFloor: (maxFloor: number) => set({ maxFloor }),
 
   // 현재 보고있는 층
-  currentFloor: 0,
+  currentFloor: 2,
   // 현재 보고있는 층 변경
   setCurrentFloor: (floor) => set({ currentFloor: floor }),
 }));

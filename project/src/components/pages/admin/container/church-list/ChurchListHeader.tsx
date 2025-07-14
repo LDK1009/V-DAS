@@ -1,13 +1,11 @@
 import { mixinFlex } from "@/styles/mixins";
 import { Stack, styled } from "@mui/material";
 import React from "react";
-import ChangeFloorButtonGroup from "../etc/ChangeFloorButtonGroup";
 
 const ChurchListHeader = () => {
   return (
     <Container>
       <h4>검색바 들어올 예정</h4>
-      <ChangeFloorButtonGroup />
     </Container>
   );
 };

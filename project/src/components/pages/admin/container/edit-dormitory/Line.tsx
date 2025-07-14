@@ -5,7 +5,8 @@ import Room from "./Room";
 
 const Line = ({ lineIndex }: { lineIndex: number }) => {
   const { dormitoryData, currentFloor } = useDormitoryStore();
-  const lineData = dormitoryData?.male?.floors[currentFloor]?.lines[lineIndex];
+  const anySexFloors = [...(dormitoryData?.male?.floors || []), ...(dormitoryData?.female?.floors || [])];
+  const lineData = anySexFloors.filter((floor) => floor.floorNumber === currentFloor)[0]?.lines[lineIndex];
 
   if (!lineData) return null;
 

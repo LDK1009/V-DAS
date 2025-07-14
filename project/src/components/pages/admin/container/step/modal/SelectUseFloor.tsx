@@ -1,60 +1,16 @@
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { mixinFlex, mixinMuiButtonNoShadow } from "@/styles/mixins";
 import { Button, Stack, styled } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { shouldForwardProp } from "@/utils/mui";
 import { DormitoryType } from "@/types/dormitory";
 import { getDormitory } from "@/utils/dormitory/make";
-import { enqueueSnackbar } from "notistack";
+import { useFloorStore } from "@/store/dormitory/useFloorStore";
 
 const SelectUseFloor = () => {
   ////////////////////////////////////////////////// 상태관리
-  const [selectedSex, setSelectedSex] = useState<"male" | "female">("male");
-  const [useFloorNumbers, setUseFloorNumbers] = useState<{ male: number[]; female: number[] }>({
-    male: [2, 3, 4, 5],
-    female: [6, 7, 8, 9],
-  });
+  const { selectedSex, setSelectedSex, useFloorNumbers, handleSelectUseFloor } = useFloorStore();
   const { setUseFloor, setDormitoryData } = useDormitoryStore();
-
-  ////////////////////////////////////////////////// 함수
-  // 층 버튼 선택
-  function handleSelectUseFloor(floorNumber: number) {
-    if (selectedSex === "male") {
-      addFloor("male", floorNumber);
-    }
-    if (selectedSex === "female") {
-      addFloor("female", floorNumber);
-    }
-  }
-
-  // 층 버튼 추가
-  function addFloor(sex: "male" | "female", floorNumber: number) {
-    const allUseFloor = [...useFloorNumbers.male, ...useFloorNumbers.female];
-
-    // 이미 추가된 층인 경우
-    if (allUseFloor.includes(floorNumber)) {
-      const newMaleUseFloor = useFloorNumbers.male.filter((number) => {
-        return number !== floorNumber;
-      });
-
-      const newFemaleUseFloor = useFloorNumbers.female.filter((number) => {
-        return number !== floorNumber;
-      });
-
-      if (newMaleUseFloor.length === 0 || newFemaleUseFloor.length === 0) {
-        enqueueSnackbar("최소 1개의 층을 선택해주세요.", { variant: "error" });
-        return;
-      }
-
-      setUseFloorNumbers((prev) => ({ ...prev, male: newMaleUseFloor, female: newFemaleUseFloor }));
-
-      return;
-    }
-
-    // 추가되지 않은 층인 경우
-    const newUseFloorNumbers = [...useFloorNumbers[sex], floorNumber];
-    setUseFloorNumbers((prev) => ({ ...prev, [sex]: newUseFloorNumbers }));
-  }
 
   ////////////////////////////////////////////////// 렌더링
   // 층 버튼 렌더링
@@ -93,18 +49,20 @@ const SelectUseFloor = () => {
   return (
     <Container>
       <SelectSexButtonContainer>
-        <SelectSexButton
+        <SelectMaleButton
+          $isSelected={selectedSex === "male"}
           variant={selectedSex === "male" ? "contained" : "outlined"}
           onClick={() => setSelectedSex("male")}
         >
           남자
-        </SelectSexButton>
-        <SelectSexButton
+        </SelectMaleButton>
+        <SelectFemaleButton
+          $isSelected={selectedSex === "female"}
           variant={selectedSex === "female" ? "contained" : "outlined"}
           onClick={() => setSelectedSex("female")}
         >
           여자
-        </SelectSexButton>
+        </SelectFemaleButton>
       </SelectSexButtonContainer>
       <FloorSelectButtonContainer>{renderFloorButton}</FloorSelectButtonContainer>
     </Container>
@@ -127,9 +85,23 @@ const SelectSexButtonContainer = styled(Stack)`
   width: 100%;
 `;
 
+type SelectSexButtonPropsType = {
+  $isSelected: boolean;
+};
+
 const SelectSexButton = styled(Button)`
   flex: 1;
   ${mixinMuiButtonNoShadow}
+`;
+
+const SelectMaleButton = styled(SelectSexButton, { shouldForwardProp })<SelectSexButtonPropsType>`
+  background-color: ${({ $isSelected }) => ($isSelected ? "#6495ED" : "white")};
+  color: ${({ theme, $isSelected }) => ($isSelected ? theme.palette.text.white : theme.palette.primary.main)};
+`;
+
+const SelectFemaleButton = styled(SelectSexButton, { shouldForwardProp })<SelectSexButtonPropsType>`
+  background-color: ${({ $isSelected }) => ($isSelected ? "#ff66b2" : "white")};
+  color: ${({ theme, $isSelected }) => ($isSelected ? theme.palette.text.white : theme.palette.primary.main)};
 `;
 
 const FloorSelectButtonContainer = styled(Stack)`
@@ -150,7 +122,7 @@ const FloorSelectButton = styled(Button, { shouldForwardProp })<FloorSelectButto
   max-height: 40px;
   min-width: 40px;
   min-height: 40px;
-  background-color: ${({ $isInMale, $isInFemale }) => ($isInMale ? "blue" : $isInFemale ? "red" : "white")};
+  background-color: ${({ $isInMale, $isInFemale }) => ($isInMale ? "#6495ED	" : $isInFemale ? "#ff66b2" : "white")};
   color: ${({ theme, $isInMale, $isInFemale }) => ($isInMale || $isInFemale ? "white" : theme.palette.primary.main)};
   border: 1px solid
     ${({ theme, $isInMale, $isInFemale }) => ($isInMale || $isInFemale ? "transparent" : theme.palette.primary.main)};
