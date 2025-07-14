@@ -8,7 +8,7 @@ import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { useAssign } from "@/hooks/assign/useAssign";
 import FileUploadStepCard from "./FileUploadStepCard";
 import { useEditDormitoryModalStore } from "@/store/ui/editDormitoryModalStore";
-import DormitorySettingModal from "./DormitorySettingModal";
+import DormitorySettingModal from "./modal/DormitorySettingModal";
 import { AutoAwesomeRounded } from "@mui/icons-material";
 import { enqueueSnackbar } from "notistack";
 

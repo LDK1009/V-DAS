@@ -25,17 +25,20 @@ type DormitoryStoreType = {
   dormitoryData: DormitoryType | null;
   setDormitoryData: (dormitoryData: DormitoryType | null) => void;
   initDormitoryData: () => void;
+  // 사용층 관련
+  setUseFloor: (sex: "male" | "female", useFloorNumbers: number[]) => void;
+
   // 현재 층 관련
   currentFloor: number;
   setCurrentFloor: (floor: number) => void;
   // 설정값 관련
   maxRoomPeople: number;
   setMaxRoomPeople: (maxRoomPeople: number) => void;
-  maxFloor: number; 
+  maxFloor: number;
   setMaxFloor: (maxFloor: number) => void;
 
   // 방 인원 빼기 관련
-  updateRoomCurrentAndRemain: ({ sex,   church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) => void;
+  updateRoomCurrentAndRemain: ({ sex, church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) => void;
 };
 
 export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
@@ -45,6 +48,18 @@ export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
   setDormitoryData: (dormitoryData) => set({ dormitoryData }),
   // 기숙사 데이터 초기화
   initDormitoryData: () => set({ dormitoryData: initialDormitory }),
+
+  // 사용층 설정
+  setUseFloor: (sex: "male" | "female", useFloorNumbers: number[]) => {
+    set(
+      produce((state) => {
+        const dormitoryData = state.dormitoryData;
+        if (dormitoryData) {
+          dormitoryData[sex].useFloorNumbers = useFloorNumbers;
+        }
+      })
+    );
+  },
 
   updateRoomCurrentAndRemain: ({ sex, church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) => {
     set(

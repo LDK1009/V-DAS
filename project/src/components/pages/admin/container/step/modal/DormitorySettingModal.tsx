@@ -1,14 +1,17 @@
-import { Modal, Stack, styled } from "@mui/material";
+import { Modal, Stack, styled, Typography } from "@mui/material";
 import React from "react";
-import EditFloorCount from "./EditFloorCount";
 import { useEditDormitoryModalStore } from "@/store/ui/editDormitoryModalStore";
+import SelectUseFloor from "./SelectUseFloor";
 
 const DormitorySettingModal = () => {
   const { isEditDormitoryModalOpen, setIsEditDormitoryModalOpen } = useEditDormitoryModalStore();
   return (
     <Modal open={isEditDormitoryModalOpen} onClose={() => setIsEditDormitoryModalOpen(false)}>
       <ModalContainer>
-        <EditFloorCount />
+        <Typography variant="h6" textAlign="center">
+          층 선택
+        </Typography>
+        <SelectUseFloor />
       </ModalContainer>
     </Modal>
   );
@@ -25,5 +28,5 @@ const ModalContainer = styled(Stack)`
   left: 50%;
   transform: translate(-50%, -50%);
   border-radius: 16px;
-  padding: 16px;
+  padding: 24px;
 `;
