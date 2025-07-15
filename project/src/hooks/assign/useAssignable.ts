@@ -171,7 +171,6 @@ function getAssignableFloorsByCombinationDifference({
 }: GetAssignableFloorsByCombinationDifferenceParamsType) {
   const assignableFloors = getAssignableInDormitory({ sex, church }) as AssignableFloorIndexArrayType;
 
-  console.log("전체 배정 가능 라인", assignableFloors);
   const { maxRoomPeople } = useDormitoryStore.getState();
   const churchPeople = church.people;
   const churchMod = churchPeople % maxRoomPeople;
@@ -339,14 +338,6 @@ function getPartnerChurch({ sex, floorIndex, lineIndex }: GetPartnerChurchParams
       return churchMod !== 0 && church.people > 0 && lineRemain > church.people && churchMod === lineNeed;
     });
 
-    if (filteredChurchs.length > 0) {
-      const church = filteredChurchs[0];
-      console.log(`라인 남은 인원 : ${lineRemain} | 라인 필요 인원 : ${lineNeed}`);
-      console.log(
-        `[짝꿍 교회] : ${church.churchName} | 인원 : ${church.people} | 나머지 : ${church.people % maxRoomPeople}`
-      );
-    }
-
     return filteredChurchs.length > 0 ? filteredChurchs[0] : null;
   }
 
@@ -366,7 +357,7 @@ function getPartnerChurch({ sex, floorIndex, lineIndex }: GetPartnerChurchParams
   return null;
 }
 
-//////////////////////////////////////////////////////////////////////////////// 미사용중 ////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////// 미사용 ////////////////////////////////////////////////////////////////////////////////
 
 //////////////////// 라인 배정 가능 여부 조회
 
@@ -470,8 +461,6 @@ function getFitAssignPoint({ sex, church }: GetFitAssignPointParamsType) {
   // 교회의 나머지 인원
   const churchRemain = church.people % maxRoomPeople;
 
-  // console.log(`${church.churchName} 모든 배정 가능 라인 \n ${JSON.stringify(assignableFloorIndexArray, null, 2)}`);
-
   // 모든 배정 가능 라인 조회
   const assignableFloorIndexArray = getAssignableInDormitory({ sex, church });
 
@@ -494,8 +483,6 @@ function getFitAssignPoint({ sex, church }: GetFitAssignPointParamsType) {
     };
   });
 
-  console.log(`${church.churchName} 교회 배정 가능 라인의 나머지 인원 \n ${JSON.stringify(lineModArray, null, 2)}`);
-
   /////////////////////////////////////////////////////////////////////
   // 핏 O 같은 방 배정 O
   for (const floorInfo of lineModArray) {
@@ -507,8 +494,6 @@ function getFitAssignPoint({ sex, church }: GetFitAssignPointParamsType) {
       const { lineIndex } = lineInfo;
 
       if (lineMod === churchRemain) {
-        console.log(`${church.churchName} 배정 위치 ${floorIndex}층 ${lineIndex}라인 | 이어서 배치`);
-
         return {
           assignType: "sequence",
           floorIndex,
@@ -528,8 +513,6 @@ function getFitAssignPoint({ sex, church }: GetFitAssignPointParamsType) {
       const { lineIndex } = lineInfo;
 
       if (lineMod > churchRemain) {
-        console.log(`${church.churchName} 배정 위치 ${floorIndex}층 ${lineIndex}라인 | 이어서 배치`);
-
         return {
           assignType: "sequence",
           floorIndex,
@@ -549,8 +532,6 @@ function getFitAssignPoint({ sex, church }: GetFitAssignPointParamsType) {
       const { lineIndex } = lineInfo;
 
       if (lineMod < churchRemain) {
-        console.log(`${church.churchName} 배정 위치 ${floorIndex}층 ${lineIndex}라인 | 다음방 배치`);
-
         return {
           assignType: "next",
           floorIndex,

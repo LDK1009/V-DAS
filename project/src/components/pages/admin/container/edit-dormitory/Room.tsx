@@ -63,10 +63,9 @@ const Room = ({
 export default Room;
 
 const Container = styled(Stack)`
-  ${mixinFlex("row", "start", "center")}
+  ${mixinFlex("row", "start", "stretch")}
   width: 100%;
   height: 100%;
-  max-width: 250px;
   border: 1px solid black;
   border-radius: 8px;
   overflow: hidden;
@@ -75,16 +74,18 @@ const Container = styled(Stack)`
 const RoomNumberContainer = styled(Stack)`
   ${mixinFlex("column", "center", "center")}
   width: 40px;
-  height: 55px;
   min-width: 40px;
+  height: 100%;
   min-height: 55px;
   font-size: 14px;
 `;
 
 const ChurchContainer = styled(Stack)`
   ${mixinFlex("column", "center", "center")}
+  width: 172px;
   min-width: 172px;
-  height: 55px;
+  height: 100%;
+  min-height: 55px;
   border: 1px solid black;
   border-top: none;
   border-bottom: none;
@@ -95,7 +96,10 @@ const ChurchContainer = styled(Stack)`
 type RoomCurrentContainerPropsType = {
   $status: "exceed" | "full" | "insufficient";
 };
-const RoomCurrentContainer = styled(RoomNumberContainer, { shouldForwardProp })<RoomCurrentContainerPropsType>`
+const RoomCurrentContainer = styled(Stack, { shouldForwardProp })<RoomCurrentContainerPropsType>`
+  ${mixinFlex("column", "center", "center")}
+  width: 40px;
+  min-width: 40px;
   font-size: 16px;
   background-color: ${({ $status }) => {
     if ($status === "exceed") return "blue";

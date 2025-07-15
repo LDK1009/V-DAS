@@ -16,18 +16,18 @@ const StepGroup = () => {
   const { autoAssign } = useAssign();
   const { setIsEditDormitoryModalOpen } = useEditDormitoryModalStore();
 
+  ////////// 자동 배정 함수
   function handleAutoAssign() {
     const { dormitoryData } = useDormitoryStore.getState();
     const { churchMaleArray, churchFemaleArray } = useCurrentChurchStore.getState();
 
     if (churchMaleArray && churchFemaleArray && dormitoryData) {
-      if (!churchMaleArray) {
+      if (!churchMaleArray && !churchFemaleArray) {
         return;
       }
 
-      for (const { churchName, people } of churchMaleArray) {
-        console.log("\n\n\n\n==========", `${churchName}(${people})`, "배정 시작==========");
-
+      // 남자 교회 배정
+      for (const { churchName } of churchMaleArray) {
         const { churchMaleArray: currentChurchMaleArray } = useCurrentChurchStore.getState();
 
         if (!currentChurchMaleArray) {
@@ -41,17 +41,35 @@ const StepGroup = () => {
         }
 
         if (targetChurch.people <= 0) {
-          console.log(`${targetChurch.churchName} | ${targetChurch.people} 인원이 0명 이하입니다. 배정 불가능`);
           continue;
         }
 
-        // if (targetChurch.people < maxRoomPeople) {
-        //   assignSmallChurch({ sex: "male", church: targetChurch });
-        //   continue;
-        // }
-
         // 자동배정
         autoAssign({ sex: "male", church: targetChurch });
+
+        continue;
+      }
+
+      // 여자 교회 배정
+      for (const { churchName } of churchFemaleArray) {
+        const { churchFemaleArray: currentChurchFemaleArray } = useCurrentChurchStore.getState();
+
+        if (!currentChurchFemaleArray) {
+          continue;
+        }
+
+        const targetChurch = currentChurchFemaleArray.filter((el) => el.churchName === churchName)[0];
+
+        if (!targetChurch) {
+          continue;
+        }
+
+        if (targetChurch.people <= 0) {
+          continue;
+        }
+
+        // 자동배정
+        autoAssign({ sex: "female", church: targetChurch });
 
         continue;
       }

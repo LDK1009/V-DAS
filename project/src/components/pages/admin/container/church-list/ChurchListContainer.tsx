@@ -1,5 +1,4 @@
 import { useCurrentChurchStore } from "@/store/church/churchStore";
-import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { useExcelStore } from "@/store/excel/excelStore";
 import { ChurchObject, FormattedExcelData } from "@/types/excel";
 import { formatExcelData } from "@/utils/excel/format";
@@ -11,8 +10,13 @@ import { mixinFlex, mixinHideScrollbar } from "@/styles/mixins";
 
 const ChurchListContainer = () => {
   const { excelFile } = useExcelStore();
-  const { churchMaleArray, churchFemaleArray, setCurrentChurchMaleArray, setCurrentChurchFemaleArray, currentChurchSex } = useCurrentChurchStore();
-  const { dormitoryData } = useDormitoryStore();
+  const {
+    churchMaleArray,
+    churchFemaleArray,
+    setCurrentChurchMaleArray,
+    setCurrentChurchFemaleArray,
+    currentChurchSex,
+  } = useCurrentChurchStore();
 
   useEffect(() => {
     // 파일 형식 변환
@@ -27,17 +31,11 @@ const ChurchListContainer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [excelFile]);
 
-  useEffect(() => {
-    console.log(dormitoryData);
-  }, [dormitoryData]);
-
   return (
     <ChurchList>
-      {currentChurchSex === "male" ? churchMaleArray?.map((church) => (
-        <ChurchItem key={church.churchName} church={church} />
-      )) : churchFemaleArray?.map((church) => (
-        <ChurchItem key={church.churchName} church={church} />
-      ))}
+      {currentChurchSex === "male"
+        ? churchMaleArray?.map((church) => <ChurchItem key={church.churchName} church={church} />)
+        : churchFemaleArray?.map((church) => <ChurchItem key={church.churchName} church={church} />)}
     </ChurchList>
   );
 };
