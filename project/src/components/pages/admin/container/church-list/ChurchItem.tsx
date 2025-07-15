@@ -1,11 +1,24 @@
 import { mixinEllipsis, mixinFlex } from "@/styles/mixins";
 import { ChurchType } from "@/types/currentChurchType";
 import { Stack, styled, Typography } from "@mui/material";
-import React from "react";
+import { useDrag } from "react-dnd";
+import React, { RefObject, useEffect } from "react";
 
 const ChurchItem = ({ church }: { church: ChurchType }) => {
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: "ITEM",
+    item: { churchName: church.churchName, people: church.people },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }));
+
+  useEffect(() => {
+    console.log(`드래그 시작 ${isDragging}`);
+  }, [isDragging]);
+
   return (
-    <Container>
+    <Container ref={drag as unknown as RefObject<HTMLDivElement>}>
       <ChurchName>{church.churchName}</ChurchName>
       <ChurchPeople>{church.people}</ChurchPeople>
     </Container>

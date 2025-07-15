@@ -7,6 +7,7 @@ import ClientSnackbarProvider from "@/lib/ClientSnackbarProvider";
 import GlobalStyles from "@/styles/GlobalStyles";
 import { templateInfo } from "@/utils/templateInfo";
 import Loading from "@/components/common/Loading";
+import DndProviderLayer from "@/lib/DndProviderLayer";
 
 // SEO 메타데이터
 export const metadata: Metadata = {
@@ -50,7 +51,7 @@ export default function RootLayout({
             {/* 로딩 */}
             <Loading />
             {/* 페이지 컨텐츠 */}
-            {children}
+            <DndProviderLayer>{children}</DndProviderLayer>
             {/* 바텀 내비게이션 */}
             {/* <CommonBottomNavigation /> */}
           </ThemeProviderWrapper>

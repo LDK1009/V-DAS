@@ -2,9 +2,10 @@ import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { mixinFlex } from "@/styles/mixins";
 import { RoomType } from "@/types/dormitory";
 import { Stack, styled } from "@mui/material";
-import React from "react";
+import React, { RefObject, useEffect } from "react";
 import ChurchItem from "../church-list/ChurchItem";
 import { shouldForwardProp } from "@/utils/mui";
+import { useDrop } from "react-dnd";
 
 const Room = ({
   lineIndex,
@@ -43,8 +44,20 @@ const Room = ({
     return "insufficient";
   }
 
+  const [{ isOver }, drop] = useDrop(() => ({
+    accept: "ITEM", // 받아들일 수 있는 드래그 아이템의 타입
+    drop: (item, monitor) => {
+      // 드롭됐을 때 실행할 로직
+      console.log("드랍한 교회 정보:", item);
+      alert(`드랍된 방 정보: ${currentFloor}층 ${lineIndex}라인 ${roomIndex}번 방`);
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+    }),
+  }));
+
   return (
-    <Container>
+    <Container ref={drop as unknown as RefObject<HTMLDivElement>}>
       <RoomNumberContainer>{`${currentFloor}${String(customRoomNumber || roomNumber).padStart(
         2,
         "0"
