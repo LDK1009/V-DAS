@@ -1,41 +1,38 @@
 import { useCurrentChurchStore } from "@/store/church/churchStore";
-import { useExcelStore } from "@/store/excel/excelStore";
-import { ChurchObject, FormattedExcelData } from "@/types/excel";
-import { formatExcelData } from "@/utils/excel/format";
-import { readExcelFile } from "@/utils/excel/read";
 import React, { useEffect } from "react";
 import ChurchItem from "./ChurchItem";
 import { Stack, styled } from "@mui/material";
 import { mixinFlex, mixinHideScrollbar } from "@/styles/mixins";
+import SelectSexButtonGroup from "./SelectSexButtonGroup";
 
 const ChurchListContainer = () => {
-  const { excelFile } = useExcelStore();
   const {
     churchMaleArray,
     churchFemaleArray,
-    setCurrentChurchMaleArray,
-    setCurrentChurchFemaleArray,
     currentChurchSex,
+    searchChurch,
+    currentViewChurches,
+    setCurrentViewChurches,
   } = useCurrentChurchStore();
 
   useEffect(() => {
-    // 파일 형식 변환
-    if (excelFile) {
-      readExcelFile(excelFile).then((data: ChurchObject[]) => {
-        const formattedData: FormattedExcelData = formatExcelData(data);
-
-        setCurrentChurchMaleArray(formattedData.churchMaleArray);
-        setCurrentChurchFemaleArray(formattedData.churchFemaleArray);
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [excelFile]);
+    const churchesBySex = currentChurchSex === "male" ? churchMaleArray : churchFemaleArray;
+    const filteredChurches = churchesBySex?.filter((church) => {
+      if (searchChurch) {
+        return searchChurch === church.churchName;
+      } else {
+        return true;
+      }
+    });
+    setCurrentViewChurches(filteredChurches || null);
+  }, [churchMaleArray, churchFemaleArray, currentChurchSex, searchChurch, setCurrentViewChurches]);
 
   return (
     <ChurchList>
-      {currentChurchSex === "male"
-        ? churchMaleArray?.map((church) => <ChurchItem key={church.churchName} church={church} />)
-        : churchFemaleArray?.map((church) => <ChurchItem key={church.churchName} church={church} />)}
+      <SelectSexButtonGroup />
+      {currentViewChurches?.map((church) => (
+        <ChurchItem key={church.churchName} church={church} />
+      ))}
     </ChurchList>
   );
 };

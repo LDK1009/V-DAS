@@ -4,7 +4,11 @@ import { create } from "zustand";
 // Zustand 스토어 정의
 
 type CurrentChurchStoreType = {
-  ////////// 교회 리스트 관련
+  ////////// 현재 보고있는 교회 리스트
+  currentViewChurches: ChurchArrayType | null;
+  setCurrentViewChurches: (currentViewChurches: ChurchArrayType | null) => void;
+
+  ////////// 교회 리스트
   churchMaleArray: ChurchArrayType | null;
   churchFemaleArray: ChurchArrayType | null;
   ////////// 교회 리스트 세팅 액션
@@ -21,9 +25,17 @@ type CurrentChurchStoreType = {
   ////////// 현재 보고있는 교회 리스트 성별
   currentChurchSex: "male" | "female";
   setCurrentChurchSex: (currentChurchSex: "male" | "female") => void;
+
+  ////////// 교회 검색어
+  searchChurch: string;
+  setSearchChurch: (searchChurch: string) => void;
 };
 
 export const useCurrentChurchStore = create<CurrentChurchStoreType>()((set) => ({
+  ////////// 현재 보고있는 교회 리스트
+  currentViewChurches: null,
+  setCurrentViewChurches: (currentViewChurches) => set({ currentViewChurches }),
+
   ////////// 교회 리스트 관련
   churchMaleArray: null,
   churchFemaleArray: null,
@@ -73,4 +85,8 @@ export const useCurrentChurchStore = create<CurrentChurchStoreType>()((set) => (
   ////////// 현재 보고있는 교회 리스트 성별
   currentChurchSex: "male",
   setCurrentChurchSex: (currentChurchSex) => set({ currentChurchSex }),
+
+  ////////// 교회 검색어
+  searchChurch: "",
+  setSearchChurch: (searchChurch) => set({ searchChurch }),
 }));

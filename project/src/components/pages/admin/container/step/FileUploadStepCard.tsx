@@ -1,11 +1,16 @@
+import { useCurrentChurchStore } from "@/store/church/churchStore";
 import { useExcelStore } from "@/store/excel/excelStore";
 import { mixinFlex, mixinMuiButtonNoShadow } from "@/styles/mixins";
+import { ChurchObject, FormattedExcelData } from "@/types/excel";
+import { formatExcelData } from "@/utils/excel/format";
+import { readExcelFile } from "@/utils/excel/read";
 import { CheckCircleOutlineRounded, UploadFile } from "@mui/icons-material";
 import { Box, Button, Stack, styled, Typography } from "@mui/material";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 const FileUploadStepCard = () => {
   const { setExcelFile, excelFile } = useExcelStore();
+  const { setCurrentChurchMaleArray, setCurrentChurchFemaleArray } = useCurrentChurchStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleButtonClick = () => {
@@ -24,6 +29,19 @@ const FileUploadStepCard = () => {
       setExcelFile(file);
     }
   };
+
+  useEffect(() => {
+    // 파일 형식 변환
+    if (excelFile) {
+      readExcelFile(excelFile).then((data: ChurchObject[]) => {
+        const formattedData: FormattedExcelData = formatExcelData(data);
+
+        setCurrentChurchMaleArray(formattedData.churchMaleArray);
+        setCurrentChurchFemaleArray(formattedData.churchFemaleArray);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [excelFile]);
 
   return (
     <Container>
