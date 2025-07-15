@@ -87,10 +87,10 @@ const FemaleFloorButton = styled(MaleFloorButton, { shouldForwardProp })<FloorBu
 
 const MaleButtonBorder = styled(Box, { shouldForwardProp })<FloorButtonPropsType>`
   padding: 4px;
-  border: 1px solid ${({ $isSelected }) => ($isSelected ? "#6495ED" : "transparent")};
+  border: 2px solid ${({ $isSelected }) => ($isSelected ? "#6495ED" : "transparent")};
   border-radius: 8px;
 `;
 
 const FemaleButtonBorder = styled(MaleButtonBorder)`
-  border: 1px solid ${({ $isSelected }) => ($isSelected ? "#ff66b2" : "transparent")};
+  border: 2px solid ${({ $isSelected }) => ($isSelected ? "#ff66b2" : "transparent")};
 `;

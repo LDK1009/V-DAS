@@ -11,7 +11,7 @@ import { mixinFlex, mixinHideScrollbar } from "@/styles/mixins";
 
 const ChurchListContainer = () => {
   const { excelFile } = useExcelStore();
-  const { churchMaleArray, setCurrentChurchMaleArray, setCurrentChurchFemaleArray } = useCurrentChurchStore();
+  const { churchMaleArray, churchFemaleArray, setCurrentChurchMaleArray, setCurrentChurchFemaleArray, currentChurchSex } = useCurrentChurchStore();
   const { dormitoryData } = useDormitoryStore();
 
   useEffect(() => {
@@ -33,7 +33,9 @@ const ChurchListContainer = () => {
 
   return (
     <ChurchList>
-      {churchMaleArray?.map((church) => (
+      {currentChurchSex === "male" ? churchMaleArray?.map((church) => (
+        <ChurchItem key={church.churchName} church={church} />
+      )) : churchFemaleArray?.map((church) => (
         <ChurchItem key={church.churchName} church={church} />
       ))}
     </ChurchList>
