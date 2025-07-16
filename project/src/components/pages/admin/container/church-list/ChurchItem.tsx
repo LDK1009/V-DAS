@@ -8,7 +8,7 @@ const ChurchItem = ({ dragFrom, church }: { dragFrom: "sidebar" | "room"; church
   const [{ isDragging: isDraggingSidebar }, fromSidebarDrag] = useDrag(
     () => ({
       type: "ITEM",
-      item: { ...church },
+      item: { ...church, dragFrom: "sidebar" },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
@@ -19,7 +19,7 @@ const ChurchItem = ({ dragFrom, church }: { dragFrom: "sidebar" | "room"; church
   const [{ isDragging: isDraggingRoom }, fromRoomDrag] = useDrag(
     () => ({
       type: "ITEM",
-      item: { ...church },
+      item: { ...church, dragFrom: "room" },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),

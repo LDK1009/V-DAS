@@ -54,7 +54,11 @@ const Room = ({
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "ITEM", // 받아들일 수 있는 드래그 아이템의 타입
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    drop: (church: ChurchType, monitor) => {
+    drop: (church: { church: ChurchType; dragFrom: "room" | "sidebar" }, monitor) => {
+      if (church.dragFrom === "room") {
+        return;
+      }
+
       // 사용 가능한 층 배열
       const useableFloors = getUseFloors(currentChurchSex);
       // 현재 층의 층 인덱스
@@ -153,7 +157,13 @@ const Room = ({
 
       <ChurchContainer>
         {room.assignedChurchArray.map((church, churchIndex) => {
-          return <ChurchItem church={church} key={`${currentFloor}-${lineIndex}-${roomNumber}-${churchIndex}`} dragFrom="room" />;
+          return (
+            <ChurchItem
+              church={church}
+              key={`${currentFloor}-${lineIndex}-${roomNumber}-${churchIndex}`}
+              dragFrom="room"
+            />
+          );
         })}
       </ChurchContainer>
       <RoomCurrentContainer $status={getRoomStatus(room.current)}>{room.current}</RoomCurrentContainer>
