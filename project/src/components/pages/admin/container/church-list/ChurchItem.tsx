@@ -2,11 +2,11 @@ import { mixinEllipsis, mixinFlex } from "@/styles/mixins";
 import { ChurchType } from "@/types/currentChurchType";
 import { Stack, styled, Typography } from "@mui/material";
 import { useDrag } from "react-dnd";
-import React, { RefObject, useEffect } from "react";
+import React, { RefObject } from "react";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
-import { getCurrentFloorIndex, getCurrentFloorSex } from "@/hooks/assign/useAssignable";
-import { useCurrentChurchStore } from "@/store/church/churchStore";
+import { getCurrentFloorIndex, getCurrentFloorSex, getRoomInfo } from "@/hooks/assign/useAssignable";
 import { enqueueSnackbar } from "notistack";
+import { useCurrentChurchStore } from "@/store/church/churchStore";
 
 const ChurchItem = ({
   lineIndex,
@@ -21,6 +21,7 @@ const ChurchItem = ({
   dragFrom: "sidebar" | "room";
   church: ChurchType;
 }) => {
+  ////////// 사이드바에서 드래그 시작
   const [{ isDragging: isDraggingSidebar }, fromSidebarDrag] = useDrag(
     () => ({
       type: "ITEM",
@@ -32,6 +33,7 @@ const ChurchItem = ({
     [church]
   );
 
+  ////////// 방에서 드래그 시작
   const [{ isDragging: isDraggingRoom }, fromRoomDrag] = useDrag(
     () => ({
       type: "ITEM",
@@ -43,37 +45,28 @@ const ChurchItem = ({
     [church]
   );
 
-  useEffect(() => {
-    console.log(`사이드바에서 드래그 시작 ${isDraggingSidebar}`);
-  }, [isDraggingSidebar]);
+  ////////// 라이프사이클
 
-  useEffect(() => {
-    console.log(`방에서 드래그 시작 ${isDraggingRoom}`);
-  }, [isDraggingRoom]);
-
+  ////////// 교회 인원 변경
   function handleChangeChurchPeople() {
     const { updateRoomCurrentAndRemain } = useDormitoryStore.getState();
+    const { evacuateChurchMale, evacuateChurchFemale } = useCurrentChurchStore.getState();
 
-    const evacuateCount = prompt("방출 인원을 입력해주세요.");
+    const inputCount = prompt("변경할 인원을 입력해주세요.");
 
     // 양의 정수 패턴
-    const integerPattern = /^[1-9]\d*$/;
+    const integerPattern = /^[0-9]\d*$/;
 
     // 입력값이 없을 경우
-    if (!evacuateCount) {
+    if (!inputCount) {
       return;
     }
 
     // 양의 정수 패턴 예외 처리
-    if (!integerPattern.test(evacuateCount)) {
-      enqueueSnackbar("양의 정수를 입력해주세요.", { variant: "error" });
+    if (!integerPattern.test(inputCount)) {
+      enqueueSnackbar("0 이상의 정수를 입력해주세요.", { variant: "error" });
       return;
     }
-
-    alert(evacuateCount);
-
-    // 현재 층
-    const { currentFloor } = useDormitoryStore.getState();
 
     // 현재 층의 성별
     const currentFloorSex = getCurrentFloorSex();
@@ -87,20 +80,29 @@ const ChurchItem = ({
     if (lineIndex && !(lineIndex >= 0)) return;
     if (roomIndex && !(roomIndex >= 0)) return;
 
+    const evacuateCount = Number(inputCount);
+    const roomInfo = getRoomInfo(currentFloorSex, floorIndex as number, lineIndex as number, roomIndex as number);
+    const currentChurchAssignInfo = roomInfo.assignedChurchArray.find((x) => x.churchName === church.churchName);
+
+    if (!currentChurchAssignInfo) return;
+
+    const updateCount = -(currentChurchAssignInfo.people - evacuateCount);
+
     updateRoomCurrentAndRemain({
       sex: currentFloorSex,
       church,
-      count: -Number(evacuateCount),
+      count: updateCount,
       floorIndex: floorIndex as number,
       lineIndex: lineIndex as number,
       roomIndex: roomIndex as number,
     });
 
-    alert("성공");
-
-    console.log(-Number(evacuateCount));
-    console.log("현재 층", currentFloor);
-    console.log("현재 층 성별", currentFloorSex);
+    // 교회 인원 변경
+    if (currentFloorSex === "male") {
+      evacuateChurchMale(church.churchName, updateCount);
+    } else if (currentFloorSex === "female") {
+      evacuateChurchFemale(church.churchName, updateCount);
+    }
   }
 
   return (

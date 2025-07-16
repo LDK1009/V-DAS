@@ -50,9 +50,9 @@ export const useCurrentChurchStore = create<CurrentChurchStoreType>()((set) => (
   ////////// 교회 배정 액션
   evacuateChurchMale: (churchName, count) => {
     set((state) => {
-      const currentChurchMaleCount = state.churchMaleArray?.find((church) => church.churchName === churchName)?.people;
+      // const currentChurchMaleCount = state.churchMaleArray?.find((church) => church.churchName === churchName)?.people;
 
-      if (currentChurchMaleCount === 0) return state;
+      // if (currentChurchMaleCount === 0) return state;
 
       const newChurchMaleArray = state.churchMaleArray?.map((church) =>
         church.churchName === churchName ? { ...church, people: church.people - count } : church
@@ -66,11 +66,11 @@ export const useCurrentChurchStore = create<CurrentChurchStoreType>()((set) => (
 
   evacuateChurchFemale: (churchName, count) => {
     set((state) => {
-      const currentChurchFemaleCount = state.churchFemaleArray?.find(
-        (church) => church.churchName === churchName
-      )?.people;
+      // const currentChurchFemaleCount = state.churchFemaleArray?.find(
+      //   (church) => church.churchName === churchName
+      // )?.people;
 
-      if (currentChurchFemaleCount === 0) return state;
+      // if (currentChurchFemaleCount === 0) return state;
 
       const newChurchFemaleArray = state.churchFemaleArray?.map((church) =>
         church.churchName === churchName ? { ...church, people: church.people - count } : church

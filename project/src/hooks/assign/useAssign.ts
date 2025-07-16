@@ -6,11 +6,9 @@ import {
   getAssignablePointByCombinationDifference,
   getAssignableRoomWithRemain,
   getAssignPointWithNoTailLine,
-  getCurrentFloorSex,
   getLastAssignedRoomRemain,
   getPartnerChurch,
 } from "./useAssignable";
-import { enqueueSnackbar } from "notistack";
 
 export const useAssign = () => {
   const { updateRoomCurrentAndRemain, dormitoryData } = useDormitoryStore();
@@ -195,43 +193,11 @@ export const useAssign = () => {
     });
   }
 
-  ////////// 배정된 교회의 인원 변경
-  type ChangeAssignedChurchPeopleParamsType = {
-    sex: "male" | "female";
-    floorIndex: number;
-    lineIndex: number;
-    roomIndex: number;
-    church: ChurchType;
-    count: number;
-  };
-
-  function changeAssignedChurchPeople({
-    sex,
-    floorIndex,
-    lineIndex,
-    roomIndex,
-    church,
-    count,
-  }: ChangeAssignedChurchPeopleParamsType) {
-    const { dormitoryData } = useDormitoryStore.getState();
-    const assignedChurch = dormitoryData?.[sex].floors[floorIndex].lines[lineIndex].rooms[roomIndex].assignedChurchArray.find(
-      (assignedChurch: ChurchType) => assignedChurch.churchName === church.churchName
-    );
-
-    if (!assignedChurch) return;
-
-    const currentAssignedCount = assignedChurch.people;
-    const { addPeopleToRoom, subPeopleFromRoom } = useDormitoryStore.getState();
-    const roomActionParams = { sex, floorIndex, lineIndex, roomIndex, count };
-
-  }
-
   return {
     assignRoom,
     assignLine,
     assignLineStartFromNextRoom,
     autoAssign,
     assignSmallChurch,
-    changeAssignedChurchPeople,
   };
 };

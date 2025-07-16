@@ -32,7 +32,7 @@ const LineColumn4 = () => {
               <Room
                 lineIndex={4}
                 room={room}
-                roomIndex={roomIndex}
+                roomIndex={roomIndex + splitPoint}
                 customRoomNumber={roomNumber}
                 key={`${currentFloor}-${4}-${roomNumber}`}
               />
