@@ -4,8 +4,19 @@ import { Stack, styled, Typography } from "@mui/material";
 import { useDrag } from "react-dnd";
 import React, { RefObject, useEffect } from "react";
 
-const ChurchItem = ({ church }: { church: ChurchType }) => {
-  const [{ isDragging }, drag] = useDrag(
+const ChurchItem = ({ dragFrom, church }: { dragFrom: "sidebar" | "room"; church: ChurchType }) => {
+  const [{ isDragging: isDraggingSidebar }, fromSidebarDrag] = useDrag(
+    () => ({
+      type: "ITEM",
+      item: { ...church },
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
+    }),
+    [church]
+  );
+
+  const [{ isDragging: isDraggingRoom }, fromRoomDrag] = useDrag(
     () => ({
       type: "ITEM",
       item: { ...church },
@@ -17,11 +28,15 @@ const ChurchItem = ({ church }: { church: ChurchType }) => {
   );
 
   useEffect(() => {
-    console.log(`드래그 시작 ${isDragging}`);
-  }, [isDragging]);
+    console.log(`사이드바에서 드래그 시작 ${isDraggingSidebar}`);
+  }, [isDraggingSidebar]);
+
+  useEffect(() => {
+    console.log(`방에서 드래그 시작 ${isDraggingRoom}`);
+  }, [isDraggingRoom]);
 
   return (
-    <Container ref={drag as unknown as RefObject<HTMLDivElement>}>
+    <Container ref={dragFrom === "sidebar" ? (fromSidebarDrag as unknown as RefObject<HTMLDivElement>) : (fromRoomDrag as unknown as RefObject<HTMLDivElement>)}>
       <ChurchName>{church.churchName}</ChurchName>
       <ChurchPeople>{church.people}</ChurchPeople>
     </Container>

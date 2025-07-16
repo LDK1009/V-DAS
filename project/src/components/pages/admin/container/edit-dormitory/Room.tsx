@@ -153,7 +153,7 @@ const Room = ({
 
       <ChurchContainer>
         {room.assignedChurchArray.map((church, churchIndex) => {
-          return <ChurchItem church={church} key={`${currentFloor}-${lineIndex}-${roomNumber}-${churchIndex}`} />;
+          return <ChurchItem church={church} key={`${currentFloor}-${lineIndex}-${roomNumber}-${churchIndex}`} dragFrom="room" />;
         })}
       </ChurchContainer>
       <RoomCurrentContainer $status={getRoomStatus(room.current)}>{room.current}</RoomCurrentContainer>

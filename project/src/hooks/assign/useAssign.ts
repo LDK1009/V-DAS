@@ -193,6 +193,15 @@ export const useAssign = () => {
     });
   }
 
+  ////////// 배정된 교회의 인원 변경
+  function changeAssignedChurchPeople({ sex, church, count }: { sex: "male" | "female"; church: ChurchType; count: number }) {
+    if (sex === "male") {
+      evacuateChurchMale(church.churchName, count);
+    } else {
+      evacuateChurchFemale(church.churchName, count);
+    }
+  }
+
   return {
     assignRoom,
     assignLine,
