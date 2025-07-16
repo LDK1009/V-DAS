@@ -37,7 +37,7 @@ const ClientSnackbarProvider = () => {
     <>
       <SnackbarProvider
         maxSnack={3} // 최대 누적 스택 - 화면에 동시에 표시될 수 있는 최대 알림 개수
-        autoHideDuration={1000} // 지속시간 - 알림이 자동으로 사라지기까지의 시간(밀리초)
+        autoHideDuration={3000} // 지속시간 - 알림이 자동으로 사라지기까지의 시간(밀리초)
         anchorOrigin={{ vertical: "top", horizontal: "center" }} // 스낵바 위치 지정 - 화면의 어느 위치에 알림을 표시할지 설정
         // preventDuplicate={true} // 중복 메시지 표시 여부 - 동일한 메시지가 여러 번 표시되는 것을 방지
         // hideIconVariant = {false} // 아이콘 숨김 여부 - 알림 유형 아이콘(성공, 오류 등)을 표시할지 여부

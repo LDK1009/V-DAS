@@ -1,7 +1,7 @@
 import { useCurrentChurchStore } from "@/store/church/churchStore";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { ChurchType } from "@/types/currentChurchType";
-import { DormitorySexType, FloorType, LineType } from "@/types/dormitory";
+import { DormitorySexType, DormitoryType, FloorType, LineType } from "@/types/dormitory";
 //////////////////////////////////////////////////////////////////////////////// 사용중 ////////////////////////////////////////////////////////////////////////////////
 //////////////////// 남은 배정 가능 인원을 통한 기숙사 내 모든 방 조회
 function getAssignableRoomWithRemain(sex: "male" | "female", remain: number) {
@@ -390,6 +390,22 @@ function getUseFloors(sex: "male" | "female") {
   return [];
 }
 
+////////// 현재 층이 어떤 성별의 층인지 조회
+function getCurrentFloorSex() {
+  const { dormitoryData, currentFloor } = useDormitoryStore.getState();
+  const { male, female } = dormitoryData as DormitoryType;
+
+  if(male && male.useFloorNumbers.includes(currentFloor)){
+    return "male";
+  }
+
+  if(female && female.useFloorNumbers.includes(currentFloor)){
+    return "female";
+  }
+
+  return null;
+}
+
 ////////// 특정 방의 정보 가져오기
 function getRoomInfo(sex: "male" | "female", floorIndex: number, lineIndex: number, roomIndex: number) {
   const { dormitoryData } = useDormitoryStore.getState();
@@ -585,7 +601,7 @@ function getFitAssignPoint({ sex, church }: GetFitAssignPointParamsType) {
   return null;
 }
 
-export {
+export {  
   getLastAssignedRoomRemain,
   getLineRemain,
   getAssignableInDormitory,
@@ -603,5 +619,6 @@ export {
   getRecommendedAssignmentPoint,
   getFitAssignPoint,
   checkLineAssign,
-  getAssignableInFloor,
+  getAssignableInFloor,   
+  getCurrentFloorSex,
 };

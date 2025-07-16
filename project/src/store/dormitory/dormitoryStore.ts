@@ -19,6 +19,31 @@ type AssignRoomParamsType = {
   roomIndex: number;
 };
 
+type AddPeopleToRoomParamsType = {
+  sex: "male" | "female";
+  floorIndex: number;
+  lineIndex: number;
+  roomIndex: number;
+  count: number;
+};
+
+type SubPeopleFromRoomParamsType = {
+  sex: "male" | "female";
+  floorIndex: number;
+  lineIndex: number;
+  roomIndex: number;
+  count: number;
+};
+
+type ChangeAssignedChurchPeopleParamsType = {
+  sex: "male" | "female";
+  floorIndex: number;
+  lineIndex: number;
+  roomIndex: number;
+  church: ChurchType;
+  count: number;
+};
+
 ////////// Zustand 스토어 정의
 type DormitoryStoreType = {
   // 기숙사 데이터 관련
@@ -40,6 +65,21 @@ type DormitoryStoreType = {
 
   // 방 인원 빼기 관련
   updateRoomCurrentAndRemain: ({ sex, church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) => void;
+
+  // 방 인원 추가
+  addPeopleToRoom: ({ sex, floorIndex, lineIndex, roomIndex, count }: AddPeopleToRoomParamsType) => void;
+  // 방 인원 빼기
+  subPeopleFromRoom: ({ sex, floorIndex, lineIndex, roomIndex, count }: SubPeopleFromRoomParamsType) => void;
+
+  // 배정된 교회의 인원 변경
+  changeAssignedChurchPeople: ({
+    sex,
+    floorIndex,
+    lineIndex,
+    roomIndex,
+    church,
+    count,
+  }: ChangeAssignedChurchPeopleParamsType) => void;
 };
 
 export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
@@ -76,23 +116,64 @@ export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
 
         // 데이터 존재 여부 확인
         if (dormitoryData) {
+          dormitoryData[sex].floors[floorIndex].lines[lineIndex].rooms[roomIndex].remain = roomRemain;
+          dormitoryData[sex].floors[floorIndex].lines[lineIndex].rooms[roomIndex].current = roomCurrent;
 
-            dormitoryData[sex].floors[floorIndex].lines[lineIndex].rooms[roomIndex].remain = roomRemain;
-            dormitoryData[sex].floors[floorIndex].lines[lineIndex].rooms[roomIndex].current = roomCurrent;
+          // 이미 배정된 교회 존재 여부 확인
+          const existChurch = targetRoom.assignedChurchArray.find(
+            (assignedChurch: ChurchType) => assignedChurch.churchName === church.churchName
+          );
 
-            // 이미 배정된 교회 존재 여부 확인
-            const existChurch = targetRoom.assignedChurchArray.find(
-              (assignedChurch: ChurchType) => assignedChurch.churchName === church.churchName
-            );
-
-            // 이미 배정된 교회 존재 시 인원 추가
-            if (existChurch) {
-              existChurch.people += count;
-            } else {
-              // 배정된 교회 없으면 배정
-              targetRoom.assignedChurchArray.push({ ...church, people: count });
-            }
+          // 이미 배정된 교회 존재 시 인원 추가
+          if (existChurch) {
+            existChurch.people += count;
+          } else {
+            // 배정된 교회 없으면 배정
+            targetRoom.assignedChurchArray.push({ ...church, people: count });
+          }
         }
+      })
+    );
+  },
+
+  // 방 인원 추가
+  addPeopleToRoom: ({ sex, floorIndex, lineIndex, roomIndex, count }: AddPeopleToRoomParamsType) => {
+    set(
+      produce((state) => {
+        const dormitoryData = state.dormitoryData;
+        const targetRoom = dormitoryData?.[sex].floors[floorIndex].lines[lineIndex].rooms[roomIndex];
+        targetRoom.current += count;
+        targetRoom.remain -= count;
+
+        return dormitoryData;
+      })
+    );
+  },
+
+  // 방 인원 빼기
+  subPeopleFromRoom: ({ sex, floorIndex, lineIndex, roomIndex, count }: SubPeopleFromRoomParamsType) => {
+    set(
+      produce((state) => {
+        const dormitoryData = state.dormitoryData;
+        const targetRoom = dormitoryData?.[sex].floors[floorIndex].lines[lineIndex].rooms[roomIndex];
+        targetRoom.current -= count;
+        targetRoom.remain += count;
+      })
+    );
+  },
+
+  // 배정된 교회의 인원 변경
+  changeAssignedChurchPeople: ({ sex, floorIndex, lineIndex, roomIndex, church, count }: ChangeAssignedChurchPeopleParamsType) => {
+    set(
+      produce((state) => {
+        const dormitoryData = state.dormitoryData;
+        const assignedChurch = dormitoryData?.[sex].floors[floorIndex].lines[lineIndex].rooms[roomIndex].assignedChurchArray.find(
+          (assignedChurch: ChurchType) => assignedChurch.churchName === church.churchName
+        );
+
+        if (!assignedChurch) return;
+
+        assignedChurch.people += count;
       })
     );
   },

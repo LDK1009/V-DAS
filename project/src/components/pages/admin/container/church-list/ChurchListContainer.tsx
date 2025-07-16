@@ -31,7 +31,7 @@ const ChurchListContainer = () => {
     <ChurchList>
       <SelectSexButtonGroup />
       {currentViewChurches?.map((church) => (
-        <ChurchItem key={church.churchName} church={church} dragFrom="sidebar" />
+        <ChurchItem key={church.churchName} church={church} dragFrom="sidebar" type="sidebar" />
       ))}
     </ChurchList>
   );

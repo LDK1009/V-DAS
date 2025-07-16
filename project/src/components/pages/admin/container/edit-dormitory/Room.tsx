@@ -54,8 +54,8 @@ const Room = ({
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "ITEM", // 받아들일 수 있는 드래그 아이템의 타입
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    drop: (church: { church: ChurchType; dragFrom: "room" | "sidebar" }, monitor) => {
-      if (church.dragFrom === "room") {
+    drop: (item: { church: ChurchType; dragFrom: "room" | "sidebar" }, monitor) => {
+      if (item.dragFrom === "room") {
         return;
       }
 
@@ -79,7 +79,7 @@ const Room = ({
       // 특정 방의 정보 가져오기
       const roomInfo = getRoomInfo(currentChurchSex, currentFloorIndex, lineIndex, roomIndex);
 
-      if (church.people <= 0) {
+      if (item.church.people <= 0) {
         enqueueSnackbar("교회 인원이 0명 이하입니다.", { variant: "error" });
         return;
       }
@@ -105,7 +105,7 @@ const Room = ({
         // 방 배정
         assignRoom({
           sex: currentChurchSex,
-          church: church,
+          church: item.church,
           count: Number(inputNumber),
           floorIndex: currentFloorIndex,
           lineIndex,
@@ -118,10 +118,10 @@ const Room = ({
       // 방이 꽉 차지 않았을 경우
       if (roomInfo.remain > 0) {
         // 교회 인원이 방 인원보다 많을 경우
-        if (church.people > roomInfo.remain) {
+        if (item.church.people > roomInfo.remain) {
           assignRoom({
             sex: currentChurchSex,
-            church: church,
+            church: item.church,
             count: roomInfo.remain,
             floorIndex: currentFloorIndex,
             lineIndex,
@@ -130,11 +130,11 @@ const Room = ({
           return;
         }
         // 교회 인원이 방 인원보다 적을 경우
-        if (church.people < roomInfo.remain) {
+        if (item.church.people < roomInfo.remain) {
           assignRoom({
             sex: currentChurchSex,
-            church: church,
-            count: church.people,
+            church: item.church,
+            count: item.church.people,
             floorIndex: currentFloorIndex,
             lineIndex,
             roomIndex,
@@ -159,9 +159,12 @@ const Room = ({
         {room.assignedChurchArray.map((church, churchIndex) => {
           return (
             <ChurchItem
+              lineIndex={lineIndex}
+              roomIndex={roomIndex}
               church={church}
               key={`${currentFloor}-${lineIndex}-${roomNumber}-${churchIndex}`}
               dragFrom="room"
+              type="room"
             />
           );
         })}
