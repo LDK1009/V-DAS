@@ -81,7 +81,7 @@ const Room = ({
       }
 
       // 방이 꽉 차있을 경우
-      if (roomInfo.remain === 0) {
+      if (roomInfo.remain <= 0) {
         const inputNumber = prompt("배정 인원을 입력해주세요.");
 
         // 양의 정수 패턴
