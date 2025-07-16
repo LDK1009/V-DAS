@@ -2,10 +2,15 @@ import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { mixinFlex } from "@/styles/mixins";
 import { RoomType } from "@/types/dormitory";
 import { Stack, styled } from "@mui/material";
-import React, { RefObject, useEffect } from "react";
+import React, { RefObject } from "react";
 import ChurchItem from "../church-list/ChurchItem";
 import { shouldForwardProp } from "@/utils/mui";
 import { useDrop } from "react-dnd";
+import { useCurrentChurchStore } from "@/store/church/churchStore";
+import { useAssign } from "@/hooks/assign/useAssign";
+import { ChurchType } from "@/types/currentChurchType";
+import { enqueueSnackbar } from "notistack";
+import { getCurrentFloorIndex, getRoomInfo, getUseFloors } from "@/hooks/assign/useAssignable";
 
 const Room = ({
   lineIndex,
@@ -18,8 +23,9 @@ const Room = ({
   roomIndex: number;
   customRoomNumber?: number;
 }) => {
-  const { currentFloor } = useDormitoryStore();
-  const { maxRoomPeople } = useDormitoryStore.getState();
+  const { currentFloor, maxRoomPeople } = useDormitoryStore();
+  const { currentChurchSex } = useCurrentChurchStore();
+  const { assignRoom } = useAssign();
 
   let startRoomNumber = 1; // 기본값 설정
   // 라인별 방 번호 시작 번호
@@ -44,12 +50,94 @@ const Room = ({
     return "insufficient";
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "ITEM", // 받아들일 수 있는 드래그 아이템의 타입
-    drop: (item, monitor) => {
-      // 드롭됐을 때 실행할 로직
-      console.log("드랍한 교회 정보:", item);
-      alert(`드랍된 방 정보: ${currentFloor}층 ${lineIndex}라인 ${roomIndex}번 방`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    drop: (church: ChurchType, monitor) => {
+      // 사용 가능한 층 배열
+      const useableFloors = getUseFloors(currentChurchSex);
+      // 현재 층의 층 인덱스
+      const currentFloorIndex = getCurrentFloorIndex(currentChurchSex);
+
+      // 현재 층 인덱스 예외 처리
+      if (currentFloorIndex !== 0 && !currentFloorIndex) {
+        enqueueSnackbar("층 정보를 가져오는데 실패했습니다.", { variant: "error" });
+        return;
+      }
+
+      // 성별 예외 처리
+      if (useableFloors && !useableFloors.includes(currentFloor)) {
+        enqueueSnackbar("다른 성별 층에는 배정할 수 없습니다.", { variant: "error" });
+        return;
+      }
+
+      // 특정 방의 정보 가져오기
+      const roomInfo = getRoomInfo(currentChurchSex, currentFloorIndex, lineIndex, roomIndex);
+
+      if (church.people <= 0) {
+        enqueueSnackbar("교회 인원이 0명 이하입니다.", { variant: "error" });
+        return;
+      }
+
+      // 방이 꽉 차있을 경우
+      if (roomInfo.remain === 0) {
+        const inputNumber = prompt("배정 인원을 입력해주세요.");
+
+        // 양의 정수 패턴
+        const integerPattern = /^[1-9]\d*$/;
+
+        // 입력값이 없을 경우
+        if (!inputNumber) {
+          return;
+        }
+
+        // 양의 정수 패턴 예외 처리
+        if (!integerPattern.test(inputNumber)) {
+          enqueueSnackbar("배정 인원을 입력해주세요.", { variant: "error" });
+          return;
+        }
+
+        // 방 배정
+        assignRoom({
+          sex: currentChurchSex,
+          church: church,
+          count: Number(inputNumber),
+          floorIndex: currentFloorIndex,
+          lineIndex,
+          roomIndex,
+        });
+
+        return;
+      }
+
+      // 방이 꽉 차지 않았을 경우
+      if (roomInfo.remain > 0) {
+        // 교회 인원이 방 인원보다 많을 경우
+        if (church.people > roomInfo.remain) {
+          assignRoom({
+            sex: currentChurchSex,
+            church: church,
+            count: roomInfo.remain,
+            floorIndex: currentFloorIndex,
+            lineIndex,
+            roomIndex,
+          });
+          return;
+        }
+        // 교회 인원이 방 인원보다 적을 경우
+        if (church.people < roomInfo.remain) {
+          assignRoom({
+            sex: currentChurchSex,
+            church: church,
+            count: church.people,
+            floorIndex: currentFloorIndex,
+            lineIndex,
+            roomIndex,
+          });
+          return;
+        }
+      }
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),

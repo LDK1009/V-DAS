@@ -5,13 +5,16 @@ import { useDrag } from "react-dnd";
 import React, { RefObject, useEffect } from "react";
 
 const ChurchItem = ({ church }: { church: ChurchType }) => {
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: "ITEM",
-    item: { churchName: church.churchName, people: church.people },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
+  const [{ isDragging }, drag] = useDrag(
+    () => ({
+      type: "ITEM",
+      item: { ...church },
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+      }),
     }),
-  }));
+    [church]
+  );
 
   useEffect(() => {
     console.log(`드래그 시작 ${isDragging}`);

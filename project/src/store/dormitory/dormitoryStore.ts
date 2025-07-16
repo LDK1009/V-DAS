@@ -70,16 +70,28 @@ export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
         const roomRemain = targetRoom.remain - count;
         const roomCurrent = targetRoom.current + count;
 
+        if (church.people < 0) {
+          return;
+        }
+
         // 데이터 존재 여부 확인
         if (dormitoryData) {
-          // 최대 인원 초과 시 배정 불가
-          if (roomRemain < 0 || roomCurrent > 7) {
-            return;
-          } else {
+
             dormitoryData[sex].floors[floorIndex].lines[lineIndex].rooms[roomIndex].remain = roomRemain;
             dormitoryData[sex].floors[floorIndex].lines[lineIndex].rooms[roomIndex].current = roomCurrent;
-            targetRoom.assignedChurchArray.push({ ...church, people: count });
-          }
+
+            // 이미 배정된 교회 존재 여부 확인
+            const existChurch = targetRoom.assignedChurchArray.find(
+              (assignedChurch: ChurchType) => assignedChurch.churchName === church.churchName
+            );
+
+            // 이미 배정된 교회 존재 시 인원 추가
+            if (existChurch) {
+              existChurch.people += count;
+            } else {
+              // 배정된 교회 없으면 배정
+              targetRoom.assignedChurchArray.push({ ...church, people: count });
+            }
         }
       })
     );

@@ -357,6 +357,47 @@ function getPartnerChurch({ sex, floorIndex, lineIndex }: GetPartnerChurchParams
   return null;
 }
 
+////////// 현재 층을 통한 현재 층 인덱스 가져오기
+function getCurrentFloorIndex(sex: "male" | "female") {
+  const { currentFloor, dormitoryData } = useDormitoryStore.getState();
+
+  if (sex === "male") {
+    const currentFloorIndex = dormitoryData?.male.floors.findIndex((floor) => floor.floorNumber === currentFloor);
+
+    return currentFloorIndex;
+  }
+
+  if (sex === "female") {
+    const currentFloorIndex = dormitoryData?.female.floors.findIndex((floor) => floor.floorNumber === currentFloor);
+
+    return currentFloorIndex;
+  }
+
+  return null;
+}
+
+////////// 성별을 통한 사용 층 배열 가져오기
+function getUseFloors(sex: "male" | "female") {
+  const { dormitoryData } = useDormitoryStore.getState();
+  if (sex === "male") {
+    return dormitoryData?.male.useFloorNumbers;
+  }
+
+  if (sex === "female") {
+    return dormitoryData?.female.useFloorNumbers;
+  }
+
+  return [];
+}
+
+////////// 특정 방의 정보 가져오기
+function getRoomInfo(sex: "male" | "female", floorIndex: number, lineIndex: number, roomIndex: number) {
+  const { dormitoryData } = useDormitoryStore.getState();
+  const { lines } = dormitoryData?.[sex].floors[floorIndex] as FloorType;
+  const { rooms } = lines[lineIndex];
+  return rooms[roomIndex];
+}
+
 //////////////////////////////////////////////////////////////////////////////// 미사용 ////////////////////////////////////////////////////////////////////////////////
 
 //////////////////// 라인 배정 가능 여부 조회
@@ -547,8 +588,6 @@ function getFitAssignPoint({ sex, church }: GetFitAssignPointParamsType) {
 export {
   getLastAssignedRoomRemain,
   getLineRemain,
-  checkLineAssign,
-  getAssignableInFloor,
   getAssignableInDormitory,
   getAssignableFloorsWithNoTailLine,
   getAssignableFloorsByCombinationDifference,
@@ -557,7 +596,12 @@ export {
   getAssignPoint,
   getAssignPointWithNoTailLine,
   getAssignablePointByCombinationDifference,
+  getAssignableRoomWithRemain,
+  getCurrentFloorIndex,
+  getUseFloors,
+  getRoomInfo,
   getRecommendedAssignmentPoint,
   getFitAssignPoint,
-  getAssignableRoomWithRemain,
+  checkLineAssign,
+  getAssignableInFloor,
 };
