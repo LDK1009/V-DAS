@@ -4,6 +4,7 @@ import ChurchItem from "./ChurchItem";
 import { Stack, styled } from "@mui/material";
 import { mixinFlex, mixinHideScrollbar } from "@/styles/mixins";
 import SelectSexButtonGroup from "./SelectSexButtonGroup";
+import AddCurchButton from "./AddCurchButton";
 
 const ChurchListContainer = () => {
   const {
@@ -34,6 +35,7 @@ const ChurchListContainer = () => {
         {currentViewChurches?.map((church) => (
           <ChurchItem key={church.churchName} church={church} dragFrom="sidebar" type="sidebar" />
         ))}
+        {currentViewChurches?.length && currentViewChurches.length > 0 && <AddCurchButton />}
       </ChurchList>
     </Container>
   );

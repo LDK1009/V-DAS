@@ -1,4 +1,5 @@
 import { ChurchArrayType } from "@/types/currentChurchType";
+import { produce } from "immer";
 import { create } from "zustand";
 
 // Zustand 스토어 정의
@@ -29,6 +30,9 @@ type CurrentChurchStoreType = {
   ////////// 교회 검색어
   searchChurch: string;
   setSearchChurch: (searchChurch: string) => void;
+
+  ////////// 교회 추가
+  addChurch: (sex: "male" | "female", churchName: string, churchCount: number) => void;
 };
 
 export const useCurrentChurchStore = create<CurrentChurchStoreType>()((set) => ({
@@ -89,4 +93,19 @@ export const useCurrentChurchStore = create<CurrentChurchStoreType>()((set) => (
   ////////// 교회 검색어
   searchChurch: "",
   setSearchChurch: (searchChurch) => set({ searchChurch }),
+
+  ////////// 교회 추가
+  addChurch: (sex, churchName, churchCount) => {
+    set(produce((state) => {
+      if(sex === "male"){
+        const newChurchMaleArray = [...state.churchMaleArray, { churchName, people: churchCount }];
+        state.churchMaleArray = newChurchMaleArray;
+      }
+      if(sex === "female"){
+        const newChurchFemaleArray = [...state.churchFemaleArray, { churchName, people: churchCount }];
+        state.churchFemaleArray = newChurchFemaleArray;
+      }
+      })
+    );
+  },
 }));
