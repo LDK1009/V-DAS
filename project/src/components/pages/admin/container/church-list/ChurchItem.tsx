@@ -138,14 +138,7 @@ const ChurchItem = ({
   const [isHover, setIsHover] = useState(false);
 
   return (
-    <Container
-      $isDragging={isContainerDragging()}
-      ref={
-        dragFrom === "sidebar"
-          ? (fromSidebarDrag as unknown as RefObject<HTMLDivElement>)
-          : (fromRoomDrag as unknown as RefObject<HTMLDivElement>)
-      }
-      onClick={type === "room" ? handleChangeChurchPeople : undefined}
+    <AssignedPositionWrapper
       onMouseEnter={() => {
         if (type === "sidebar") {
           setIsHover(true);
@@ -157,20 +150,35 @@ const ChurchItem = ({
         }
       }}
     >
-      <ChurchName>{church.churchName}</ChurchName>
-      <ChurchPeople>{church.people}</ChurchPeople>
-      {isHover && (
+      <Container
+        ref={
+          dragFrom === "sidebar"
+            ? (fromSidebarDrag as unknown as RefObject<HTMLDivElement>)
+            : (fromRoomDrag as unknown as RefObject<HTMLDivElement>)
+        }
+        onClick={type === "room" ? handleChangeChurchPeople : undefined}
+        $isDragging={isContainerDragging()}
+      >
+        <ChurchName>{church.churchName}</ChurchName>
+        <ChurchPeople $isRemain={type === "sidebar" && church.people > 0}>{church.people}</ChurchPeople>
+      </Container>
+      {Number(assginedPosition[2]) >= 0 && (
         <AssignedPosition
+          $isHover={isDraggingSidebar ? false : isHover}
           onClick={() => {
             setCurrentFloor(assginedPosition[0] as number);
           }}
         >{`${assginedPosition[2]}호`}</AssignedPosition>
       )}
-    </Container>
+    </AssignedPositionWrapper>
   );
 };
 
 export default ChurchItem;
+
+const AssignedPositionWrapper = styled(Box)`
+  position: relative;
+`;
 
 type ContainerPropsType = {
   $isDragging: boolean;
@@ -195,14 +203,18 @@ const pulse = keyframes`
 `;
 
 const Container = styled(Stack, { shouldForwardProp })<ContainerPropsType>`
-  position: relative;
   width: 164px;
+  height: 20px;
+  min-height: 20px;
+
   ${mixinFlex("row", "start", "center")}
   border-radius: 12px;
   border: 1px solid #000000;
   background-color: ${({ theme, $isDragging }) => ($isDragging ? theme.palette.primary.main : "transparent")};
   border: ${({ theme, $isDragging }) => $isDragging && `1px solid ${theme.palette.primary.main}`};
   animation: ${({ $isDragging }) => ($isDragging ? pulse : "none")} 1s ease-in-out infinite;
+  overflow: hidden;
+  z-index: 2;
 
   &:hover {
     background-color: ${({ theme }) => theme.palette.primary.main};
@@ -218,7 +230,11 @@ const ChurchName = styled(Typography)`
   ${mixinEllipsis()};
 `;
 
-const ChurchPeople = styled(Typography)`
+type ChurchPeoplePropsType = {
+  $isRemain: boolean;
+};
+
+const ChurchPeople = styled(Typography, { shouldForwardProp })<ChurchPeoplePropsType>`
   width: 40px;
   height: 20px;
   ${mixinFlex("column", "center", "center")}
@@ -226,18 +242,26 @@ const ChurchPeople = styled(Typography)`
   border-left: 1px solid #000000;
   font-size: 16px;
   text-align: center;
+  background-color: ${({ $isRemain }) => ($isRemain ? "yellow" : "transparent")};
 `;
 
-const AssignedPosition = styled(Box)`
+type AssignedPositionPropsType = {
+  $isHover: boolean;
+};
+
+const AssignedPosition = styled(Box, { shouldForwardProp })<AssignedPositionPropsType>`
   position: absolute;
-  bottom:100%;
-  right: 0px;
+  bottom: 0px;
+  left: calc(100% + 4px);
   width: 40px;
   height: 20px;
   padding: 4px;
   ${mixinFlex("column", "center", "center")}
   background-color: rgba(0, 0, 0, 0.8);
   color: white;
-  border-radius: 8px 8px 0px 0px;
+  border-radius: 4px;
   font-size: 12px;
+  cursor: pointer;
+  opacity: ${({ $isHover }) => ($isHover ? 1 : 0)};
+  z-index: 1;
 `;
