@@ -28,23 +28,34 @@ const ChurchListContainer = () => {
   }, [churchMaleArray, churchFemaleArray, currentChurchSex, searchChurch, setCurrentViewChurches]);
 
   return (
-    <ChurchList>
+    <Container>
       <SelectSexButtonGroup />
-      {currentViewChurches?.map((church) => (
-        <ChurchItem key={church.churchName} church={church} dragFrom="sidebar" type="sidebar" />
-      ))}
-    </ChurchList>
+      <ChurchList>
+        {currentViewChurches?.map((church) => (
+          <ChurchItem key={church.churchName} church={church} dragFrom="sidebar" type="sidebar" />
+        ))}
+      </ChurchList>
+    </Container>
   );
 };
 
 export default ChurchListContainer;
 
+const Container = styled(Stack)`
+  position: relative;
+  ${mixinFlex("column", "start", "stretch")}
+  width: 100%;
+  height: 100%;
+  max-height: 804px;
+  padding-top: 64px;
+  padding-bottom: 32px;
+`;
+
 const ChurchList = styled(Stack)`
   ${mixinFlex("column", "start", "center")}
   width: 100%;
   height: 100%;
-  max-height: 804px;
-  padding: 26px 18px;
+  max-height: 750px;
   row-gap: 14px;
   overflow-y: auto;
   ${mixinHideScrollbar}

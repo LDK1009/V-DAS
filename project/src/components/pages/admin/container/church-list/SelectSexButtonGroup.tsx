@@ -21,8 +21,12 @@ const SelectSexButtonGroup = () => {
 
 export default SelectSexButtonGroup;
 
-
 const Container = styled(Stack)`
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
   ${mixinFlex("row", "center", "center")}
   column-gap: 8px;
   width: 100%;
