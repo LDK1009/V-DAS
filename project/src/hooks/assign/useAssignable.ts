@@ -414,6 +414,26 @@ function getRoomInfo(sex: "male" | "female", floorIndex: number, lineIndex: numb
   return rooms[roomIndex];
 }
 
+////////// 특정 교회가 배정된 위치 가져오기
+function getChurchAssignedPosition(sex: "male" | "female", churchName: string) {
+  const { dormitoryData } = useDormitoryStore.getState();
+  const { floors } = dormitoryData?.[sex] as DormitorySexType;
+
+  for (const floor of floors){
+    for (const [lineIndex, line] of floor.lines.entries()){
+        for (const [roomIndex, room] of line.rooms.entries()){
+            if (room.assignedChurchArray.filter((church) => church.churchName === churchName).length > 0){
+                return {
+                    floorIndex: floor.floorNumber,
+                    lineIndex: lineIndex,
+                    roomIndex: roomIndex,
+                };
+            }
+        }
+    }
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////////// 미사용 ////////////////////////////////////////////////////////////////////////////////
 
 //////////////////// 라인 배정 가능 여부 조회
@@ -621,4 +641,5 @@ export {
   checkLineAssign,
   getAssignableInFloor,   
   getCurrentFloorSex,
+  getChurchAssignedPosition,
 };

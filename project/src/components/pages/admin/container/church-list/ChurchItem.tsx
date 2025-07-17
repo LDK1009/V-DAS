@@ -1,13 +1,19 @@
 import { mixinEllipsis, mixinFlex } from "@/styles/mixins";
 import { ChurchType } from "@/types/currentChurchType";
-import { keyframes, Stack, styled, Typography } from "@mui/material";
+import { Box, keyframes, Stack, styled, Typography } from "@mui/material";
 import { useDrag } from "react-dnd";
-import React, { RefObject, useCallback } from "react";
+import React, { RefObject, useCallback, useState } from "react";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
-import { getCurrentFloorIndex, getCurrentFloorSex, getRoomInfo } from "@/hooks/assign/useAssignable";
+import {
+  getChurchAssignedPosition,
+  getCurrentFloorIndex,
+  getCurrentFloorSex,
+  getRoomInfo,
+} from "@/hooks/assign/useAssignable";
 import { enqueueSnackbar } from "notistack";
 import { useCurrentChurchStore } from "@/store/church/churchStore";
 import { shouldForwardProp } from "@/utils/mui";
+import { getRoomNumber } from "@/utils/room/room";
 
 const ChurchItem = ({
   lineIndex,
@@ -116,6 +122,21 @@ const ChurchItem = ({
     return false;
   }, [type, isDraggingSidebar, isDraggingRoom]);
 
+  ////////// 교회 배정 위치
+  const { currentChurchSex } = useCurrentChurchStore();
+  const { setCurrentFloor } = useDormitoryStore();
+  const churchAssignedPosition = getChurchAssignedPosition(currentChurchSex, church.churchName);
+  const assginedPosition = [
+    churchAssignedPosition?.floorIndex,
+    (churchAssignedPosition?.lineIndex as number) + 1,
+    getRoomNumber(
+      churchAssignedPosition?.floorIndex as number,
+      churchAssignedPosition?.lineIndex as number,
+      churchAssignedPosition?.roomIndex as number
+    ),
+  ];
+  const [isHover, setIsHover] = useState(false);
+
   return (
     <Container
       $isDragging={isContainerDragging()}
@@ -125,9 +146,26 @@ const ChurchItem = ({
           : (fromRoomDrag as unknown as RefObject<HTMLDivElement>)
       }
       onClick={type === "room" ? handleChangeChurchPeople : undefined}
+      onMouseEnter={() => {
+        if (type === "sidebar") {
+          setIsHover(true);
+        }
+      }}
+      onMouseLeave={() => {
+        if (type === "sidebar") {
+          setIsHover(false);
+        }
+      }}
     >
       <ChurchName>{church.churchName}</ChurchName>
       <ChurchPeople>{church.people}</ChurchPeople>
+      {isHover && (
+        <AssignedPosition
+          onClick={() => {
+            setCurrentFloor(assginedPosition[0] as number);
+          }}
+        >{`${assginedPosition[2]}호`}</AssignedPosition>
+      )}
     </Container>
   );
 };
@@ -157,6 +195,7 @@ const pulse = keyframes`
 `;
 
 const Container = styled(Stack, { shouldForwardProp })<ContainerPropsType>`
+  position: relative;
   width: 164px;
   ${mixinFlex("row", "start", "center")}
   border-radius: 12px;
@@ -165,8 +204,8 @@ const Container = styled(Stack, { shouldForwardProp })<ContainerPropsType>`
   border: ${({ theme, $isDragging }) => $isDragging && `1px solid ${theme.palette.primary.main}`};
   animation: ${({ $isDragging }) => ($isDragging ? pulse : "none")} 1s ease-in-out infinite;
 
-  &:hover{
-    background-color: ${({theme}) => theme.palette.primary.main};
+  &:hover {
+    background-color: ${({ theme }) => theme.palette.primary.main};
     cursor: pointer;
   }
 `;
@@ -187,4 +226,18 @@ const ChurchPeople = styled(Typography)`
   border-left: 1px solid #000000;
   font-size: 16px;
   text-align: center;
+`;
+
+const AssignedPosition = styled(Box)`
+  position: absolute;
+  bottom:100%;
+  right: 0px;
+  width: 40px;
+  height: 20px;
+  padding: 4px;
+  ${mixinFlex("column", "center", "center")}
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  border-radius: 8px 8px 0px 0px;
+  font-size: 12px;
 `;

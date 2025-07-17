@@ -13,7 +13,7 @@ function getRoomNumber(floorNumber: number, lineIndex: number, roomIndex: number
     startRoomNumber = 22;
   }
 
-  return `${floorNumber}${startRoomNumber + roomIndex}`;
+  return `${floorNumber}${String(startRoomNumber + roomIndex).padStart(2, "0")}`;
 }
 
 export { getRoomNumber };
