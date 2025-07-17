@@ -10,7 +10,7 @@ import { useCurrentChurchStore } from "@/store/church/churchStore";
 import { useAssign } from "@/hooks/assign/useAssign";
 import { ChurchType } from "@/types/currentChurchType";
 import { enqueueSnackbar } from "notistack";
-import { getCurrentFloorIndex, getRoomInfo, getUseFloors } from "@/hooks/assign/useAssignable";
+import { getCurrentFloorIndex, getCurrentFloorSex, getRoomInfo, getUseFloors } from "@/hooks/assign/useAssignable";
 
 const Room = ({
   lineIndex,
@@ -50,15 +50,27 @@ const Room = ({
     return "insufficient";
   }
 
+  type DropItemType = {
+    church: ChurchType;
+    dragFrom: "room" | "sidebar";
+    lineIndex?: number;
+    roomIndex?: number;
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "ITEM", // 받아들일 수 있는 드래그 아이템의 타입
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    drop: (item: { church: ChurchType; dragFrom: "room" | "sidebar" }, monitor) => {
+    drop: (item: DropItemType, monitor) => {
+      ////////// 드래그가 방에서 방으로 드래그 되었을 경우
       if (item.dragFrom === "room") {
+        const dragRoomInfo = { church: item.church, room: { lineIndex: item.lineIndex, roomIndex: item.roomIndex } };
+        const dropRoomInfo = { lineIndex, roomIndex };
+        alert(JSON.stringify(dragRoomInfo, null, 2));
         return;
       }
 
+      ////////// 드래그가 사이드바에서 방으로 드래그 되었을 경우
       // 사용 가능한 층 배열
       const useableFloors = getUseFloors(currentChurchSex);
       // 현재 층의 층 인덱스
@@ -67,6 +79,17 @@ const Room = ({
       // 현재 층 인덱스 예외 처리
       if (currentFloorIndex !== 0 && !currentFloorIndex) {
         enqueueSnackbar("층 정보를 가져오는데 실패했습니다.", { variant: "error" });
+        return;
+      }
+
+      // 현재 사이드바의 성별
+      const currentSidebarSex = useCurrentChurchStore.getState().currentChurchSex;
+      // 현재 기숙사 층의 성별
+      const currentFloorSex = getCurrentFloorSex();
+
+      // 현재 사이드바의 성별과 현재 기숙사 층의 성별이 다를 경우
+      if (currentSidebarSex !== currentFloorSex) {
+        enqueueSnackbar("다른 성별 층에는 배정할 수 없습니다.", { variant: "error" });
         return;
       }
 
