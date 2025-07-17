@@ -7,6 +7,7 @@ import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { getCurrentFloorIndex, getCurrentFloorSex, getRoomInfo } from "@/hooks/assign/useAssignable";
 import { enqueueSnackbar } from "notistack";
 import { useCurrentChurchStore } from "@/store/church/churchStore";
+import { shouldForwardProp } from "@/utils/mui";
 
 const ChurchItem = ({
   lineIndex,
@@ -155,7 +156,7 @@ const pulse = keyframes`
   }
 `;
 
-const Container = styled(Stack)<ContainerPropsType>`
+const Container = styled(Stack, { shouldForwardProp })<ContainerPropsType>`
   width: 164px;
   ${mixinFlex("row", "start", "center")}
   border-radius: 12px;
