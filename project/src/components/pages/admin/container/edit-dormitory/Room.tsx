@@ -103,6 +103,8 @@ const Room = ({
       }
 
       ////////// 드래그가 사이드바에서 방으로 드래그 되었을 경우
+      alert(JSON.stringify(item, null, 2));
+
       // 사용 가능한 층 배열
       const useableFloors = getUseFloors(currentChurchSex);
       // 현재 층의 층 인덱스
@@ -139,6 +141,7 @@ const Room = ({
         return;
       }
 
+      
       // 방이 꽉 차있을 경우
       if (roomInfo.remain <= 0) {
         const inputNumber = prompt("배정 인원을 입력해주세요.");
@@ -172,8 +175,9 @@ const Room = ({
 
       // 방이 꽉 차지 않았을 경우
       if (roomInfo.remain > 0) {
-        // 교회 인원이 방 인원보다 많을 경우
-        if (item.church.people > roomInfo.remain) {
+
+        // 교회 인원이 방 인원보다 많거나 같을 경우
+        if (item.church.people >= roomInfo.remain) {
           assignRoom({
             sex: currentChurchSex,
             church: item.church,
@@ -182,6 +186,7 @@ const Room = ({
             lineIndex,
             roomIndex,
           });
+          
           return;
         }
         // 교회 인원이 방 인원보다 적을 경우
