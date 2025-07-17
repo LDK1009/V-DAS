@@ -8,22 +8,26 @@ import Header from "./container/etc/Header";
 import { mixinFlex } from "@/styles/mixins";
 import ChurchListHeader from "./container/church-list/ChurchListHeader";
 import StepSection from "./container/step/StepSection";
+import ExportCard from "./container/export/card/ExportCard";
 
 const AdminContainer = () => {
   return (
-    <Container>
-      <Header />
-      <StepSection />
-      <BodyArea>
-        <BodyLeft>
-          <ChurchListHeader />
-          <ChurchListContainer />
-        </BodyLeft>
-        <BodyRight>
-          <EditDormitoryContainer />
-        </BodyRight>
-      </BodyArea>
-    </Container>
+    <>
+      <Container>
+        <Header />
+        <StepSection />
+        <BodyArea>
+          <BodyLeft>
+            <ChurchListHeader />
+            <ChurchListContainer />
+          </BodyLeft>
+          <BodyRight>
+            <EditDormitoryContainer />
+          </BodyRight>
+        </BodyArea>
+      </Container>
+      <ExportCard />
+    </>
   );
 };
 

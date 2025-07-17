@@ -164,6 +164,11 @@ const Container = styled(Stack, { shouldForwardProp })<ContainerPropsType>`
   background-color: ${({ theme, $isDragging }) => ($isDragging ? theme.palette.primary.main : "transparent")};
   border: ${({ theme, $isDragging }) => $isDragging && `1px solid ${theme.palette.primary.main}`};
   animation: ${({ $isDragging }) => ($isDragging ? pulse : "none")} 1s ease-in-out infinite;
+
+  &:hover{
+    background-color: ${({theme}) => theme.palette.primary.main};
+    cursor: pointer;
+  }
 `;
 
 const ChurchName = styled(Typography)`

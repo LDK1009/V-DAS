@@ -103,8 +103,6 @@ const Room = ({
       }
 
       ////////// 드래그가 사이드바에서 방으로 드래그 되었을 경우
-      alert(JSON.stringify(item, null, 2));
-
       // 사용 가능한 층 배열
       const useableFloors = getUseFloors(currentChurchSex);
       // 현재 층의 층 인덱스
