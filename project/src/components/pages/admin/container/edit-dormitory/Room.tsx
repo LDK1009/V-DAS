@@ -64,9 +64,41 @@ const Room = ({
     drop: (item: DropItemType, monitor) => {
       ////////// 드래그가 방에서 방으로 드래그 되었을 경우
       if (item.dragFrom === "room") {
+        const currentFloorSex = getCurrentFloorSex();
+        if (!currentFloorSex) {
+          enqueueSnackbar("층 정보를 가져오는데 실패했습니다.", { variant: "error" });
+          return;
+        }
+
+        const currentFloorIndex = getCurrentFloorIndex(currentFloorSex);
+        if (currentFloorIndex && !(currentFloorIndex >= 0)) {
+          enqueueSnackbar("층 정보를 가져오는데 실패했습니다.", { variant: "error" });
+          return;
+        }
+
         const dragRoomInfo = { church: item.church, room: { lineIndex: item.lineIndex, roomIndex: item.roomIndex } };
         const dropRoomInfo = { lineIndex, roomIndex };
-        alert(JSON.stringify(dragRoomInfo, null, 2));
+
+        // 기존 방에서 교회 삭제
+        assignRoom({
+          sex: currentFloorSex,
+          church: dragRoomInfo.church,
+          count: -dragRoomInfo.church.people,
+          floorIndex: currentFloorIndex as number,
+          lineIndex: dragRoomInfo.room.lineIndex as number,
+          roomIndex: dragRoomInfo.room.roomIndex as number,
+        });
+
+        // 새로운 방으로 교회 이동
+        assignRoom({
+          sex: currentFloorSex,
+          church: item.church,
+          count: dragRoomInfo.church.people,
+          floorIndex: currentFloorIndex as number,
+          lineIndex: dropRoomInfo.lineIndex as number,
+          roomIndex: dropRoomInfo.roomIndex as number,
+        });
+
         return;
       }
 
