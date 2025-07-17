@@ -126,7 +126,15 @@ export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
 
           // 이미 배정된 교회 존재 시 인원 추가
           if (existChurch) {
-            existChurch.people += count;
+            const newPeople = existChurch.people + count;
+            // 인원이 0이 된다면 교회 배정 삭제
+            if (newPeople === 0) {
+              targetRoom.assignedChurchArray = targetRoom.assignedChurchArray.filter(
+                (assignedChurch: ChurchType) => assignedChurch.churchName !== church.churchName
+              );
+            } else {
+              existChurch.people = newPeople;
+            }
           } else {
             // 배정된 교회 없으면 배정
             targetRoom.assignedChurchArray.push({ ...church, people: count });
@@ -163,13 +171,20 @@ export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
   },
 
   // 배정된 교회의 인원 변경
-  changeAssignedChurchPeople: ({ sex, floorIndex, lineIndex, roomIndex, church, count }: ChangeAssignedChurchPeopleParamsType) => {
+  changeAssignedChurchPeople: ({
+    sex,
+    floorIndex,
+    lineIndex,
+    roomIndex,
+    church,
+    count,
+  }: ChangeAssignedChurchPeopleParamsType) => {
     set(
       produce((state) => {
         const dormitoryData = state.dormitoryData;
-        const assignedChurch = dormitoryData?.[sex].floors[floorIndex].lines[lineIndex].rooms[roomIndex].assignedChurchArray.find(
-          (assignedChurch: ChurchType) => assignedChurch.churchName === church.churchName
-        );
+        const assignedChurch = dormitoryData?.[sex].floors[floorIndex].lines[lineIndex].rooms[
+          roomIndex
+        ].assignedChurchArray.find((assignedChurch: ChurchType) => assignedChurch.churchName === church.churchName);
 
         if (!assignedChurch) return;
 
