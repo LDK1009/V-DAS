@@ -46,7 +46,10 @@ const Room = ({
   function getRoomStatus(current: number) {
     if (current > maxRoomPeople) return "exceed";
     if (current === maxRoomPeople) return "full";
-    if (current < maxRoomPeople) return "insufficient";
+    if (current < maxRoomPeople) {
+      if (current === 0) return "empty";
+      return "insufficient";
+    }
     return "insufficient";
   }
 
@@ -139,7 +142,6 @@ const Room = ({
         return;
       }
 
-      
       // 방이 꽉 차있을 경우
       if (roomInfo.remain <= 0) {
         const inputNumber = prompt("배정 인원을 입력해주세요.");
@@ -173,7 +175,6 @@ const Room = ({
 
       // 방이 꽉 차지 않았을 경우
       if (roomInfo.remain > 0) {
-
         // 교회 인원이 방 인원보다 많거나 같을 경우
         if (item.church.people >= roomInfo.remain) {
           assignRoom({
@@ -184,7 +185,7 @@ const Room = ({
             lineIndex,
             roomIndex,
           });
-          
+
           return;
         }
         // 교회 인원이 방 인원보다 적을 경우
@@ -266,7 +267,7 @@ const ChurchContainer = styled(Stack)`
 `;
 
 type RoomCurrentContainerPropsType = {
-  $status: "exceed" | "full" | "insufficient";
+  $status: "exceed" | "full" | "insufficient" | "empty";
 };
 const RoomCurrentContainer = styled(Stack, { shouldForwardProp })<RoomCurrentContainerPropsType>`
   ${mixinFlex("column", "center", "center")}
@@ -274,8 +275,15 @@ const RoomCurrentContainer = styled(Stack, { shouldForwardProp })<RoomCurrentCon
   min-width: 40px;
   font-size: 16px;
   background-color: ${({ $status }) => {
-    if ($status === "exceed") return "blue";
+    if ($status === "exceed") return "red";
     if ($status === "full") return "transparent";
     if ($status === "insufficient") return "yellow";
+    if ($status === "empty") return "transparent";
+  }};
+  color: ${({ $status }) => {
+    if ($status === "exceed") return "white";
+    if ($status === "full") return "black";
+    if ($status === "insufficient") return "black";
+    if ($status === "empty") return "black";
   }};
 `;
