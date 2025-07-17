@@ -1,8 +1,8 @@
 import { mixinEllipsis, mixinFlex } from "@/styles/mixins";
 import { ChurchType } from "@/types/currentChurchType";
-import { Stack, styled, Typography } from "@mui/material";
+import { keyframes, Stack, styled, Typography } from "@mui/material";
 import { useDrag } from "react-dnd";
-import React, { RefObject } from "react";
+import React, { RefObject, useCallback } from "react";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { getCurrentFloorIndex, getCurrentFloorSex, getRoomInfo } from "@/hooks/assign/useAssignable";
 import { enqueueSnackbar } from "notistack";
@@ -105,8 +105,19 @@ const ChurchItem = ({
     }
   }
 
+  const isContainerDragging = useCallback(() => {
+    if (type === "sidebar") {
+      return isDraggingSidebar;
+    }
+    if (type === "room") {
+      return isDraggingRoom;
+    }
+    return false;
+  }, [type, isDraggingSidebar, isDraggingRoom]);
+
   return (
     <Container
+      $isDragging={isContainerDragging()}
       ref={
         dragFrom === "sidebar"
           ? (fromSidebarDrag as unknown as RefObject<HTMLDivElement>)
@@ -122,11 +133,36 @@ const ChurchItem = ({
 
 export default ChurchItem;
 
-const Container = styled(Stack)`
+type ContainerPropsType = {
+  $isDragging: boolean;
+};
+
+const pulse = keyframes`
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+`;
+
+const Container = styled(Stack)<ContainerPropsType>`
   width: 164px;
   ${mixinFlex("row", "start", "center")}
   border-radius: 12px;
   border: 1px solid #000000;
+  background-color: ${({ theme, $isDragging }) => ($isDragging ? theme.palette.primary.main : "transparent")};
+  border: ${({ theme, $isDragging }) => $isDragging && `1px solid ${theme.palette.primary.main}`};
+  animation: ${({ $isDragging }) => ($isDragging ? pulse : "none")} 1s ease-in-out infinite;
 `;
 
 const ChurchName = styled(Typography)`
