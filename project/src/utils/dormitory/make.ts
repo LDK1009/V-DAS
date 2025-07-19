@@ -2,9 +2,9 @@ import { LineType, FloorType, RoomType } from "@/types/dormitory";
 
 ////////// 방 초기화
 const initialRoom: RoomType = {
-  max: 7,
+  max: 6,
   current: 0,
-  remain: 7,
+  remain: 6,
   assignedChurchArray: [],
 };
 

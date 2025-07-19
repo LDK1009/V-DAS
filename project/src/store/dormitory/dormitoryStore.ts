@@ -194,7 +194,7 @@ export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
   },
 
   // 설정값 관련
-  maxRoomPeople: 7,
+  maxRoomPeople: 6,
   setMaxRoomPeople: (maxRoomPeople: number) => {
     // 최대 인원 설정
     set({ maxRoomPeople });

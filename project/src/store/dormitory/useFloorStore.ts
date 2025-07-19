@@ -23,7 +23,7 @@ export const useFloorStore = create<UseFloorStoreType>()((set) => ({
   // 사용층 관련
   useFloorNumbers: {
     male: [2, 3, 4, 5],
-    female: [6, 7, 8, 9],
+    female: [7, 8, 9,10],
   },
 
   // 층 선택 핸들러

@@ -14,7 +14,7 @@ const SelectUseFloor = () => {
 
   ////////////////////////////////////////////////// 렌더링
   // 층 버튼 렌더링
-  const renderFloorButton = [2, 3, 4, 5, 6, 7, 8, 9].map((number, index) => {
+  const renderFloorButton = [2, 3, 4, 5, 7, 8, 9, 10].map((number, index) => {
     const isInMale = useFloorNumbers.male.includes(number);
     const isInFemale = useFloorNumbers.female.includes(number);
 

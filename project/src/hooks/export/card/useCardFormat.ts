@@ -187,5 +187,17 @@ export const useCardFormat = () => {
     [dormitoryData]
   );
 
-  return { getUniqChurches, getChurchCardData };
+  const getAllChurchCardData = useCallback(() => {
+    const uniqChurches = getUniqChurches();
+    const churchCardDatas: CardInfoType[] = [];
+
+    uniqChurches.forEach((churchName) => {
+      const churchCardInfo = getChurchCardData(churchName);
+      churchCardDatas.push(churchCardInfo);
+    });
+
+    return churchCardDatas;
+  }, [getUniqChurches, getChurchCardData]);
+
+  return { getUniqChurches, getChurchCardData, getAllChurchCardData };
 };
