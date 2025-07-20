@@ -132,6 +132,10 @@ function getAssignableFloorsWithNoTailLine({ sex, church }: GetAssignableFloorsW
   const churchPeople = church.people;
   const churchRemain = churchPeople % maxRoomPeople;
 
+  if (!assignableFloors) {
+    return null;
+  }
+
   const assignableFloorsWithNoTailLine = assignableFloors
     .map((floorInfo) => {
       const lineInfos = floorInfo.lineInfoArray;
@@ -174,6 +178,10 @@ function getAssignableFloorsByCombinationDifference({
   const { maxRoomPeople } = useDormitoryStore.getState();
   const churchPeople = church.people;
   const churchMod = churchPeople % maxRoomPeople;
+
+  if (!assignableFloors) {
+    return null;
+  }
 
   const assignableFloorsByCombinationDifference = assignableFloors
     .map((floorInfo) => {
@@ -280,7 +288,12 @@ type GetAssignPointWithNoTailLineParamsType = {
 
 function getAssignPointWithNoTailLine({ sex, church }: GetAssignPointWithNoTailLineParamsType) {
   const assignableData = getAssignableFloorsWithNoTailLine({ sex, church });
-  const seperatedData = separateAssignFloorsToFiveLinesAndOthers(assignableData as AssignableFloorIndexArrayType);
+
+  if (!assignableData) {
+    return null;
+  }
+
+  const seperatedData = separateAssignFloorsToFiveLinesAndOthers(assignableData);
   const assignPoint = getAssignPoint(seperatedData);
 
   if (assignPoint) {
@@ -303,7 +316,12 @@ function getAssignablePointByCombinationDifference({
   difference,
 }: GetAssignablePointByCombinationDifferenceParamsType) {
   const assignableData = getAssignableFloorsByCombinationDifference({ sex, church, difference });
-  const seperatedData = separateAssignFloorsToFiveLinesAndOthers(assignableData as AssignableFloorIndexArrayType);
+
+  if (!assignableData) {
+    return null;
+  }
+
+  const seperatedData = separateAssignFloorsToFiveLinesAndOthers(assignableData);
   const assignPoint = getAssignPoint(seperatedData);
 
   if (assignPoint) {
@@ -395,11 +413,11 @@ function getCurrentFloorSex() {
   const { dormitoryData, currentFloor } = useDormitoryStore.getState();
   const { male, female } = dormitoryData as DormitoryType;
 
-  if(male && male.useFloorNumbers.includes(currentFloor)){
+  if (male && male.useFloorNumbers.includes(currentFloor)) {
     return "male";
   }
 
-  if(female && female.useFloorNumbers.includes(currentFloor)){
+  if (female && female.useFloorNumbers.includes(currentFloor)) {
     return "female";
   }
 
@@ -419,17 +437,17 @@ function getChurchAssignedPosition(sex: "male" | "female", churchName: string) {
   const { dormitoryData } = useDormitoryStore.getState();
   const { floors } = dormitoryData?.[sex] as DormitorySexType;
 
-  for (const floor of floors){
-    for (const [lineIndex, line] of floor.lines.entries()){
-        for (const [roomIndex, room] of line.rooms.entries()){
-            if (room.assignedChurchArray.filter((church) => church.churchName === churchName).length > 0){
-                return {
-                    floorIndex: floor.floorNumber,
-                    lineIndex: lineIndex,
-                    roomIndex: roomIndex,
-                };
-            }
+  for (const floor of floors) {
+    for (const [lineIndex, line] of floor.lines.entries()) {
+      for (const [roomIndex, room] of line.rooms.entries()) {
+        if (room.assignedChurchArray.filter((church) => church.churchName === churchName).length > 0) {
+          return {
+            floorIndex: floor.floorNumber,
+            lineIndex: lineIndex,
+            roomIndex: roomIndex,
+          };
         }
+      }
     }
   }
 }
@@ -621,7 +639,7 @@ function getFitAssignPoint({ sex, church }: GetFitAssignPointParamsType) {
   return null;
 }
 
-export {  
+export {
   getLastAssignedRoomRemain,
   getLineRemain,
   getAssignableInDormitory,
@@ -639,7 +657,7 @@ export {
   getRecommendedAssignmentPoint,
   getFitAssignPoint,
   checkLineAssign,
-  getAssignableInFloor,   
+  getAssignableInFloor,
   getCurrentFloorSex,
   getChurchAssignedPosition,
 };

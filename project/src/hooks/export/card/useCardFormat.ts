@@ -164,7 +164,6 @@ export const useCardFormat = () => {
 
   const getChurchCardData = useCallback(
     (churchName: string): CardInfoType => {
-      console.log("시작");
       const churchAssginInfosInMaleDormitory = getAllChurchAssginInfo({ sex: "male", churchName });
       const churchAssginInfosInFemaleDormitory = getAllChurchAssginInfo({ sex: "female", churchName });
 

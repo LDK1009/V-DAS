@@ -91,17 +91,6 @@ export const useAssign = () => {
       assignRoom({ sex, church, count: churchPeople, floorIndex, lineIndex, roomIndex });
       churchPeople = churchPeople - churchPeople;
     }
-    // for (let i = startRoomIndex; i < endRoomIndex; i++) {
-    //   let churchPeople = church.people;
-
-    //   if (roomRemain < churchPeople) {
-    //     assignRoom({ sex, church, count: roomRemain, floorIndex, lineIndex, roomIndex:i });
-    //     churchPeople -= roomRemain;
-    //   } else {
-    //     assignRoom({ sex, church, count: churchPeople, floorIndex, lineIndex, roomIndex });
-    //     churchPeople = 0;
-    //   }
-    // }
 
     return dormitoryData;
   }
@@ -143,6 +132,7 @@ export const useAssign = () => {
       church,
       difference: 1,
     });
+
     ////////// 조합하여 6명이 되는 배정
     if (assignPointByCombinationDifference1) {
       assignLine({
