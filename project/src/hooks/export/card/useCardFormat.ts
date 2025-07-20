@@ -195,7 +195,13 @@ export const useCardFormat = () => {
       churchCardDatas.push(churchCardInfo);
     });
 
-    return churchCardDatas;
+    return churchCardDatas.filter((el) => {
+      if (el.churchName.includes("개인") && !el.churchName.includes("교회")) {
+        return false;
+      }
+
+      return true;
+    });
   }, [getUniqChurches, getChurchCardData]);
 
   return { getUniqChurches, getChurchCardData, getAllChurchCardData };

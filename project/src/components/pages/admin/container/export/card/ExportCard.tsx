@@ -23,8 +23,6 @@ const Container = styled(Stack)`
   flex-direction: column;
   row-gap: 10px;
   position: fixed;
-  /* top: 0px; */
-  /* right: -100%; */
-  top:0px;
-  right: 0px;
+  top: 0px;
+  right: -100%;
 `;
