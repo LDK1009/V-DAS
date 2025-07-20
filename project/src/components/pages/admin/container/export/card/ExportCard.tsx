@@ -1,22 +1,30 @@
 import { useCardFormat } from "@/hooks/export/card/useCardFormat";
 import AssignCard from "./AssignCard";
+import { Stack, styled } from "@mui/material";
 
 const ExportCard = () => {
-  const { getChurchCardData, getAllChurchCardData } = useCardFormat();
-
+  const { getAllChurchCardData } = useCardFormat();
   const churchCardDatas = getAllChurchCardData();
 
   return (
-    <div>
+    <Container>
       {churchCardDatas.map((churchCardData, index) => (
         <AssignCard key={index} {...churchCardData} />
       ))}
-      <h1>남자</h1>
-      <pre>{JSON.stringify(getChurchCardData("중부명성교회").maleCardInfo, null, 2)}</pre>
-      <h1>여자</h1>
-      <pre>{JSON.stringify(getChurchCardData("중부명성교회").femaleCardInfo, null, 2)}</pre>
-    </div>
+    </Container>
   );
 };
 
 export default ExportCard;
+
+const Container = styled(Stack)`
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  position: fixed;
+  /* top: 0px; */
+  /* right: -100%; */
+  top:0px;
+  right: 0px;
+`;

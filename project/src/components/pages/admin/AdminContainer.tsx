@@ -9,7 +9,6 @@ import { mixinFlex } from "@/styles/mixins";
 import ChurchListHeader from "./container/church-list/ChurchListHeader";
 import StepSection from "./container/step/StepSection";
 import ExportCard from "./container/export/card/ExportCard";
-import TableContainer from "./container/export/table/TableContainer";
 
 const AdminContainer = () => {
   return (
@@ -27,8 +26,8 @@ const AdminContainer = () => {
             <EditDormitoryContainer />
           </BodyRight>
         </BodyArea>
+        <ExportCard />
       </Container>
-      {/* <ExportCard /> */}
     </>
   );
 };
@@ -36,6 +35,7 @@ const AdminContainer = () => {
 export default AdminContainer;
 
 const Container = styled(Stack)`
+  position: relative;
   width: 100vw;
   height: 100vh;
   ${mixinFlex("column", "start", "start")}

@@ -1,4 +1,5 @@
 import { mixinFlex } from "@/styles/mixins";
+import { getAB, getAssignedInfo } from "@/utils/export/card";
 import { Stack, styled, Typography } from "@mui/material";
 import React from "react";
 
@@ -25,27 +26,6 @@ type CardInfoType = {
 };
 
 const AssignCard = ({ churchName, maleCardInfo, femaleCardInfo }: CardInfoType) => {
-  function getAssignedInfo(cardInfo: TableRowType | null) {
-    if (!cardInfo) return "";
-
-    const { startAssignedInfo, endAssignedInfo } = cardInfo.assignedInfo;
-    const startAssignedCount = startAssignedInfo.assignedCount !== 7 ? `(${startAssignedInfo.assignedCount})` : "";
-    const endAssignedCount = endAssignedInfo.assignedCount !== 7 ? `(${endAssignedInfo.assignedCount})` : "";
-
-    return `${startAssignedInfo.roomNumber}${startAssignedCount}-${endAssignedInfo.roomNumber}호${endAssignedCount}`;
-  }
-
-  function getAB(floorNumber: number) {
-    if (!floorNumber) {
-      return "";
-    }
-    if ([2, 3, 4, 5].includes(floorNumber)) {
-      return "A";
-    } else {
-      return "B";
-    }
-  }
-
   const maleRow = {
     sex: "형제",
     totalCount: maleCardInfo?.assignedInfo.totalAssignedCount
@@ -65,7 +45,7 @@ const AssignCard = ({ churchName, maleCardInfo, femaleCardInfo }: CardInfoType) 
   };
 
   return (
-    <Container>
+    <Container className="assign-card">
       <ContentContainer>
         <ChurchName variant="h5">{churchName}</ChurchName>
         <Table>
@@ -84,8 +64,15 @@ const AssignCard = ({ churchName, maleCardInfo, femaleCardInfo }: CardInfoType) 
             </Tr>
           </tbody>
         </Table>
+        <AlertText align="left">
+          * 괄호 안의 숫자는 해당 호실에 배정된 인원이며,
+          <br />
+          &nbsp;&nbsp;해당 호실은 다른 교회와 함께 사용하게 됩니다 :)
+        </AlertText>
       </ContentContainer>
-      <TextLogo variant="h5">VISIONCAMP</TextLogo>
+      <TextLogoContainer>
+        <TextLogo variant="h5">VISIONCAMP</TextLogo>
+      </TextLogoContainer>
     </Container>
   );
 };
@@ -94,36 +81,34 @@ export default AssignCard;
 
 const Container = styled(Stack)`
   ${mixinFlex("column", "center", "center")};
-  width: 500px;
-  height: 400px;
-  padding: 50px 25px;
-  padding-bottom: 16px;
+  width: 375px;
+  height: 300px;
+  padding: 24px;
+  padding-bottom: 0px;
   background-color: #efa235;
 `;
 
 const ContentContainer = styled(Stack)`
   ${mixinFlex("column", "center", "center")};
-  row-gap: 24px;
+  row-gap: 16px;
   width: 100%;
   height: 100%;
-  padding: 40px;
+  padding: 24px;
   background-color: white;
   box-shadow: 4px 4px 8px 0px rgba(0, 0, 0, 0.25);
 `;
 
 const Table = styled("table")`
-  border: 3px solid black;
-  border-left: none;
-  border-right: none;
   border-collapse: collapse;
   width: 100%;
+  border-top: 1px solid black;
 
   & td {
-    padding: 16px 0px;
-    font-size: 20px;
+    padding: 12px 0px;
+    font-size: 14px;
     line-height: 1.5;
     text-align: center;
-    border-bottom: 3px solid black;
+    border-bottom: 1px solid black;
   }
 `;
 
@@ -135,7 +120,8 @@ const Sex = styled("td")`
 
 const TotalCount = styled("td")`
   width: 20%;
-  border: 3px solid black;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
 `;
 
 const AB = styled("td")`
@@ -149,8 +135,16 @@ const AssignedInfo = styled("td")`
 
 const ChurchName = styled(Typography)``;
 
+const AlertText = styled(Typography)`
+  font-size: 7px;
+`;
+const TextLogoContainer = styled(Stack)`
+  ${mixinFlex("column", "center", "center")};
+  width: 100%;
+  height: 64px;
+`;
+
 const TextLogo = styled(Typography)`
   font-weight: bolder;
   color: #3956bc;
-  margin-top: 16px;
 `;
