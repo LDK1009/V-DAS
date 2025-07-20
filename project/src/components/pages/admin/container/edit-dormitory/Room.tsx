@@ -1,8 +1,8 @@
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { mixinFlex } from "@/styles/mixins";
 import { RoomType } from "@/types/dormitory";
-import { Stack, styled } from "@mui/material";
-import React, { RefObject } from "react";
+import { Button, Stack, styled } from "@mui/material";
+import React, { RefObject, useState } from "react";
 import ChurchItem from "../church-list/ChurchItem";
 import { shouldForwardProp } from "@/utils/mui";
 import { useDrop } from "react-dnd";
@@ -11,6 +11,9 @@ import { useAssign } from "@/hooks/assign/useAssign";
 import { ChurchType } from "@/types/currentChurchType";
 import { enqueueSnackbar } from "notistack";
 import { getCurrentFloorIndex, getCurrentFloorSex, getRoomInfo, getUseFloors } from "@/hooks/assign/useAssignable";
+import { getRoomNumber } from "@/utils/room/room";
+import { checkFloorIndex } from "@/utils/dormitory/check";
+import { LockOpenRounded, LockOutlined } from "@mui/icons-material";
 
 const Room = ({
   lineIndex,
@@ -26,7 +29,9 @@ const Room = ({
   const { currentFloor, maxRoomPeople } = useDormitoryStore();
   const { currentChurchSex } = useCurrentChurchStore();
   const { assignRoom } = useAssign();
+  const [isOptionMenuOpen, setIsOptionMenuOpen] = useState(false);
 
+  ////////// 방 번호 가져오기
   let startRoomNumber = 1; // 기본값 설정
   // 라인별 방 번호 시작 번호
   if (lineIndex === 0) {
@@ -43,6 +48,7 @@ const Room = ({
 
   const roomNumber = startRoomNumber + roomIndex;
 
+  ////////// 방 상태 가져오기
   function getRoomStatus(current: number) {
     if (current > maxRoomPeople) return "exceed";
     if (current === maxRoomPeople) return "full";
@@ -53,6 +59,7 @@ const Room = ({
     return "insufficient";
   }
 
+  ////////// 드래그 앤 드롭
   type DropItemType = {
     church: ChurchType;
     dragFrom: "room" | "sidebar";
@@ -207,41 +214,126 @@ const Room = ({
     }),
   }));
 
-  return (
-    <Container ref={drop as unknown as RefObject<HTMLDivElement>}>
-      <RoomNumberContainer>{`${currentFloor}${String(customRoomNumber || roomNumber).padStart(
-        2,
-        "0"
-      )}`}</RoomNumberContainer>
+  ////////// 우클릭
+  const handleRightClick = (event: React.MouseEvent) => {
+    // 기본 컨텍스트 메뉴가 나타나는 것을 방지
+    event.preventDefault();
 
-      <ChurchContainer>
-        {room.assignedChurchArray.map((church, churchIndex) => {
-          return (
-            <ChurchItem
-              lineIndex={lineIndex}
-              roomIndex={roomIndex}
-              church={church}
-              key={`${currentFloor}-${lineIndex}-${roomNumber}-${churchIndex}`}
-              dragFrom="room"
-              type="room"
-            />
-          );
-        })}
-      </ChurchContainer>
-      <RoomCurrentContainer $status={getRoomStatus(room.current)}>{room.current}</RoomCurrentContainer>
-    </Container>
+    console.log(event.clientX, event.clientY);
+    setIsOptionMenuOpen((prev) => !prev);
+  };
+
+  ////////// 방 폐쇄
+  const handleCloseRoom = () => {
+    const { closeRoom } = useDormitoryStore.getState();
+    const currentFloorSex = getCurrentFloorSex();
+
+    if (!currentFloorSex) {
+      return;
+    }
+    const floorIndex = getCurrentFloorIndex(currentFloorSex);
+
+    if (typeof floorIndex !== "number" || !checkFloorIndex(floorIndex)) {
+      return;
+    }
+
+    closeRoom({ sex: currentFloorSex, floorIndex: floorIndex, lineIndex, roomIndex });
+
+    enqueueSnackbar(`${getRoomNumber(currentFloor, lineIndex, roomIndex)}호 폐쇄`, { variant: "error" });
+    setIsOptionMenuOpen(false);
+  };
+
+  ////////// 방 개방
+  const handleOpenRoom = () => {
+    const { openRoom } = useDormitoryStore.getState();
+    const currentFloorSex = getCurrentFloorSex();
+
+    if (!currentFloorSex) {
+      return;
+    }
+    const floorIndex = getCurrentFloorIndex(currentFloorSex);
+
+    if (typeof floorIndex !== "number" || !checkFloorIndex(floorIndex)) {
+      return;
+    }
+
+    openRoom({ sex: currentFloorSex, floorIndex: floorIndex, lineIndex, roomIndex });
+
+    enqueueSnackbar(`${getRoomNumber(currentFloor, lineIndex, roomIndex)}호 개방`, { variant: "info" });
+    setIsOptionMenuOpen(false);
+  };
+
+  ////////// 방 폐쇄 체크
+  function checkClose(room: RoomType) {
+    if (room.max === 0 && room.current === 0 && room.remain === 0 && room.assignedChurchArray.length === 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  return (
+    <>
+      {isOptionMenuOpen ? (
+        <OptionMenuContainer
+          onContextMenu={handleRightClick}
+          onClick={checkClose(room) ? handleOpenRoom : handleCloseRoom}
+        >
+          <CloseButton
+            startIcon={checkClose(room) ? <LockOpenRounded /> : <LockOutlined />}
+            color={checkClose(room) ? "success" : "error"}
+          >
+            {checkClose(room) ? "방 개방" : "방 폐쇄"}
+          </CloseButton>
+        </OptionMenuContainer>
+      ) : (
+        <Container
+          ref={drop as unknown as RefObject<HTMLDivElement>}
+          onContextMenu={handleRightClick}
+          $isClose={checkClose(room)}
+        >
+          <RoomNumberContainer>{`${currentFloor}${String(customRoomNumber || roomNumber).padStart(
+            2,
+            "0"
+          )}`}</RoomNumberContainer>
+
+          <ChurchContainer>
+            {checkClose(room)
+              ? "X"
+              : room.assignedChurchArray.map((church, churchIndex) => {
+                  return (
+                    <ChurchItem
+                      lineIndex={lineIndex}
+                      roomIndex={roomIndex}
+                      church={church}
+                      key={`${currentFloor}-${lineIndex}-${roomNumber}-${churchIndex}`}
+                      dragFrom="room"
+                      type="room"
+                    />
+                  );
+                })}
+          </ChurchContainer>
+          <RoomCurrentContainer $status={getRoomStatus(room.current)}>{room.current}</RoomCurrentContainer>
+        </Container>
+      )}
+    </>
   );
 };
 
 export default Room;
 
-const Container = styled(Stack)`
+type ContainerPropsType = {
+  $isClose: boolean;
+};
+
+const Container = styled(Stack, { shouldForwardProp })<ContainerPropsType>`
   ${mixinFlex("row", "start", "stretch")}
   width: 100%;
   height: 100%;
   border: 1px solid black;
   border-radius: 8px;
   overflow: hidden;
+  background-color: ${({ $isClose }) => ($isClose ? "#DCDCDC" : "transparent")};
 `;
 
 const RoomNumberContainer = styled(Stack)`
@@ -287,3 +379,15 @@ const RoomCurrentContainer = styled(Stack, { shouldForwardProp })<RoomCurrentCon
     if ($status === "empty") return "black";
   }};
 `;
+
+const OptionMenuContainer = styled(Stack)`
+  ${mixinFlex("column", "center", "center")}
+  width: 100%;
+  height: 55px;
+  min-height: 55px;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 8px;
+`;
+
+const CloseButton = styled(Button)``;

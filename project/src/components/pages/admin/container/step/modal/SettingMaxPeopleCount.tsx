@@ -7,7 +7,6 @@ const SettingMaxPeopleCount = () => {
   const { maxRoomPeople, setMaxRoomPeople, dormitoryData } = useDormitoryStore();
 
   useEffect(() => {
-    console.log(dormitoryData);
     if (dormitoryData) {
       setMaxRoomPeople(maxRoomPeople);
     }
