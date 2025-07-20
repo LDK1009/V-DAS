@@ -9,12 +9,12 @@ import { mixinFlex } from "@/styles/mixins";
 import ChurchListHeader from "./container/church-list/ChurchListHeader";
 import StepSection from "./container/step/StepSection";
 import ExportCard from "./container/export/card/ExportCard";
+import ExportTable from "./container/export/table/ExportTable";
 
 const AdminContainer = () => {
   return (
     <>
       <Container>
-        {/* <TableContainer /> */}
         <Header />
         <StepSection />
         <BodyArea>
@@ -27,6 +27,7 @@ const AdminContainer = () => {
           </BodyRight>
         </BodyArea>
         <ExportCard />
+        <ExportTable />
       </Container>
     </>
   );

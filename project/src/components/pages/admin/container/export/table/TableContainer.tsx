@@ -1,21 +1,17 @@
-import { useCardFormat } from "@/hooks/export/card/useCardFormat";
 import { mixinFlex } from "@/styles/mixins";
 import { Grid2, Stack, styled, Typography } from "@mui/material";
 import React from "react";
 import TableItem from "./TableItem";
+import { CardInfoType } from "@/types/card";
 
-const TableContainer = () => {
-  const { getAllChurchCardData } = useCardFormat();
-
-  const churchCardDatas = getAllChurchCardData();
-
+const TableContainer = ({ churchCardDatas }: { churchCardDatas: CardInfoType[] }) => {
   return (
-    <Container>
+    <Container className="assign-table">
       <Title variant="h5" align="center">
         숙소배정표
       </Title>
-      <ItemContainer container>
-        {churchCardDatas.slice(0, 14).map((churchCardData, index) => (
+      <ItemContainer container spacing={1}>
+        {churchCardDatas.map((churchCardData, index) => (
           <ItemGrid size={6} key={index}>
             <TableItem {...churchCardData} />
           </ItemGrid>
@@ -45,7 +41,8 @@ const Container = styled(Stack)`
 const Title = styled(Typography)`
   width: 100%;
   font-size: 35px;
-  line-height: 88px;
+  /* line-height: 88px; */
+  line-height: 80px;
   text-align: center;
 `;
 
@@ -54,11 +51,7 @@ const ItemContainer = styled(Grid2)`
   height: 695px;
   min-height: 695px;
   max-height: 695px;
-  row-gap: 6px;
-
-  & > .MuiGrid2-root:nth-child(even) > table {
-    border-right: none !important;
-  }
+  padding: 0px 40px;
 `;
 
 const ItemGrid = styled(Grid2)``;
@@ -68,4 +61,5 @@ const Footer = styled(Typography)`
   line-height: 59px;
   font-size: 12px;
   text-align: center;
+  margin-top: 12px;
 `;

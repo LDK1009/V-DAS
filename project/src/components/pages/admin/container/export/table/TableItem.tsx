@@ -50,18 +50,18 @@ export default TableItem;
 const Table = styled("table")`
   width: 100%;
   border: 1px solid black;
-  border-left: none;
+  border-bottom: none;
   border-collapse: collapse;
   font-size: 12px;
 
   & tr {
     max-height: 30px;
     min-height: 30px;
+    border-bottom: 1px solid black;
   }
 
   & td {
     text-align: center;
-    border-bottom: 1px solid black;
   }
 `;
 
@@ -90,6 +90,8 @@ const Sex = styled("td")`
 const TotalCount = styled("td")`
   width: 20%;
   border: 1px solid black;
+  border-top: none;
+  border-bottom: none;
 `;
 
 const AB = styled("td")`

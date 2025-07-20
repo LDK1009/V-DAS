@@ -11,6 +11,7 @@ const Footer = () => {
   const { getAllChurchCardData } = useCardFormat();
   const churchCardDatas = getAllChurchCardData();
 
+  ////////// 카드 이미지 다운로드
   const downloadCardsAsZip = async () => {
     const cards = document.querySelectorAll(".assign-card");
     const zip = new JSZip();
@@ -67,6 +68,57 @@ const Footer = () => {
     }
   };
 
+  ////////// 표 이미지 다운로드
+  const downloadTableAsZip = async () => {
+    const tables = document.querySelectorAll(".assign-table");
+    const zip = new JSZip();
+
+    // 토스트 ID를 저장하여 나중에 닫을 수 있도록 함
+    const toastId = enqueueSnackbar("라벨지 이미지 생성 중...", {
+      variant: "info",
+      persist: true, // 수동으로 닫을 때까지 토스트 유지
+    });
+
+    try {
+      for (let i = 0; i < tables.length; i++) {
+        const table = tables[i] as HTMLElement;
+
+        const canvas = await html2canvas(table, {
+          scale: 1,
+          backgroundColor: "#ffffff",
+          logging: false,
+        });
+
+        const imageData = canvas.toDataURL("image/png").split(",")[1];
+        const fileName = `배정표${i + 1}.png`;
+        const safeFileName = fileName.replace(/[\\/:*?"<>|]/g, "_");
+
+        zip.file(safeFileName, imageData, { base64: true });
+      }
+
+      const content = await zip.generateAsync({ type: "blob" });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(content);
+      link.download = "배정표.zip";
+      link.click();
+
+      URL.revokeObjectURL(link.href);
+
+      // 진행 중이던 토스트 닫기
+      closeSnackbar(toastId);
+
+      // 완료 메시지 표시
+      enqueueSnackbar("다운로드가 완료되었습니다.", { variant: "success" });
+    } catch (error) {
+      // 에러 발생 시 진행 중이던 토스트 닫기
+      closeSnackbar(toastId);
+
+      console.error("ZIP 파일 생성 중 오류 발생:", error);
+      enqueueSnackbar("다운로드 중 오류가 발생했습니다.", { variant: "error" });
+    }
+  };
+
   return (
     <Container>
       <StyledButton variant="contained">저장하기</StyledButton>
@@ -81,7 +133,9 @@ const Footer = () => {
             <StyledButton variant="contained" onClick={downloadCardsAsZip}>
               카드
             </StyledButton>
-            <StyledButton variant="contained">라벨지</StyledButton>
+            <StyledButton variant="contained" onClick={downloadTableAsZip}>
+              라벨지
+            </StyledButton>
           </DownloadOptionContainer>
         </DownloadOptionFade>
       </DownloadButtonWrapper>
