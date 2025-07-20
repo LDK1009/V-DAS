@@ -11,3 +11,24 @@ export type FormattedExcelData = {
   churchMaleArray: ChurchArrayType;
   churchFemaleArray: ChurchArrayType;
 };
+
+// 호수, 교회명, 인원, 교회명, 인원,....
+// 예: ["101", "교회A", 3, "교회B", 2, "교회C", 4]
+export type AssignSheetRowType = [string, ...(string | number)[]];
+
+export type AssignSheetFloorType = {
+  floorNumber: number;
+  totalCount: number;
+  rows: AssignSheetRowType[];
+};
+
+export type AssignSheetType = {
+  male: {
+    totalCount: number;
+    floors: AssignSheetFloorType[];
+  };
+  female: {
+    totalCount: number;
+    floors: AssignSheetFloorType[];
+  };
+};

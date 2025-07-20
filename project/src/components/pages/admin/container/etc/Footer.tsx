@@ -5,11 +5,27 @@ import html2canvas from "html2canvas";
 import { useCardFormat } from "@/hooks/export/card/useCardFormat";
 import { enqueueSnackbar, closeSnackbar } from "notistack";
 import JSZip from "jszip";
+import {
+  addSheetData,
+  createSheet,
+  downloadExcel,
+  excelToJson,
+  formatFromDormitoryToRow,
+  getLastDataPosition,
+  getSheet,
+  getSheetData,
+  initExcel,
+  sortByChurchName,
+} from "@/utils/export/excel";
+import { useExcelStore } from "@/store/excel/excelStore";
+import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 
 const Footer = () => {
   const [isDownloadOptionOpen, setIsDownloadOptionOpen] = useState(false);
   const { getAllChurchCardData } = useCardFormat();
   const churchCardDatas = getAllChurchCardData();
+  const { excelFile } = useExcelStore();
+  const { dormitoryData } = useDormitoryStore.getState();
 
   ////////// 카드 이미지 다운로드
   const downloadCardsAsZip = async () => {
@@ -119,6 +135,38 @@ const Footer = () => {
     }
   };
 
+  ////////// 엑셀 다운로드
+  const downloadExcelFile = async () => {
+    try {
+      ////////// 워크북&시트 초기화
+      const { wb } = initExcel();
+      const sheet1 = createSheet(wb, "데이터");
+      const sheet2 = createSheet(wb, "숙소 배정");
+
+      ////////// 시트1 작업
+      // 업로드된 엑셀 파일 읽기
+      const excelData = await excelToJson(excelFile as File);
+      // 교회명 기준 오름차순 정렬
+      const sortedData = sortByChurchName(excelData);
+      // 시트1에 데이터추가
+      addSheetData(sheet1, sortedData, "A1");
+
+      ////////// 시트2 작업
+      if(!dormitoryData) return;
+
+      const formattedData = formatFromDormitoryToRow(dormitoryData);
+      // 시트2에 데이터추가
+      addSheetData(sheet2, formattedData, "A1", true);
+      console.log(formattedData);
+
+
+      downloadExcel(wb, "배정표.xlsx");
+    } catch (error) {
+      console.error("엑셀 다운로드 중 오류 발생:", error);
+      enqueueSnackbar("다운로드 중 오류가 발생했습니다.", { variant: "error" });
+    }
+  };
+
   return (
     <Container>
       <StyledButton variant="contained">저장하기</StyledButton>
@@ -129,7 +177,9 @@ const Footer = () => {
         <DownloadOptionFade in={isDownloadOptionOpen}>
           <DownloadOptionContainer>
             <StyledButton variant="contained">전체</StyledButton>
-            <StyledButton variant="contained">엑셀</StyledButton>
+            <StyledButton variant="contained" onClick={downloadExcelFile}>
+              엑셀
+            </StyledButton>
             <StyledButton variant="contained" onClick={downloadCardsAsZip}>
               카드
             </StyledButton>
