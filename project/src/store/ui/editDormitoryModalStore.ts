@@ -1,17 +1,21 @@
 import { create } from "zustand";
 
 interface EditDormitoryModalStoreType {
-  // 상태
+  // 모달 열기 닫기
   isEditDormitoryModalOpen: boolean;
-
-  // 액션
   setIsEditDormitoryModalOpen: (isEditDormitoryModalOpen: boolean) => void;
+
+  // 사용 층 번호
+  useSelectableFloorNumbers: number[];
+  setUseSelectableFloorNumbers: (useSelectableFloorNumbers: number[]) => void;
 }
 
 export const useEditDormitoryModalStore = create<EditDormitoryModalStoreType>((set) => ({
-  // 상태
+  // 모달 열기 닫기
   isEditDormitoryModalOpen: false,
-
-  // 액션
   setIsEditDormitoryModalOpen: (isEditDormitoryModalOpen: boolean) => set({ isEditDormitoryModalOpen }),
+
+  // 사용 층 번호
+  useSelectableFloorNumbers: [2, 3, 4, 5, 7, 8, 9, 10],
+  setUseSelectableFloorNumbers: (useSelectableFloorNumbers: number[]) => set({ useSelectableFloorNumbers }),
 }));

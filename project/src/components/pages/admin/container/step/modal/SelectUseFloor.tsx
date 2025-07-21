@@ -6,15 +6,17 @@ import { shouldForwardProp } from "@/utils/mui";
 import { DormitoryType } from "@/types/dormitory";
 import { getDormitory } from "@/utils/dormitory/make";
 import { useFloorStore } from "@/store/dormitory/useFloorStore";
+import { useEditDormitoryModalStore } from "@/store/ui/editDormitoryModalStore";
 
 const SelectUseFloor = () => {
   ////////////////////////////////////////////////// 상태관리
   const { selectedSex, setSelectedSex, useFloorNumbers, handleSelectUseFloor } = useFloorStore();
   const { setUseFloor, setDormitoryData } = useDormitoryStore();
+  const { useSelectableFloorNumbers } = useEditDormitoryModalStore();
 
   ////////////////////////////////////////////////// 렌더링
   // 층 버튼 렌더링
-  const renderFloorButton = [2, 3, 4, 5, 7, 8, 9, 10].map((number, index) => {
+  const renderFloorButton = useSelectableFloorNumbers.map((number, index) => {
     const isInMale = useFloorNumbers.male.includes(number);
     const isInFemale = useFloorNumbers.female.includes(number);
 
