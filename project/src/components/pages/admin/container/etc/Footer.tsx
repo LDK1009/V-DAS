@@ -5,6 +5,7 @@ import html2canvas from "html2canvas";
 import { useCardFormat } from "@/hooks/export/card/useCardFormat";
 import { enqueueSnackbar, closeSnackbar } from "notistack";
 import JSZip from "jszip";
+
 import {
   addSheetData,
   createSheet,
@@ -17,6 +18,9 @@ import {
 } from "@/utils/export/excel";
 import { useExcelStore } from "@/store/excel/excelStore";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
+import { saveCamp } from "@/service/save/save";
+import { useCurrentChurchStore } from "@/store/church/churchStore";
+import { useFloorStore } from "@/store/dormitory/useFloorStore";
 
 const Footer = () => {
   const [isDownloadOptionOpen, setIsDownloadOptionOpen] = useState(false);
@@ -24,6 +28,10 @@ const Footer = () => {
   const churchCardDatas = getAllChurchCardData();
   const { excelFile } = useExcelStore();
   const { dormitoryData } = useDormitoryStore.getState();
+
+  const { maxRoomPeople } = useDormitoryStore.getState();
+  const { churchMaleArray, churchFemaleArray } = useCurrentChurchStore.getState();
+  const { useFloorNumbers } = useFloorStore.getState();
 
   ////////// 카드 이미지 다운로드
   const downloadCardsAsZip = async () => {
@@ -161,7 +169,7 @@ const Footer = () => {
 
       // 시트2에 데이터추가
       writeSheetDormitory({ ws: sheet2, dormitoryData: formattedData });
-      
+
       // 엑셀 파일 다운로드
       downloadExcel(wb, "배정표.xlsx");
 
@@ -185,9 +193,48 @@ const Footer = () => {
     await downloadExcelFile();
   };
 
+  ////////// 전체 다운로드
+  const handleSave = async () => {
+    try {
+      const round = 3;
+
+      const dormitory_setting = {
+        useFloorNumbers: useFloorNumbers,
+        maxRoomPeople: maxRoomPeople,
+      };
+
+      const church_list = {
+        male: [...(churchMaleArray || [])],
+        female: [...(churchFemaleArray || [])],
+      };
+
+      const dormitory = dormitoryData;
+
+      const is_public = false;
+
+      if (!round || !dormitory_setting || !church_list || !dormitory) return;
+
+      const params = {
+        round,
+        dormitory_setting,
+        church_list,
+        dormitory,
+        is_public,
+      };
+
+      await saveCamp(params);
+
+      enqueueSnackbar("캠프 저장 완료", { variant: "success" });
+    } catch {
+      enqueueSnackbar("캠프 저장 실패", { variant: "error" });
+    }
+  };
+
   return (
     <Container>
-      <StyledButton variant="contained">저장하기</StyledButton>
+      <StyledButton variant="contained" onClick={handleSave}>
+        저장하기
+      </StyledButton>
       <DownloadButtonWrapper>
         <StyledButton variant="contained" onClick={() => setIsDownloadOptionOpen((prev) => !prev)}>
           다운로드

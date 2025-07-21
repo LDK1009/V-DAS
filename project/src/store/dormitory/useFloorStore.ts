@@ -12,6 +12,7 @@ type UseFloorStoreType = {
     male: number[];
     female: number[];
   };
+  setUseFloorNumbers: (useFloorNumbers: { male: number[]; female: number[] }) => void;
   handleSelectUseFloor: (floorNumber: number) => void;
 };
 
@@ -25,6 +26,7 @@ export const useFloorStore = create<UseFloorStoreType>()((set) => ({
     male: [2, 3, 4, 5],
     female: [7, 8, 9,10],
   },
+  setUseFloorNumbers: (useFloorNumbers) => set({ useFloorNumbers }),
 
   // 층 선택 핸들러
   handleSelectUseFloor: (floorNumber) =>
