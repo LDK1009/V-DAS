@@ -1,15 +1,17 @@
-import { ChurchArrayType } from "@/types/currentChurchType";
-import { produce } from "immer";
+import { ChurchCardType } from "@/types/camp";
 import { create } from "zustand";
 
 // 타입 정의
+type distributeDataType = {
+  round: number;
+  churchCards: ChurchCardType[];
+};
 type DistributeStoreType = {
-  churchCards: CampType | null;
-  setCurrentViewCamps: (currentViewCamps: CampType | null) => void;  
+  distributeData: distributeDataType | null;
+  setDistributeData: (distributeData: distributeDataType | null) => void;
 };
 
 export const useDistributeStore = create<DistributeStoreType>()((set) => ({
-  currentViewChurches: null,
-  setCurrentViewChurches: (currentViewChurches) => set({ currentViewChurches }),
-
+  distributeData: null,
+  setDistributeData: (distributeData) => set({ distributeData }),
 }));

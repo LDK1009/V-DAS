@@ -1,19 +1,27 @@
 "use client";
 
-import { mixinContainer, mixinFlex } from "@/styles/mixins";
-import { styled, Box } from "@mui/material";
+import { styled, Stack } from "@mui/material";
+import { mixinFlex } from "@/styles/mixins";
+import Header from "./container/Header";
+import InputSection from "./container/InputSection";
+import Footer from "./container/Footer";
 
 const MainContainer = () => {
-  return <Container>Hello World</Container>;
+  return (
+    <Container>
+      <Header />
+      <InputSection />
+      <Footer />
+    </Container>
+  );
 };
 
 export default MainContainer;
 
-// 메인 컨테이너 스타일
-const Container = styled(Box)`
-  ${mixinContainer()};
-  ${mixinFlex("column")};
-  align-items: center;
-  padding-top: 40px;
-  padding-bottom: 40px;
+const Container = styled(Stack)`
+  ${mixinFlex("column", "start", "center")};
+  width: 100vw;
+  height: 100vh;
+
+  padding: 126px 50px 0px 50px;
 `;

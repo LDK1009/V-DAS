@@ -30,7 +30,7 @@ type TableRowType = {
   };
 } | null;
 
-type ChurchCardType = {
+export type ChurchCardType = {
   churchName: string;
   maleCardInfo: TableRowType | null;
   femaleCardInfo: TableRowType | null;
