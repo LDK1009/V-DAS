@@ -219,7 +219,6 @@ const Room = ({
     // 기본 컨텍스트 메뉴가 나타나는 것을 방지
     event.preventDefault();
 
-    console.log(event.clientX, event.clientY);
     setIsOptionMenuOpen((prev) => !prev);
   };
 

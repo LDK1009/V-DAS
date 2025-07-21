@@ -11,12 +11,9 @@ import {
   downloadExcel,
   excelToJson,
   formatFromDormitoryToRow,
-  getLastDataPosition,
-  getSheet,
-  getSheetData,
   initExcel,
   sortByChurchName,
-  writeSheetFloor,
+  writeSheetDormitory,
 } from "@/utils/export/excel";
 import { useExcelStore } from "@/store/excel/excelStore";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
@@ -153,14 +150,13 @@ const Footer = () => {
       addSheetData(sheet1, sortedData, "A1");
 
       ////////// 시트2 작업
-      if(!dormitoryData) return;
+      if (!dormitoryData) return;
 
+      // 전체 데이터 포맷팅
       const formattedData = formatFromDormitoryToRow(dormitoryData);
-      // 시트2에 데이터추가
-      writeSheetFloor("male", sheet2, formattedData.male.floors[0], undefined, true);
-      // addSheetData(sheet2, formattedData, "A1", true);
-      console.log(JSON.stringify(formattedData, null, 2));
 
+      // 시트2에 데이터추가
+      writeSheetDormitory({ ws: sheet2, dormitoryData: formattedData });
 
       downloadExcel(wb, "배정표.xlsx");
     } catch (error) {
