@@ -27,11 +27,9 @@ const Footer = () => {
   const { getAllChurchCardData } = useCardFormat();
   const churchCardDatas = getAllChurchCardData();
   const { excelFile } = useExcelStore();
-  const { dormitoryData } = useDormitoryStore.getState();
-
-  const { maxRoomPeople, round: currentRound } = useDormitoryStore.getState();
-  const { churchMaleArray, churchFemaleArray } = useCurrentChurchStore.getState();
-  const { useFloorNumbers } = useFloorStore.getState();
+  const { dormitoryData, maxRoomPeople, round: currentRound } = useDormitoryStore();
+  const { churchMaleArray, churchFemaleArray } = useCurrentChurchStore();
+  const { useFloorNumbers } = useFloorStore();
 
   ////////// 카드 이미지 다운로드
   const downloadCardsAsZip = async () => {
@@ -196,8 +194,6 @@ const Footer = () => {
   ////////// 전체 다운로드
   const handleSave = async () => {
     try {
-      const round = currentRound;
-
       const dormitory_setting = {
         useFloorNumbers: useFloorNumbers,
         maxRoomPeople: maxRoomPeople,
@@ -212,14 +208,17 @@ const Footer = () => {
 
       const is_public = false;
 
-      if (!round || !dormitory_setting || !church_list || !dormitory) return;
+      if (!currentRound || !dormitory_setting || !church_list || !dormitory || !churchCardDatas) {
+        throw new Error("캠프 저장 실패 : 데이터가 존재하지 않습니다.");
+      }
 
       const params = {
-        round,
+        round: currentRound,
         dormitory_setting,
         church_list,
         dormitory,
         is_public,
+        church_cards: churchCardDatas,
       };
 
       await saveCamp(params);
