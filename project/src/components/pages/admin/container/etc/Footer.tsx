@@ -31,7 +31,7 @@ const Footer = () => {
     const zip = new JSZip();
 
     // 토스트 ID를 저장하여 나중에 닫을 수 있도록 함
-    const toastId = enqueueSnackbar("카드 이미지 생성 중...", {
+    const toastId = enqueueSnackbar("카드 다운로드 중...", {
       variant: "info",
       persist: true, // 수동으로 닫을 때까지 토스트 유지
     });
@@ -67,7 +67,7 @@ const Footer = () => {
       closeSnackbar(toastId);
 
       // 완료 메시지 표시
-      enqueueSnackbar("다운로드가 완료되었습니다.", {
+      enqueueSnackbar("카드 다운로드 완료", {
         variant: "success",
       });
     } catch (error) {
@@ -75,7 +75,7 @@ const Footer = () => {
       closeSnackbar(toastId);
 
       console.error("ZIP 파일 생성 중 오류 발생:", error);
-      enqueueSnackbar("다운로드 중 오류가 발생했습니다.", {
+      enqueueSnackbar("카드 다운로드 중 오류가 발생했습니다.", {
         variant: "error",
         autoHideDuration: 2000,
       });
@@ -88,7 +88,7 @@ const Footer = () => {
     const zip = new JSZip();
 
     // 토스트 ID를 저장하여 나중에 닫을 수 있도록 함
-    const toastId = enqueueSnackbar("라벨지 이미지 생성 중...", {
+    const toastId = enqueueSnackbar("라벨지 다운로드 중...", {
       variant: "info",
       persist: true, // 수동으로 닫을 때까지 토스트 유지
     });
@@ -121,20 +121,24 @@ const Footer = () => {
 
       // 진행 중이던 토스트 닫기
       closeSnackbar(toastId);
-
       // 완료 메시지 표시
-      enqueueSnackbar("다운로드가 완료되었습니다.", { variant: "success" });
+      enqueueSnackbar("라벨지 다운로드 완료", { variant: "success" });
     } catch (error) {
       // 에러 발생 시 진행 중이던 토스트 닫기
       closeSnackbar(toastId);
 
       console.error("ZIP 파일 생성 중 오류 발생:", error);
-      enqueueSnackbar("다운로드 중 오류가 발생했습니다.", { variant: "error" });
+      enqueueSnackbar("라벨지 다운로드 중 오류가 발생했습니다.", { variant: "error" });
     }
   };
 
   ////////// 엑셀 다운로드
   const downloadExcelFile = async () => {
+    const toastId = enqueueSnackbar("엑셀 다운로드 중...", {
+      variant: "info",
+      persist: true, // 수동으로 닫을 때까지 토스트 유지
+    });
+
     try {
       ////////// 워크북&시트 초기화
       const { wb } = initExcel();
@@ -157,12 +161,28 @@ const Footer = () => {
 
       // 시트2에 데이터추가
       writeSheetDormitory({ ws: sheet2, dormitoryData: formattedData });
-
+      
+      // 엑셀 파일 다운로드
       downloadExcel(wb, "배정표.xlsx");
+
+      // 진행 중이던 토스트 닫기
+      closeSnackbar(toastId);
+      // 완료 메시지 표시
+      enqueueSnackbar("엑셀 다운로드 완료", { variant: "success" });
     } catch (error) {
+      // 진행 중이던 토스트 닫기
+      closeSnackbar(toastId);
+
       console.error("엑셀 다운로드 중 오류 발생:", error);
-      enqueueSnackbar("다운로드 중 오류가 발생했습니다.", { variant: "error" });
+      enqueueSnackbar("엑셀 다운로드 중 오류가 발생했습니다.", { variant: "error" });
     }
+  };
+
+  ////////// 전체 다운로드
+  const allDownload = async () => {
+    await downloadCardsAsZip();
+    await downloadTableAsZip();
+    await downloadExcelFile();
   };
 
   return (
@@ -174,7 +194,9 @@ const Footer = () => {
         </StyledButton>
         <DownloadOptionFade in={isDownloadOptionOpen}>
           <DownloadOptionContainer>
-            <StyledButton variant="contained">전체</StyledButton>
+            <StyledButton variant="contained" onClick={allDownload}>
+              전체
+            </StyledButton>
             <StyledButton variant="contained" onClick={downloadExcelFile}>
               엑셀
             </StyledButton>
