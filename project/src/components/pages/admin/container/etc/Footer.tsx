@@ -54,7 +54,7 @@ const Footer = () => {
         });
 
         const imageData = canvas.toDataURL("image/png").split(",")[1];
-        const fileName = `${churchData.churchName}-배정카드.png`;
+        const fileName = `${churchData.churchName}-숙소배정카드.png`;
         const safeFileName = fileName.replace(/[\\/:*?"<>|]/g, "_");
 
         zip.file(safeFileName, imageData, { base64: true });
@@ -64,7 +64,7 @@ const Footer = () => {
 
       const link = document.createElement("a");
       link.href = URL.createObjectURL(content);
-      link.download = "배정카드.zip";
+      link.download = "숙소배정 카드.zip";
       link.click();
 
       URL.revokeObjectURL(link.href);
@@ -110,7 +110,7 @@ const Footer = () => {
         });
 
         const imageData = canvas.toDataURL("image/png").split(",")[1];
-        const fileName = `배정표${i + 1}.png`;
+        const fileName = `숙소배정표${i + 1}.png`;
         const safeFileName = fileName.replace(/[\\/:*?"<>|]/g, "_");
 
         zip.file(safeFileName, imageData, { base64: true });
@@ -120,7 +120,7 @@ const Footer = () => {
 
       const link = document.createElement("a");
       link.href = URL.createObjectURL(content);
-      link.download = "배정표.zip";
+      link.download = "숙소배정표.zip";
       link.click();
 
       URL.revokeObjectURL(link.href);
@@ -149,7 +149,7 @@ const Footer = () => {
       ////////// 워크북&시트 초기화
       const { wb } = initExcel();
       const sheet1 = createSheet(wb, "데이터");
-      const sheet2 = createSheet(wb, "숙소 배정");
+      const sheet2 = createSheet(wb, "숙소배정");
 
       ////////// 시트1 작업
       // 업로드된 엑셀 파일 읽기
@@ -169,7 +169,7 @@ const Footer = () => {
       writeSheetDormitory({ ws: sheet2, dormitoryData: formattedData });
 
       // 엑셀 파일 다운로드
-      downloadExcel(wb, "배정표.xlsx");
+      downloadExcel(wb, "숙소배정.xlsx");
 
       // 진행 중이던 토스트 닫기
       closeSnackbar(toastId);
@@ -209,7 +209,7 @@ const Footer = () => {
       const is_public = false;
 
       if (!currentRound || !dormitory_setting || !church_list || !dormitory || !churchCardDatas) {
-        throw new Error("캠프 저장 실패 : 데이터가 존재하지 않습니다.");
+        throw new Error("숙소배정 저장 실패 : 데이터가 존재하지 않습니다.");
       }
 
       const params = {
@@ -223,9 +223,9 @@ const Footer = () => {
 
       await saveCamp(params);
 
-      enqueueSnackbar("캠프 저장 완료", { variant: "success" });
+      enqueueSnackbar("숙소배정 저장 완료", { variant: "success" });
     } catch {
-      enqueueSnackbar("캠프 저장 실패", { variant: "error" });
+      enqueueSnackbar("숙소배정 저장 실패", { variant: "error" });
     }
   };
 

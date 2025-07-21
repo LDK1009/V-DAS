@@ -1,11 +1,11 @@
 import { mixinFlex } from "@/styles/mixins";
-import { Stack, styled } from "@mui/material";
+import { Stack, styled, Typography } from "@mui/material";
 import React from "react";
 
 const Header = () => {
   return (
     <Container>
-      <h3>헤더?</h3>
+      <Text>VISIONCAMP 숙소배정기</Text>
     </Container>
   );
 };
@@ -19,3 +19,8 @@ const Container = styled(Stack)`
   background-color: #000000;
   color: ${({ theme }) => theme.palette.text.white};
 `;
+
+
+const Text = styled(Typography)`
+font-size: 16px;
+`
