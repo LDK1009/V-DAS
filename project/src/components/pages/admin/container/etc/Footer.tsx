@@ -29,7 +29,7 @@ const Footer = () => {
   const { excelFile } = useExcelStore();
   const { dormitoryData } = useDormitoryStore.getState();
 
-  const { maxRoomPeople } = useDormitoryStore.getState();
+  const { maxRoomPeople, round: currentRound } = useDormitoryStore.getState();
   const { churchMaleArray, churchFemaleArray } = useCurrentChurchStore.getState();
   const { useFloorNumbers } = useFloorStore.getState();
 
@@ -196,7 +196,7 @@ const Footer = () => {
   ////////// 전체 다운로드
   const handleSave = async () => {
     try {
-      const round = 3;
+      const round = currentRound;
 
       const dormitory_setting = {
         useFloorNumbers: useFloorNumbers,

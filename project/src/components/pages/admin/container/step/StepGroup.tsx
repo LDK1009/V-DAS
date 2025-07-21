@@ -9,12 +9,13 @@ import { useAssign } from "@/hooks/assign/useAssign";
 import FileUploadStepCard from "./FileUploadStepCard";
 import { useEditDormitoryModalStore } from "@/store/ui/editDormitoryModalStore";
 import DormitorySettingModal from "./modal/DormitorySettingModal";
-import { AutoAwesomeRounded } from "@mui/icons-material";
+import { AutoAwesomeRounded, CalendarTodayRounded } from "@mui/icons-material";
 import { enqueueSnackbar } from "notistack";
+import SettingRoundModal from "./modal/SettingRoundModal";
 
 const StepGroup = () => {
   const { autoAssign } = useAssign();
-  const { setIsEditDormitoryModalOpen } = useEditDormitoryModalStore();
+  const { setIsEditDormitoryModalOpen, setIsSettingRoundModalOpen } = useEditDormitoryModalStore();
 
   ////////// 자동 배정 함수
   function handleAutoAssign() {
@@ -100,10 +101,15 @@ const StepGroup = () => {
 
   return (
     <Container>
+      <StepCard stepNumber={1} cardText="차수 설정" label="설정하기" buttonIcon={<CalendarTodayRounded />} onClick={() => {
+        setIsSettingRoundModalOpen(true)
+      }} />
       <FileUploadStepCard />
       {stepCards.map((stepCard, index) => (
-        <StepCard key={stepCard.label} stepNumber={index + 2} {...stepCard} />
+        <StepCard key={stepCard.label} stepNumber={index + 3} {...stepCard} />
       ))}
+      
+      <SettingRoundModal />
       <DormitorySettingModal />
     </Container>
   );

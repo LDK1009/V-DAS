@@ -78,6 +78,10 @@ type DormitoryStoreType = {
   maxFloor: number;
   setMaxFloor: (maxFloor: number) => void;
 
+  // 차수 관련
+  round: number;
+  setRound: (round: number) => void;
+
   // 방 인원 빼기 관련
   updateRoomCurrentAndRemain: ({ sex, church, count, floorIndex, lineIndex, roomIndex }: AssignRoomParamsType) => void;
 
@@ -300,4 +304,8 @@ export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
   currentFloor: 2,
   // 현재 보고있는 층 변경
   setCurrentFloor: (floor) => set({ currentFloor: floor }),
+
+  // 차수 관련
+  round: 1,
+  setRound: (round) => set({ round }),
 }));

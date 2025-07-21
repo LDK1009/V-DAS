@@ -51,7 +51,7 @@ const FileUploadStepCard = () => {
           <CheckCircle />
         ) : (
           <StepNumberCircle>
-            <StepNumberText>1</StepNumberText>
+            <StepNumberText>2</StepNumberText>
           </StepNumberCircle>
         )}
         <CardText>엑셀 파일 업로드</CardText>

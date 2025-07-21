@@ -1,7 +1,6 @@
 import { css } from "@emotion/react";
 import { Theme } from "@mui/material/styles";
 
-
 const breakpoint = {
   // 모바일 (스마트폰)
   mobile: 768, // 0px 이상 ~ 767px 이하
@@ -181,7 +180,7 @@ export const mixinMuiTextInputBorder = (theme: Theme) => css`
   }
 
   & .MuiOutlinedInput-notchedOutline {
-    border-color: ${theme.palette.primary.main};
+    border: none;
   }
 `;
 
