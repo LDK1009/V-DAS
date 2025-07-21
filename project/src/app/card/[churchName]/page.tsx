@@ -6,6 +6,9 @@ import { ChurchCardType } from "@/types/camp";
 type PropsType = Promise<{ churchName: string }>;
 
 export default async function CardDetail({ params }: { params: PropsType }) {
+  //
+  // 배포용 주석
+  //
   const { churchName } = await params;
 
   const decodedChurchName = decodeURIComponent(churchName);
@@ -15,7 +18,7 @@ export default async function CardDetail({ params }: { params: PropsType }) {
   );
 
   if (!churchCardInfo) {
-    return <NotFoundChurch/>;
+    return <NotFoundChurch />;
   }
 
   return <CardOfChurchNameContainer churchCardInfo={churchCardInfo} />;
