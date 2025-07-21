@@ -16,6 +16,7 @@ import {
   getSheetData,
   initExcel,
   sortByChurchName,
+  writeSheetFloor,
 } from "@/utils/export/excel";
 import { useExcelStore } from "@/store/excel/excelStore";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
@@ -156,8 +157,9 @@ const Footer = () => {
 
       const formattedData = formatFromDormitoryToRow(dormitoryData);
       // 시트2에 데이터추가
-      addSheetData(sheet2, formattedData, "A1", true);
-      console.log(formattedData);
+      writeSheetFloor("male", sheet2, formattedData.male.floors[0], undefined, true);
+      // addSheetData(sheet2, formattedData, "A1", true);
+      console.log(JSON.stringify(formattedData, null, 2));
 
 
       downloadExcel(wb, "배정표.xlsx");

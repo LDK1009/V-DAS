@@ -1,5 +1,5 @@
-import { DormitoryType } from "@/types/dormitory";
-import { AssignSheetRowType, ChurchObject } from "@/types/excel";
+import { DormitoryType, FloorType } from "@/types/dormitory";
+import { AssignSheetFloorType, AssignSheetRowType, AssignSheetType, ChurchObject } from "@/types/excel";
 import * as XLSX from "xlsx";
 import { WorkBook, WorkSheet } from "xlsx";
 import { getRoomNumber } from "../room/room";
@@ -11,30 +11,61 @@ export const sortByChurchName = (data: ChurchObject[]): ChurchObject[] => {
 };
 
 ////////////////////////////////////////////////// Format 데이터 //////////////////////////////////////////////////
-export const formatFromDormitoryToRow = (dormitory: DormitoryType): AssignSheetRowType => {
+export const formatFromDormitoryToRow = (dormitory: DormitoryType): AssignSheetType => {
   const { male: maleDormitory, female: femaleDormitory } = dormitory;
-  const maleRoomRows : AssignSheetRowType[] = [];
+  const maleFloors: AssignSheetFloorType[] = [];
+  const femaleFloors: AssignSheetFloorType[] = [];
 
   maleDormitory.floors.forEach((floor) => {
-    floor.lines.forEach((line, lineIndex) => {
-      line.rooms.forEach((room, roomIndex) => {
-        const roomNumber = getRoomNumber(floor.floorNumber, lineIndex, roomIndex);
-        const roomRow : AssignSheetRowType = [];
+    const rows = formatFromFloorToRows(floor);
+    maleFloors.push(rows);
+  });
 
-        roomRow.push(roomNumber);
-        room.assignedChurchArray.forEach((church) => {
-            roomRow.push(church.churchName, church.people);
-        });
+  femaleDormitory.floors.forEach((floor) => {
+    const rows = formatFromFloorToRows(floor);
+    femaleFloors.push(rows);
+  });
 
-        maleRoomRows.push(roomRow);
+  const response = {
+    male: {
+      totalCount: maleFloors.reduce((acc, floor) => acc + floor.totalCount, 0),
+      floors: maleFloors,
+    },
+    female: {
+      totalCount: femaleFloors.reduce((acc, floor) => acc + floor.totalCount, 0),
+      floors: femaleFloors,
+    },
+  };
+
+  return response;
+};
+
+export const formatFromFloorToRows = (floor: FloorType): AssignSheetFloorType => {
+  const rows: AssignSheetRowType[] = [];
+  let totalCount = 0;
+
+  floor.lines.forEach((line, lineIndex) => {
+    line.rooms.forEach((room, roomIndex) => {
+      const roomNumber = getRoomNumber(floor.floorNumber, lineIndex, roomIndex);
+      const roomRow: AssignSheetRowType = [roomNumber];
+
+      room.assignedChurchArray.forEach((church) => {
+        roomRow.push(church.churchName, church.people);
+        totalCount += church.people;
       });
+
+      rows.push(roomRow);
     });
   });
 
-  return maleRoomRows;
+  const response = {
+    floorNumber: floor.floorNumber,
+    totalCount,
+    rows,
+  };
+
+  return response;
 };
-
-
 
 ////////////////////////////////////////////////// CREATE 엑셀 //////////////////////////////////////////////////
 ////////// 엑셀 초기화
@@ -59,6 +90,26 @@ export const addSheetData = (ws: WorkSheet, data: any, originPoint: string, skip
 ////////// 엑셀 다운로드
 export const downloadExcel = (wb: WorkBook, fileName: string) => {
   XLSX.writeFile(wb, fileName);
+};
+
+////////// 시트에 층 별 데이터 쓰기
+export const writeSheetFloor = (
+  sex: "male" | "female",
+  ws: WorkSheet,
+  floorData: AssignSheetFloorType,
+  originPoint: string = "A1",
+  skipHeader: boolean = false
+) => {
+  try {
+    const { floorNumber, totalCount, rows } = floorData;
+
+    const insertData = [[sex === "male" ? "형제" : "자매"], ...rows, [totalCount]];
+    XLSX.utils.sheet_add_json(ws, insertData, { origin: originPoint, skipHeader });
+
+    return { data: "success", error: null };
+  } catch {
+    throw new Error("시트에 데이터 쓰기 실패");
+  }
 };
 
 ////////////////////////////////////////////////// READ 엑셀 //////////////////////////////////////////////////
