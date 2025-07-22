@@ -94,7 +94,7 @@ type DormitoryStoreType = {
   closeRoom: ({ sex, floorIndex, lineIndex, roomIndex }: CloseRoomParamsType) => void;
   // 방 개방
   openRoom: ({ sex, floorIndex, lineIndex, roomIndex }: OpenRoomParamsType) => void;
-  
+
   // 배정된 교회의 인원 변경
   changeAssignedChurchPeople: ({
     sex,
@@ -306,6 +306,6 @@ export const useDormitoryStore = create<DormitoryStoreType>()((set) => ({
   setCurrentFloor: (floor) => set({ currentFloor: floor }),
 
   // 차수 관련
-  round: 1,
+  round: 0,
   setRound: (round) => set({ round }),
 }));

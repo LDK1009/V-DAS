@@ -1,33 +1,19 @@
-import { supabase } from "@/lib/supabaseClient";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { useEditDormitoryModalStore } from "@/store/ui/editDormitoryModalStore";
 import { mixinMuiTextInputBorder } from "@/styles/mixins";
-import { Button, Modal, Stack, styled, TextField } from "@mui/material";
-import React, { useEffect } from "react";
+import { Button, Modal, Stack, styled, TextField, Typography } from "@mui/material";
+import React from "react";
 
 const SettingRoundModal = () => {
   const { isSettingRoundModalOpen, setIsSettingRoundModalOpen } = useEditDormitoryModalStore.getState();
   const { round, setRound } = useDormitoryStore.getState();
 
-  useEffect(() => {
-    async function fetchLastRound() {
-      const { data } = await supabase
-        .from("camps")
-        .select("round")
-        .order("round", { ascending: false })
-        .limit(1)
-        .single();
-      if (data?.round) {
-        setRound(data?.round + 1);
-      }
-    }
-
-    fetchLastRound();
-  }, [setRound]);
-
   return (
     <Modal open={isSettingRoundModalOpen} onClose={() => setIsSettingRoundModalOpen(false)}>
       <ModalContainer>
+        <Typography variant="h6" align="center">
+          차수 설정
+        </Typography>
         <StyleTextField type="number" label="차수" value={round} onChange={(e) => setRound(Number(e.target.value))} />
         <Button
           variant="contained"
@@ -51,6 +37,7 @@ const ModalContainer = styled(Stack)`
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 100px;
+  padding-top: 75px;
   row-gap: 16px;
   background-color: white;
   border-radius: 10px;
