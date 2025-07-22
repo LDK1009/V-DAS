@@ -16,11 +16,11 @@ const Container = styled(Stack)`
   ${mixinFlex("column", "center", "center")}
   width: 100%;
   height: 40px;
-  background-color: #000000;
-  color: ${({ theme }) => theme.palette.text.white};
+  background-color: #ffc300;
+  color: ${({ theme }) => theme.palette.text.black};
 `;
 
-
 const Text = styled(Typography)`
-font-size: 16px;
-`
+  font-size: 16px;
+  font-weight: 700;
+`;
