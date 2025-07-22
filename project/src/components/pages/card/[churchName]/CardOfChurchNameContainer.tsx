@@ -11,6 +11,16 @@ import { DownloadRounded, InsertLinkRounded, ShareRounded } from "@mui/icons-mat
 import html2canvas from "html2canvas";
 import { enqueueSnackbar } from "notistack";
 
+declare global {
+  interface Window {
+    Kakao: {
+      Share: {
+        sendScrap: (options: { requestUrl: string; templateId: number; templateArgs: Record<string, string> }) => void;
+      };
+    };
+  }
+}
+
 type PropsType = {
   churchCardInfo: ChurchCardType;
 };
@@ -51,13 +61,12 @@ const CardOfChurchNameContainer = ({ churchCardInfo }: PropsType) => {
   }
 
   function handleShare() {
-    // @ts-expect-error - window.Kakao 타입이 전역에 정의되지 않음
     window.Kakao.Share.sendScrap({
       requestUrl: `${window.location.origin}/card/${churchCardInfo.churchName}`,
-      templateId: 122683, 
+      templateId: 122683,
       templateArgs: {
-        title: `${churchCardInfo.churchName}`, 
-        content: `${churchCardInfo.churchName} 숙소배정카드`, 
+        title: `${churchCardInfo.churchName}`,
+        content: `${churchCardInfo.churchName} 숙소배정카드`,
         churchName: churchCardInfo.churchName,
       },
     });
