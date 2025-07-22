@@ -6,22 +6,54 @@ import { shouldForwardProp } from "@/utils/mui";
 import { formatDate } from "@/utils/time";
 import { Edit, Public, PublicOff } from "@mui/icons-material";
 import { useCampManageStore } from "@/store/admin/manage/CampManageStore";
+import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
+import { useCurrentChurchStore } from "@/store/church/churchStore";
+import { useRouter } from "next/navigation";
 
 type PropsType = {
   campData: CampsTableType;
 };
 
 const CampItem = ({ campData }: PropsType) => {
+  const router = useRouter();
   const { round, updated_at, is_public } = campData;
   const { setUpdateCampPublic } = useCampManageStore();
+  const { setDormitoryData, setRound, setCurrentFloor, setMaxRoomPeople } = useDormitoryStore();
+  const { setCurrentChurchFemaleArray, setCurrentChurchMaleArray } = useCurrentChurchStore();
 
+  const handleEditClick = () => {
+    const { round, church_list, dormitory_setting, dormitory } = campData;
+
+    // 차수 세팅
+    setRound(round);
+
+    // 현재 층 세팅
+    setCurrentFloor(dormitory_setting.useFloorNumbers.male[0]);
+    // 최대 방 인원 세팅
+    setMaxRoomPeople(dormitory_setting.maxRoomPeople);
+
+    // 교회 리스트 세팅
+    setCurrentChurchFemaleArray(church_list.female);
+    setCurrentChurchMaleArray(church_list.male);
+
+    // 기숙사 데이터 세팅
+    setDormitoryData(dormitory);
+
+    router.push("/admin/assign");
+  };
   return (
     <Container $isPublic={is_public}>
       <RoundColumn>{round}차 숙소배정</RoundColumn>
       <UpdatedAtColumn>{formatDate(updated_at, "dot")}</UpdatedAtColumn>
-      <PublicColumn>{is_public ? <PublicIcon onClick={() => setUpdateCampPublic(campData.id)} /> : <PublicOffIcon onClick={() => setUpdateCampPublic(campData.id)} />}</PublicColumn>
+      <PublicColumn>
+        {is_public ? (
+          <PublicIcon onClick={() => setUpdateCampPublic(campData.id)} />
+        ) : (
+          <PublicOffIcon onClick={() => setUpdateCampPublic(campData.id)} />
+        )}
+      </PublicColumn>
       <EditColumn>
-        <EditIcon $isPublic={is_public} />
+        <EditIcon $isPublic={is_public} onClick={handleEditClick} />
       </EditColumn>
     </Container>
   );

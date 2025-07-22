@@ -1,7 +1,7 @@
 import { useCampManageStore } from "@/store/admin/manage/CampManageStore";
 import { mixinFlex, mixinHideScrollbar } from "@/styles/mixins";
 import { Stack, styled } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import CampItem from "./CampItem";
 import { enqueueSnackbar } from "notistack";
 
@@ -12,7 +12,14 @@ const ManageArea = () => {
     fetchCampHistory();
   }, [fetchCampHistory]);
 
+  const isFirstRender = useRef(true);
+
   useEffect(() => {
+    if (!campHistory) return;
+
+    if (!isFirstRender.current) return;
+    isFirstRender.current = false;
+
     const publicCampsLength = campHistory.filter((camp) => camp.is_public).length;
     if (publicCampsLength > 1) {
       enqueueSnackbar("공개된 숙소배정이 2개 이상입니다.", {
