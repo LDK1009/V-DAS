@@ -1,7 +1,7 @@
 import { useCampManageStore } from "@/store/admin/manage/CampManageStore";
 import { mixinFlex, mixinHideScrollbar } from "@/styles/mixins";
 import { Stack, styled } from "@mui/material";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import CampItem from "./CampItem";
 import { enqueueSnackbar } from "notistack";
 
@@ -12,13 +12,8 @@ const ManageArea = () => {
     fetchCampHistory();
   }, [fetchCampHistory]);
 
-  const isFirstRender = useRef(true);
-
   useEffect(() => {
     if (!campHistory) return;
-
-    if (!isFirstRender.current) return;
-    isFirstRender.current = false;
 
     const publicCampsLength = campHistory.filter((camp) => camp.is_public).length;
     if (publicCampsLength > 1) {
@@ -30,12 +25,6 @@ const ManageArea = () => {
     if (publicCampsLength === 1) {
       enqueueSnackbar("숙소배정이 공개되었습니다.", {
         variant: "success",
-      });
-    }
-
-    if (publicCampsLength === 0) {
-      enqueueSnackbar("모든 숙소배정이 비공개 상태입니다.", {
-        variant: "warning",
       });
     }
   }, [campHistory]);
