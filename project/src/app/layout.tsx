@@ -2,13 +2,12 @@ import ThemeProviderWrapper from "@/styles/ThemeProviderWrapper";
 import type { Metadata } from "next";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import ClientSnackbarProvider from "@/lib/ClientSnackbarProvider";
-// import CommonBottomNavigation from "@/components/common/CommonBottomNavigation";
-// import CommonHeader from "@/components/common/CommonHeader";
 import GlobalStyles from "@/styles/GlobalStyles";
 import { templateInfo } from "@/utils/templateInfo";
 import Loading from "@/components/common/Loading";
 import DndProviderLayer from "@/lib/DndProviderLayer";
 import KakaoInitializer from "@/lib/KakaoInitializer";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 // SEO 메타데이터
 export const metadata: Metadata = {
@@ -57,6 +56,7 @@ export default function RootLayout({
             </DndProviderLayer>
           </ThemeProviderWrapper>
         </AppRouterCacheProvider>
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       </body>
     </html>
   );
