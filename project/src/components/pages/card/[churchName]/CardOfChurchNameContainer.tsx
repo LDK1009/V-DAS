@@ -27,7 +27,7 @@ const CardOfChurchNameContainer = ({ churchCardInfo }: PropsType) => {
     });
 
     const imageData = canvas.toDataURL("image/png").split(",")[1];
-    const fileName = `${churchCardInfo.churchName}-숙소배정카드.png`;
+    const fileName = `${decodeURIComponent(churchCardInfo.churchName)}-숙소배정카드.png`;
     const safeFileName = fileName.replace(/[\\/:*?"<>|]/g, "_");
 
     // 카드 다운로드
