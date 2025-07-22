@@ -45,7 +45,7 @@ const AssignCard = ({ churchName, maleCardInfo, femaleCardInfo }: CardInfoType) 
   };
 
   return (
-    <Container className="assign-card">
+    <Container className="distribute-assign-card">
       <ContentContainer>
         <ChurchName variant="h5">{churchName}</ChurchName>
         <Table>
