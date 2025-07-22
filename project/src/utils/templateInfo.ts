@@ -1,5 +1,5 @@
 export const templateInfo = {
-    name: "V-DAS",
-    description: "비전캠프 기숙사 배정 시스템",
-    link: "https://v-das.site",
-}
+  name: "VISIONCAMP",
+  description: "비전캠프에 오신 것을 환영합니다~",
+  link: "https://v-das.site",
+};
