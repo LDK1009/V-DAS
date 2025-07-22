@@ -2,6 +2,18 @@
 
 import Script from "next/script";
 
+declare global {
+  interface Window {
+    Kakao: {
+      init: (key: string) => void;
+      isInitialized: () => boolean;
+      Share: {
+        sendScrap: (options: { requestUrl: string; templateId: number; templateArgs: Record<string, string> }) => void;
+      };
+    };
+  }
+}
+
 export default function KakaoInitializer() {
   return (
     <Script
@@ -10,9 +22,7 @@ export default function KakaoInitializer() {
       crossOrigin="anonymous"
       strategy="afterInteractive"
       onLoad={() => {
-        // @ts-expect-error - window.Kakao 타입이 전역에 정의되지 않음
-        window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_SDK_KEY);
-        // @ts-expect-error - window.Kakao 타입이 전역에 정의되지 않음
+        window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_SDK_KEY as string);
         console.log(window.Kakao.isInitialized());
       }}
     />

@@ -11,16 +11,6 @@ import { DownloadRounded, InsertLinkRounded, ShareRounded } from "@mui/icons-mat
 import html2canvas from "html2canvas";
 import { enqueueSnackbar } from "notistack";
 
-declare global {
-  interface Window {
-    Kakao: {
-      Share: {
-        sendScrap: (options: { requestUrl: string; templateId: number; templateArgs: Record<string, string> }) => void;
-      };
-    };
-  }
-}
-
 type PropsType = {
   churchCardInfo: ChurchCardType;
 };
