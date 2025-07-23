@@ -89,11 +89,10 @@ const Container = styled(Stack)`
 `;
 
 const ContentContainer = styled(Stack)`
-  ${mixinFlex("column", "center", "center")};
-  row-gap: 16px;
+  ${mixinFlex("column", "space-evenly", "center")};
   width: 100%;
   height: 100%;
-  padding: 8px;
+  padding: 0px 8px;
   background-color: white;
   box-shadow: 4px 4px 8px 0px rgba(0, 0, 0, 0.25);
 `;
