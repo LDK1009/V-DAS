@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     title: templateInfo.name,
     description: templateInfo.description,
     url: templateInfo.link,
-    images: [{ url: "/img/og.png", width: 1200, height: 630, alt: "og-image" }],
+    images: [{ url: "/img/og2.png", width: 1200, height: 630, alt: "og-image" }],
     type: "website",
   },
   robots: {
