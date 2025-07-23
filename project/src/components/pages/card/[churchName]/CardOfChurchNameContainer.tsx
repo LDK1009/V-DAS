@@ -95,7 +95,7 @@ const Container = styled(Stack)`
 const ButtonContainer = styled(Stack)`
   ${mixinFlex("row", "flex-end", "center")};
   column-gap: 8px;
-  width: 100%;
+  width: 300px;
   padding-top: 8px;
 `;
 
