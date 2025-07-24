@@ -1,4 +1,4 @@
-import { ChurchArrayType } from "@/types/currentChurchType";
+import { ChurchArrayType, ChurchType } from "@/types/currentChurchType";
 import { produce } from "immer";
 import { create } from "zustand";
 
@@ -33,6 +33,9 @@ type CurrentChurchStoreType = {
 
   ////////// 교회 추가
   addChurch: (sex: "male" | "female", churchName: string, churchCount: number) => void;
+
+  ////////// 교회 삭제
+  deleteChurch: (sex: "male" | "female", churchName: string) => void;
 };
 
 export const useCurrentChurchStore = create<CurrentChurchStoreType>()((set) => ({
@@ -96,15 +99,35 @@ export const useCurrentChurchStore = create<CurrentChurchStoreType>()((set) => (
 
   ////////// 교회 추가
   addChurch: (sex, churchName, churchCount) => {
-    set(produce((state) => {
-      if(sex === "male"){
-        const newChurchMaleArray = [...state.churchMaleArray, { churchName, people: churchCount }];
-        state.churchMaleArray = newChurchMaleArray;
-      }
-      if(sex === "female"){
-        const newChurchFemaleArray = [...state.churchFemaleArray, { churchName, people: churchCount }];
-        state.churchFemaleArray = newChurchFemaleArray;
-      }
+    set(
+      produce((state) => {
+        if (sex === "male") {
+          const newChurchMaleArray = [...state.churchMaleArray, { churchName, people: churchCount }];
+          state.churchMaleArray = newChurchMaleArray;
+        }
+        if (sex === "female") {
+          const newChurchFemaleArray = [...state.churchFemaleArray, { churchName, people: churchCount }];
+          state.churchFemaleArray = newChurchFemaleArray;
+        }
+      })
+    );
+  },
+
+  ////////// 교회 삭제
+  deleteChurch: (sex: "male" | "female", churchName: string) => {
+    set(
+      produce((state) => {
+        if (sex === "male") {
+          state.churchMaleArray = state.churchMaleArray?.filter(
+            (church: ChurchType) => church.churchName !== churchName
+          );
+        }
+
+        if (sex === "female") {
+          state.churchFemaleArray = state.churchFemaleArray?.filter(
+            (church: ChurchType) => church.churchName !== churchName
+          );
+        }
       })
     );
   },

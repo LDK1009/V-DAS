@@ -175,6 +175,19 @@ const ChurchItem = ({
   ];
   const [isHover, setIsHover] = useState(false);
 
+  ////////// 사이드바에서 우클릭
+  ////////// 우클릭
+  const handleRightClickInSidebar = (event: React.MouseEvent) => {
+    const { deleteChurch } = useCurrentChurchStore.getState();
+    // 기본 컨텍스트 메뉴가 나타나는 것을 방지
+    event.preventDefault();
+    const isConfirm = confirm("교회를 삭제하시겠습니까?");
+    if (isConfirm) {
+      deleteChurch(currentChurchSex, church.churchName);
+      enqueueSnackbar(`${church.churchName} 교회 삭제`, { variant: "error" });
+    }
+  };
+
   return (
     <AssignedPositionWrapper
       onMouseEnter={() => {
@@ -196,6 +209,7 @@ const ChurchItem = ({
         }
         onClick={type === "room" ? handleChangeChurchPeopleInRoom : handleChangeChurchPeopleInSidebar}
         $isDragging={isContainerDragging()}
+        onContextMenu={type === "sidebar" ? handleRightClickInSidebar : undefined}
       >
         <ChurchName>{church.churchName}</ChurchName>
         <ChurchPeople $isRemain={type === "sidebar" && church.people > 0}>{church.people}</ChurchPeople>
