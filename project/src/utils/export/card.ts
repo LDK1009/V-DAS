@@ -2,18 +2,28 @@ import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { TableRowType } from "@/types/card";
 
 function getAssignedInfo(cardInfo: TableRowType | null) {
-  const {maxRoomPeople} = useDormitoryStore.getState();
+  const { maxRoomPeople } = useDormitoryStore.getState();
 
   if (!cardInfo) return "";
 
   const { startAssignedInfo, endAssignedInfo } = cardInfo.assignedInfo;
-  const startAssignedCount = startAssignedInfo.assignedCount !== maxRoomPeople ? startAssignedInfo.assignedCount !== 7 ?  `(${startAssignedInfo.assignedCount})` : "" : "";
-  const endAssignedCount = endAssignedInfo.assignedCount !== maxRoomPeople ? endAssignedInfo.assignedCount !== 7 ? `(${endAssignedInfo.assignedCount})` : "" : "";
+  const startAssignedCount =
+    startAssignedInfo.assignedCount !== maxRoomPeople
+      ? startAssignedInfo.assignedCount !== 7
+        ? `(${startAssignedInfo.assignedCount})`
+        : ""
+      : "";
+  const endAssignedCount =
+    endAssignedInfo.assignedCount !== maxRoomPeople
+      ? endAssignedInfo.assignedCount !== 7
+        ? `(${endAssignedInfo.assignedCount})`
+        : ""
+      : "";
 
-  if(startAssignedInfo.roomNumber === endAssignedInfo.roomNumber) {
+  if (startAssignedInfo.roomNumber === endAssignedInfo.roomNumber) {
     return `${startAssignedInfo.roomNumber}호${startAssignedCount}`;
   }
-  
+
   return `${startAssignedInfo.roomNumber}${startAssignedCount}-${endAssignedInfo.roomNumber}호${endAssignedCount}`;
 }
 

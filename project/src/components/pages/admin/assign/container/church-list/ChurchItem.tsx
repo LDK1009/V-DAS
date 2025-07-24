@@ -52,10 +52,8 @@ const ChurchItem = ({
     [church]
   );
 
-  ////////// 라이프사이클
-
-  ////////// 교회 인원 변경
-  function handleChangeChurchPeople() {
+  ////////// 교회 인원 변경(방)
+  function handleChangeChurchPeopleInRoom() {
     const { updateRoomCurrentAndRemain } = useDormitoryStore.getState();
     const { evacuateChurchMale, evacuateChurchFemale } = useCurrentChurchStore.getState();
 
@@ -112,6 +110,46 @@ const ChurchItem = ({
     }
   }
 
+  ////////// 교회 인원 변경(사이드바)
+  function handleChangeChurchPeopleInSidebar() {
+    ///// 데이터 가져오기
+    const { churchMaleArray, churchFemaleArray, currentChurchSex, evacuateChurchMale, evacuateChurchFemale } =
+      useCurrentChurchStore.getState();
+    const currentChurches = currentChurchSex === "male" ? churchMaleArray : churchFemaleArray;
+    const targetChurch = currentChurches?.find((el) => el.churchName === church.churchName);
+    const targetChurchCurrentPeople = targetChurch?.people;
+    /////
+
+    ///// 변경할 인원 입력 받기
+    const inputCount = prompt("변경할 인원을 입력해주세요.");
+
+    // 양의 정수 패턴
+    const integerPattern = /^[0-9]\d*$/;
+
+    // 입력값이 없을 경우
+    if (!inputCount) {
+      return;
+    }
+
+    // 양의 정수 패턴 예외 처리
+    if (!integerPattern.test(inputCount)) {
+      enqueueSnackbar("0 이상의 정수를 입력해주세요.", { variant: "error" });
+      return;
+    }
+    /////
+
+    ///// 교회 인원 변경
+    if (targetChurchCurrentPeople !== 0 && !targetChurchCurrentPeople) return;
+
+    const updateCount = targetChurchCurrentPeople - Number(inputCount);
+
+    if (currentChurchSex === "male") {
+      evacuateChurchMale(church.churchName, updateCount);
+    } else if (currentChurchSex === "female") {
+      evacuateChurchFemale(church.churchName, updateCount);
+    }
+  }
+
   const isContainerDragging = useCallback(() => {
     if (type === "sidebar") {
       return isDraggingSidebar;
@@ -156,7 +194,7 @@ const ChurchItem = ({
             ? (fromSidebarDrag as unknown as RefObject<HTMLDivElement>)
             : (fromRoomDrag as unknown as RefObject<HTMLDivElement>)
         }
-        onClick={type === "room" ? handleChangeChurchPeople : undefined}
+        onClick={type === "room" ? handleChangeChurchPeopleInRoom : handleChangeChurchPeopleInSidebar}
         $isDragging={isContainerDragging()}
       >
         <ChurchName>{church.churchName}</ChurchName>
