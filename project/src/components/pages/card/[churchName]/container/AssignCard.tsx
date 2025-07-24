@@ -51,7 +51,7 @@ const AssignCard = ({ churchName, maleCardInfo, femaleCardInfo }: CardInfoType) 
       case "온누리비전교회":
         return { male: "316-317호(2)", female: "806, 1037호(4)" };
       case "의림교회":
-        return { male: "229-230(7), 416(5)", female: "814-815호(5)" };
+        return { male: "229-230, 416호(5)", female: "814-815호(5)" };
       default:
         return { male: "", female: "" };
     }
