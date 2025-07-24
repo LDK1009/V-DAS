@@ -13,6 +13,7 @@ export default async function CardDetail({ params }: { params: PropsType }) {
 
   const decodedChurchName = decodeURIComponent(churchName);
   const publicCampsData = await getPublicCampChurchCards();
+
   const churchCardInfo = publicCampsData?.find(
     (churchCard: ChurchCardType) => churchCard.churchName === decodedChurchName
   );

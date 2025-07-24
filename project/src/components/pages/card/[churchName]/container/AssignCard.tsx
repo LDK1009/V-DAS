@@ -44,6 +44,19 @@ const AssignCard = ({ churchName, maleCardInfo, femaleCardInfo }: CardInfoType) 
     assignedInfo: getAssignedInfo(femaleCardInfo),
   };
 
+  const exceptList = ["의림교회", "온누리비전교회"];
+
+  function temporaryAssignInfo(churchName: string): { male: string; female: string } {
+    switch (churchName) {
+      case "온누리비전교회":
+        return { male: "316-317호(2)", female: "806, 1037호(4)" };
+      case "의림교회":
+        return { male: "229-230(7), 416(5)", female: "814-815호(5)" };
+      default:
+        return { male: "", female: "" };
+    }
+  }
+
   return (
     <Container className="distribute-assign-card">
       <ContentContainer>
@@ -54,13 +67,17 @@ const AssignCard = ({ churchName, maleCardInfo, femaleCardInfo }: CardInfoType) 
               <Sex>{maleRow.sex}</Sex>
               <TotalCount>{maleRow.totalCount}</TotalCount>
               <AB>{maleRow.AB}</AB>
-              <AssignedInfo>{maleRow.assignedInfo}</AssignedInfo>
+              <AssignedInfo>
+                {exceptList.includes(churchName) ? temporaryAssignInfo(churchName).male : maleRow.assignedInfo}
+              </AssignedInfo>
             </Tr>
             <Tr>
               <Sex>{femaleRow.sex}</Sex>
               <TotalCount>{femaleRow.totalCount}</TotalCount>
               <AB>{femaleRow.AB}</AB>
-              <AssignedInfo>{femaleRow.assignedInfo}</AssignedInfo>
+              <AssignedInfo>
+                {exceptList.includes(churchName) ? temporaryAssignInfo(churchName).female : femaleRow.assignedInfo}
+              </AssignedInfo>
             </Tr>
           </tbody>
         </Table>
