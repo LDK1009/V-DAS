@@ -7,8 +7,8 @@ function getAssignedInfo(cardInfo: TableRowType | null) {
   if (!cardInfo) return "";
 
   const { startAssignedInfo, endAssignedInfo } = cardInfo.assignedInfo;
-  const startAssignedCount = startAssignedInfo.assignedCount !== maxRoomPeople ? `(${startAssignedInfo.assignedCount})` : "";
-  const endAssignedCount = endAssignedInfo.assignedCount !== maxRoomPeople ? `(${endAssignedInfo.assignedCount})` : "";
+  const startAssignedCount = startAssignedInfo.assignedCount !== maxRoomPeople ? startAssignedInfo.assignedCount !== 7 ?  `(${startAssignedInfo.assignedCount})` : "" : "";
+  const endAssignedCount = endAssignedInfo.assignedCount !== maxRoomPeople ? endAssignedInfo.assignedCount !== 7 ? `(${endAssignedInfo.assignedCount})` : "" : "";
 
   if(startAssignedInfo.roomNumber === endAssignedInfo.roomNumber) {
     return `${startAssignedInfo.roomNumber}호${startAssignedCount}`;
