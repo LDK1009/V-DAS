@@ -1,4 +1,4 @@
-import { changeCampPublic, getAllCamps } from "@/service/table/camps/camps";
+import { changeCampPublic, deleteCamp, getAllCamps } from "@/service/table/camps/camps";
 import { CampsTableType } from "@/types/camp";
 import { create } from "zustand";
 
@@ -7,6 +7,7 @@ type CampManageStoreType = {
   setCampHistory: (value: CampsTableType[]) => void;
   fetchCampHistory: () => Promise<void>;
   setUpdateCampPublic: (targetCampId: number) => Promise<void>;
+  setDeleteCamp: (targetCampId: number) => Promise<void>;
 };
 
 export const useCampManageStore = create<CampManageStoreType>((set, get) => ({
@@ -33,6 +34,19 @@ export const useCampManageStore = create<CampManageStoreType>((set, get) => ({
       }));
     } catch {
       throw new Error("캠프 공개 여부 수정 실패");
+    }
+  },
+  setDeleteCamp: async (targetCampId) => {
+    try {
+      // 서비스 호출
+      await deleteCamp(targetCampId);
+
+      // 상태 업데이트
+      set((state) => ({
+        campHistory: state.campHistory.filter((camp) => camp.id !== targetCampId),
+      }));
+    } catch {
+      throw new Error("캠프 삭제 실패");
     }
   },
 }));

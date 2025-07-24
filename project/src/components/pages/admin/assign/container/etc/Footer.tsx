@@ -7,16 +7,18 @@ import { enqueueSnackbar, closeSnackbar } from "notistack";
 import JSZip from "jszip";
 
 import {
-  addSheetData,
   createSheet,
   downloadExcel,
-  excelToJson,
   formatFromDormitoryToRow,
   initExcel,
-  sortByChurchName,
   writeSheetDormitory,
+  ////////// 임시 주석
+  // excelToJson,
+  // addSheetData,
+  // sortByChurchName,
+  ////////// 임시 주석
 } from "@/utils/export/excel";
-import { useExcelStore } from "@/store/excel/excelStore";
+// import { useExcelStore } from "@/store/excel/excelStore";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { saveCamp } from "@/service/save/save";
 import { useCurrentChurchStore } from "@/store/church/churchStore";
@@ -26,7 +28,8 @@ const Footer = () => {
   const [isDownloadOptionOpen, setIsDownloadOptionOpen] = useState(false);
   const { getAllChurchCardData } = useCardFormat();
   const churchCardDatas = getAllChurchCardData();
-  const { excelFile } = useExcelStore();
+  ////////// 임시 주석
+  // const { excelFile } = useExcelStore();
   const { dormitoryData, maxRoomPeople, round: currentRound } = useDormitoryStore();
   const { churchMaleArray, churchFemaleArray } = useCurrentChurchStore();
   const { useFloorNumbers } = useFloorStore();
@@ -148,16 +151,21 @@ const Footer = () => {
     try {
       ////////// 워크북&시트 초기화
       const { wb } = initExcel();
-      const sheet1 = createSheet(wb, "데이터");
-      const sheet2 = createSheet(wb, "숙소배정");
+
+      ////////// 임시 주석
+      // const sheet1 = createSheet(wb, "데이터");
+      // const sheet2 = createSheet(wb, "숙소배정");
 
       ////////// 시트1 작업
       // 업로드된 엑셀 파일 읽기
-      const excelData = await excelToJson(excelFile as File);
+      // const excelData = await excelToJson(excelFile as File);
       // 교회명 기준 오름차순 정렬
-      const sortedData = sortByChurchName(excelData);
+      // const sortedData = sortByChurchName(excelData);
       // 시트1에 데이터추가
-      addSheetData(sheet1, sortedData, "A1");
+      // addSheetData(sheet1, sortedData, "A1");
+      ////////// 임시 주석
+
+      const sheet2 = createSheet(wb, "숙소배정");
 
       ////////// 시트2 작업
       if (!dormitoryData) return;

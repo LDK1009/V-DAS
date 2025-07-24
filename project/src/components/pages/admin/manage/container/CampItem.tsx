@@ -4,11 +4,12 @@ import { Stack, styled } from "@mui/material";
 import React from "react";
 import { shouldForwardProp } from "@/utils/mui";
 import { formatDate } from "@/utils/time";
-import { Edit, Public, PublicOff } from "@mui/icons-material";
+import { Delete, Edit, Public, PublicOff } from "@mui/icons-material";
 import { useCampManageStore } from "@/store/admin/manage/CampManageStore";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { useCurrentChurchStore } from "@/store/church/churchStore";
 import { useRouter } from "next/navigation";
+import { enqueueSnackbar } from "notistack";
 
 type PropsType = {
   campData: CampsTableType;
@@ -17,7 +18,7 @@ type PropsType = {
 const CampItem = ({ campData }: PropsType) => {
   const router = useRouter();
   const { round, updated_at, is_public } = campData;
-  const { setUpdateCampPublic } = useCampManageStore();
+  const { setUpdateCampPublic, setDeleteCamp } = useCampManageStore();
   const { setDormitoryData, setRound, setCurrentFloor, setMaxRoomPeople } = useDormitoryStore();
   const { setCurrentChurchFemaleArray, setCurrentChurchMaleArray } = useCurrentChurchStore();
 
@@ -41,6 +42,15 @@ const CampItem = ({ campData }: PropsType) => {
 
     router.push("/admin/assign");
   };
+
+  const handleDeleteClick = () => {
+    const isConfirm = confirm("캠프를 삭제하시겠습니까?");
+    if (isConfirm) {
+      setDeleteCamp(campData.id);
+      enqueueSnackbar(`${round}차 캠프 삭제`, { variant: "error" });
+    }
+  };
+
   return (
     <Container $isPublic={is_public}>
       <RoundColumn>{round}차 숙소배정</RoundColumn>
@@ -55,6 +65,9 @@ const CampItem = ({ campData }: PropsType) => {
       <EditColumn>
         <EditIcon $isPublic={is_public} onClick={handleEditClick} />
       </EditColumn>
+      <DeleteColumn>
+        <DeleteIcon onClick={handleDeleteClick} />
+      </DeleteColumn>
     </Container>
   );
 };
@@ -121,5 +134,14 @@ type EditIconPropsType = {
 
 const EditIcon = styled(Edit, { shouldForwardProp })<EditIconPropsType>`
   color: ${({ theme, $isPublic }) => ($isPublic ? theme.palette.primary.main : theme.palette.text.disabled)};
+  cursor: pointer;
+`;
+
+const DeleteColumn = styled(ItemColumn)`
+  width: 100px;
+`;
+
+const DeleteIcon = styled(Delete)`
+  color: ${({ theme }) => theme.palette.error.main};
   cursor: pointer;
 `;
