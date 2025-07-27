@@ -44,24 +44,148 @@ const AssignCard = ({ churchName, maleCardInfo, femaleCardInfo }: CardInfoType) 
     assignedInfo: getAssignedInfo(femaleCardInfo),
   };
 
+  const exceptList = [
+    "세종한소망교회",
+    "예선교회",
+    "평화로운교회",
+    "청주대청교회",
+    "행복누리교회",
+    "후포중앙교회",
+    "민들레교회",
+    "비전선교교회",
+  ];
+
+  type RowType = {
+    sex: string;
+    totalCount: string;
+    AB: string;
+    assignedInfo: string;
+  };
+
+  function temporaryAssignInfo(churchName: string): { maleRow: RowType; femaleRow: RowType } {
+    const existMaleRow = maleRow;
+    const existFemaleRow = femaleRow;
+
+    const temporaryInfos = [
+      {
+        churchName: "세종한소망교회",
+        maleRow: existMaleRow,
+        femaleRow: {
+          sex: "자매",
+          totalCount: "3명",
+          AB: "A",
+          assignedInfo: "409호(3)",
+        },
+      },
+      {
+        churchName: "예선교회",
+        maleRow: existMaleRow,
+        femaleRow: {
+          sex: "자매",
+          totalCount: "3명",
+          AB: "A",
+          assignedInfo: "409호(3)",
+        },
+      },
+      {
+        churchName: "평화로운교회",
+        maleRow: existMaleRow,
+        femaleRow: {
+          sex: "자매",
+          totalCount: "6명",
+          AB: "A",
+          assignedInfo: "410호",
+        },
+      },
+      {
+        churchName: "청주대청교회",
+        maleRow: existMaleRow,
+        femaleRow: {
+          sex: "자매",
+          totalCount: "7명",
+          AB: "A",
+          assignedInfo: "411-412호(1)",
+        },
+      },
+      {
+        churchName: "행복누리교회",
+        maleRow: existMaleRow,
+        femaleRow: {
+          sex: "자매",
+          totalCount: "5명",
+          AB: "A",
+          assignedInfo: "412호(5)",
+        },
+      },
+      {
+        churchName: "후포중앙교회",
+        maleRow: existMaleRow,
+        femaleRow: {
+          sex: "자매",
+          totalCount: "7명",
+          AB: "A",
+          assignedInfo: "413(1)-414호",
+        },
+      },
+      {
+        churchName: "민들레교회",
+        maleRow: existMaleRow,
+        femaleRow: {
+          sex: "자매",
+          totalCount: "3명",
+          AB: "A",
+          assignedInfo: "413호(3)",
+        },
+      },
+      {
+        churchName: "비전선교교회",
+        maleRow: existMaleRow,
+        femaleRow: {
+          sex: "자매",
+          totalCount: "6명",
+          AB: "A",
+          assignedInfo: "415호",
+        },
+      },
+    ];
+
+    const response = temporaryInfos.find((info) => info.churchName === churchName) ?? {
+      maleRow: existMaleRow,
+      femaleRow: existFemaleRow,
+    };
+
+    return response;
+  }
+
+  const RowComponent = () => {
+    const isExcept = exceptList.includes(churchName);
+    const assignInfo = isExcept ? temporaryAssignInfo(churchName) : { maleRow, femaleRow };
+
+    return (
+      <>
+        <Tr>
+          <Sex>{assignInfo.maleRow.sex}</Sex>
+          <TotalCount>{assignInfo.maleRow.totalCount}</TotalCount>
+          <AB>{assignInfo.maleRow.AB}</AB>
+          <AssignedInfo>{assignInfo.maleRow.assignedInfo}</AssignedInfo>
+        </Tr>
+        <Tr>
+          <Sex>{assignInfo.femaleRow.sex}</Sex>
+          <TotalCount>{assignInfo.femaleRow.totalCount}</TotalCount>
+          <AB>{assignInfo.femaleRow.AB}</AB>
+          <AssignedInfo>{assignInfo.femaleRow.assignedInfo}</AssignedInfo>
+        </Tr>
+      </>
+    );
+  };
+
   return (
     <Container className="assign-card">
       <ContentContainer>
         <ChurchName variant="h5">{churchName}</ChurchName>
         <Table>
           <tbody>
-            <Tr>
-              <Sex>{maleRow.sex}</Sex>
-              <TotalCount>{maleRow.totalCount}</TotalCount>
-              <AB>{maleRow.AB}</AB>
-              <AssignedInfo>{maleRow.assignedInfo}</AssignedInfo>
-            </Tr>
-            <Tr>
-              <Sex>{femaleRow.sex}</Sex>
-              <TotalCount>{femaleRow.totalCount}</TotalCount>
-              <AB>{femaleRow.AB}</AB>
-              <AssignedInfo>{femaleRow.assignedInfo}</AssignedInfo>
-            </Tr>
+            <RowComponent />
           </tbody>
         </Table>
         <AlertText align="left">
