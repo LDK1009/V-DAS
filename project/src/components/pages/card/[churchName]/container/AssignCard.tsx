@@ -45,14 +45,11 @@ const AssignCard = ({ churchName, maleCardInfo, femaleCardInfo }: CardInfoType) 
   };
 
   const exceptList = [
-    "세종한소망교회",
     "예선교회",
-    "평화로운교회",
-    "청주대청교회",
-    "행복누리교회",
     "후포중앙교회",
-    "민들레교회",
-    "비전선교교회",
+    "청주대청교회",
+    "대전충일교회",
+    "주월교회",
   ];
 
   type RowType = {
@@ -68,16 +65,6 @@ const AssignCard = ({ churchName, maleCardInfo, femaleCardInfo }: CardInfoType) 
 
     const temporaryInfos = [
       {
-        churchName: "세종한소망교회",
-        maleRow: existMaleRow,
-        femaleRow: {
-          sex: "자매",
-          totalCount: "3명",
-          AB: "A",
-          assignedInfo: "409호(3)",
-        },
-      },
-      {
         churchName: "예선교회",
         maleRow: existMaleRow,
         femaleRow: {
@@ -88,13 +75,13 @@ const AssignCard = ({ churchName, maleCardInfo, femaleCardInfo }: CardInfoType) 
         },
       },
       {
-        churchName: "평화로운교회",
+        churchName: "후포중앙교회",
         maleRow: existMaleRow,
         femaleRow: {
           sex: "자매",
-          totalCount: "6명",
+          totalCount: "7명",
           AB: "A",
-          assignedInfo: "410호",
+          assignedInfo: "408-419호(1)",
         },
       },
       {
@@ -104,47 +91,27 @@ const AssignCard = ({ churchName, maleCardInfo, femaleCardInfo }: CardInfoType) 
           sex: "자매",
           totalCount: "7명",
           AB: "A",
-          assignedInfo: "411-412호(1)",
+          assignedInfo: "409(1)-410호(6)",
         },
       },
       {
-        churchName: "행복누리교회",
-        maleRow: existMaleRow,
-        femaleRow: {
-          sex: "자매",
-          totalCount: "5명",
-          AB: "A",
-          assignedInfo: "412호(5)",
-        },
-      },
-      {
-        churchName: "후포중앙교회",
-        maleRow: existMaleRow,
-        femaleRow: {
-          sex: "자매",
-          totalCount: "7명",
-          AB: "A",
-          assignedInfo: "413(1)-414호",
-        },
-      },
-      {
-        churchName: "민들레교회",
-        maleRow: existMaleRow,
-        femaleRow: {
-          sex: "자매",
-          totalCount: "3명",
-          AB: "A",
-          assignedInfo: "413호(3)",
-        },
-      },
-      {
-        churchName: "비전선교교회",
+        churchName: "대전충일교회",
         maleRow: existMaleRow,
         femaleRow: {
           sex: "자매",
           totalCount: "6명",
           AB: "A",
-          assignedInfo: "415호",
+          assignedInfo: "411-412호(5)",
+        },
+      },
+      {
+        churchName: "주월교회",
+        maleRow: existMaleRow,
+        femaleRow: {
+          sex: "자매",
+          totalCount: "13명",
+          AB: "A",
+          assignedInfo: "412(1)-414호",
         },
       },
     ];
