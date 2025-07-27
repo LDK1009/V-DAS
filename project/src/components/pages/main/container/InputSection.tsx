@@ -29,7 +29,8 @@ const InputSection = () => {
 
   useEffect(() => {
     getDistributeData();
-  }, [getDistributeData]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Container>
