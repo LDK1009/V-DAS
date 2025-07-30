@@ -12,6 +12,15 @@ export const getAllCamps = async () => {
   }
 };
 
+export const getAllRounds = async () => {
+  try {
+    const { data } = await supabase.from("camps").select("round");
+    return data;
+  } catch {
+    throw new Error("캠프 차수 조회 실패");
+  }
+};
+
 ////////////////////////////// 공개 캠프 조회 //////////////////////////////
 export const getPublicCamps = async () => {
   try {

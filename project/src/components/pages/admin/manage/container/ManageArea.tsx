@@ -4,6 +4,7 @@ import { Stack, styled } from "@mui/material";
 import React, { useEffect } from "react";
 import CampItem from "./CampItem";
 import { enqueueSnackbar } from "notistack";
+import ExceptModal from "./ExceptModal";
 
 const ManageArea = () => {
   const { fetchCampHistory, campHistory } = useCampManageStore();
@@ -39,6 +40,7 @@ const ManageArea = () => {
           ))}
         </CampHistoryContainer>
       </BodyArea>
+      <ExceptModal />
     </Container>
   );
 };

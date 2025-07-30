@@ -4,12 +4,13 @@ import { Stack, styled } from "@mui/material";
 import React from "react";
 import { shouldForwardProp } from "@/utils/mui";
 import { formatDate } from "@/utils/time";
-import { Delete, Edit, Public, PublicOff } from "@mui/icons-material";
+import { BrushRounded, Delete, Edit, Public, PublicOff } from "@mui/icons-material";
 import { useCampManageStore } from "@/store/admin/manage/CampManageStore";
 import { useDormitoryStore } from "@/store/dormitory/dormitoryStore";
 import { useCurrentChurchStore } from "@/store/church/churchStore";
 import { useRouter } from "next/navigation";
 import { enqueueSnackbar } from "notistack";
+import { useExceptModalStore } from "@/store/ui/exceptModalStore";
 
 type PropsType = {
   campData: CampsTableType;
@@ -21,7 +22,8 @@ const CampItem = ({ campData }: PropsType) => {
   const { setUpdateCampPublic, setDeleteCamp } = useCampManageStore();
   const { setDormitoryData, setRound, setCurrentFloor, setMaxRoomPeople } = useDormitoryStore();
   const { setCurrentChurchFemaleArray, setCurrentChurchMaleArray } = useCurrentChurchStore();
-
+  const { setIsExceptModalOpen } = useExceptModalStore();
+  
   const handleEditClick = () => {
     const { round, church_list, dormitory_setting, dormitory } = campData;
 
@@ -65,6 +67,9 @@ const CampItem = ({ campData }: PropsType) => {
       <EditColumn>
         <EditIcon $isPublic={is_public} onClick={handleEditClick} />
       </EditColumn>
+      <ExceptionColumn>
+        <ExceptionIcon $isPublic={is_public} onClick={() => setIsExceptModalOpen(true)} />
+      </ExceptionColumn>
       <DeleteColumn>
         <DeleteIcon onClick={handleDeleteClick} />
       </DeleteColumn>
@@ -143,5 +148,18 @@ const DeleteColumn = styled(ItemColumn)`
 
 const DeleteIcon = styled(Delete)`
   color: ${({ theme }) => theme.palette.error.main};
+  cursor: pointer;
+`;
+
+const ExceptionColumn = styled(ItemColumn)`
+  width: 100px; 
+`;
+
+type ExceptionIconPropsType = {
+  $isPublic: boolean;
+};
+
+const ExceptionIcon = styled(BrushRounded, { shouldForwardProp })<ExceptionIconPropsType>`
+  color: ${({ theme, $isPublic }) => ($isPublic ? theme.palette.primary.main : theme.palette.text.disabled)};
   cursor: pointer;
 `;
