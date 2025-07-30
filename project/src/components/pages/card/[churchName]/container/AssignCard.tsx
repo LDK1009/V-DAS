@@ -1,7 +1,10 @@
+import { supabase } from "@/lib/supabaseClient";
+import { getPublicCamps } from "@/service/table/camps/camps";
 import { mixinFlex } from "@/styles/mixins";
+import { ExceptionTableType } from "@/types/exceptions";
 import { getAB, getAssignedInfo } from "@/utils/export/card";
 import { Stack, styled, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 type TableRowType = {
   sex: "male" | "female";
@@ -26,6 +29,44 @@ type CardInfoType = {
 };
 
 const AssignCard = ({ churchName, maleCardInfo, femaleCardInfo }: CardInfoType) => {
+  const [maleException, setMaleException] = useState<ExceptionTableType | null>(null);
+  const [femaleException, setFemaleException] = useState<ExceptionTableType | null>(null);
+
+  useEffect(() => {
+    const fetchExceptions = async () => {
+      try {
+        // 공개 캠프 라운드 조회
+        const response = await getPublicCamps();
+        const { round: publicCampRound } = response;
+
+        // 형제 예외 조회
+        const { data: maleData } = await supabase
+          .from("exceptions")
+          .select("*")
+          .eq("sex", "male")
+          .eq("round", publicCampRound)
+          .eq("church_name", churchName)
+          .single();
+
+        // 자매 예외 조회
+        const { data: femaleData } = await supabase
+          .from("exceptions")
+          .select("*")
+          .eq("sex", "female")
+          .eq("round", publicCampRound)
+          .eq("church_name", churchName)
+          .single();
+
+        setMaleException(maleData);
+        setFemaleException(femaleData);
+      } catch (error) {
+        console.error("Error fetching exceptions:", error);
+      }
+    };
+
+    fetchExceptions();
+  }, [churchName]);
+
   const maleRow = {
     sex: "형제",
     totalCount: maleCardInfo?.assignedInfo.totalAssignedCount
@@ -44,104 +85,42 @@ const AssignCard = ({ churchName, maleCardInfo, femaleCardInfo }: CardInfoType) 
     assignedInfo: getAssignedInfo(femaleCardInfo),
   };
 
-  const exceptList = [
-    "예선교회",
-    "후포중앙교회",
-    "청주대청교회",
-    "대전충일교회",
-    "주월교회",
-  ];
-
-  type RowType = {
-    sex: string;
-    totalCount: string;
-    AB: string;
-    assignedInfo: string;
-  };
-
-  function temporaryAssignInfo(churchName: string): { maleRow: RowType; femaleRow: RowType } {
-    const existMaleRow = maleRow;
-    const existFemaleRow = femaleRow;
-
-    const temporaryInfos = [
-      {
-        churchName: "예선교회",
-        maleRow: existMaleRow,
-        femaleRow: {
-          sex: "자매",
-          totalCount: "3명",
-          AB: "A",
-          assignedInfo: "409호(3)",
-        },
-      },
-      {
-        churchName: "후포중앙교회",
-        maleRow: existMaleRow,
-        femaleRow: {
-          sex: "자매",
-          totalCount: "7명",
-          AB: "A",
-          assignedInfo: "408-419호(1)",
-        },
-      },
-      {
-        churchName: "청주대청교회",
-        maleRow: existMaleRow,
-        femaleRow: {
-          sex: "자매",
-          totalCount: "7명",
-          AB: "A",
-          assignedInfo: "409(1)-410호(6)",
-        },
-      },
-      {
-        churchName: "대전충일교회",
-        maleRow: existMaleRow,
-        femaleRow: {
-          sex: "자매",
-          totalCount: "6명",
-          AB: "A",
-          assignedInfo: "411-412호(5)",
-        },
-      },
-      {
-        churchName: "주월교회",
-        maleRow: existMaleRow,
-        femaleRow: {
-          sex: "자매",
-          totalCount: "13명",
-          AB: "A",
-          assignedInfo: "412(1)-414호",
-        },
-      },
-    ];
-
-    const response = temporaryInfos.find((info) => info.churchName === churchName) ?? {
-      maleRow: existMaleRow,
-      femaleRow: existFemaleRow,
-    };
-
-    return response;
-  }
-
   const RowComponent = () => {
-    const isExcept = exceptList.includes(churchName);
-    const assignInfo = isExcept ? temporaryAssignInfo(churchName) : { maleRow, femaleRow };
+    const isMaleException = maleException ? true : false;
+    const isFemaleException = femaleException ? true : false;
 
     return (
       <>
-        <Tr>
-          <Sex>{assignInfo.maleRow.sex}</Sex>
-          <TotalCount>{assignInfo.maleRow.totalCount}</TotalCount>
-          <AB>{assignInfo.maleRow.AB}</AB>
-          <AssignedInfo>{assignInfo.maleRow.assignedInfo}</AssignedInfo>
-        </Tr>
-        <Tr>
-          <Sex>{assignInfo.femaleRow.sex}</Sex>
-          <TotalCount>{assignInfo.femaleRow.totalCount}</TotalCount>
-          <AB>{assignInfo.femaleRow.AB}</AB>
-          <AssignedInfo>{assignInfo.femaleRow.assignedInfo}</AssignedInfo>
-        </Tr>
+        {isMaleException ? (
+          <Tr>
+            <Sex>형제</Sex>
+            <TotalCount>{maleException?.new_assigned.totalAssignedCount}명</TotalCount>
+            <AB>{maleException?.new_assigned.AorB}</AB>
+            <AssignedInfo>{maleException?.new_assigned.assignedText}</AssignedInfo>
+          </Tr>
+        ) : (
+          <Tr>
+            <Sex>형제</Sex>
+            <TotalCount>{maleRow.totalCount}</TotalCount>
+            <AB>{maleRow.AB}</AB>
+            <AssignedInfo>{maleRow.assignedInfo}</AssignedInfo>
+          </Tr>
+        )}
+        {isFemaleException ? (
+          <Tr>
+            <Sex>자매</Sex>
+            <TotalCount>{femaleException?.new_assigned.totalAssignedCount}명</TotalCount>
+            <AB>{femaleException?.new_assigned.AorB}</AB>
+            <AssignedInfo>{femaleException?.new_assigned.assignedText}</AssignedInfo>
+          </Tr>
+        ) : (
+          <Tr>
+            <Sex>자매</Sex>
+            <TotalCount>{femaleRow.totalCount}</TotalCount>
+            <AB>{femaleRow.AB}</AB>
+            <AssignedInfo>{femaleRow.assignedInfo}</AssignedInfo>
+          </Tr>
+        )}
       </>
     );
   };
