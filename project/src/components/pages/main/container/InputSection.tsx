@@ -63,6 +63,7 @@ const Container = styled(Stack)`
   height: 260px;
   border: 1px solid black;
   padding: 24px;
+  text-align: center;
 `;
 
 const CaregoryWrapper = styled(Stack)`
@@ -74,13 +75,11 @@ const CaregoryWrapper = styled(Stack)`
 const CategoryText = styled(Typography)`
   width: 100%;
   font-size: 20px;
-  text-align: left;
 `;
 
 const RoundText = styled(Typography)`
   width: 100%;
   font-size: 20px;
-  text-align: left;
 `;
 
 const ChurchNameInput = styled(TextField)`
