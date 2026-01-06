@@ -14,5 +14,4 @@ const Container = styled(Stack)`
   height: 58px;
   border: 1px solid black;
   font-size: 25px;
-  margin-bottom: 100px;
 `;

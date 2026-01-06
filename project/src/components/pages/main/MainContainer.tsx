@@ -10,6 +10,7 @@ const MainContainer = () => {
   return (
     <Container>
       <Header />
+      <NoticeImage src="/img/main-notice.png" alt="main-notice" />
       <InputSection />
       <Footer />
     </Container>
@@ -19,9 +20,15 @@ const MainContainer = () => {
 export default MainContainer;
 
 const Container = styled(Stack)`
-  ${mixinFlex("column", "start", "center")};
+  ${mixinFlex("column", "space-between", "center")};
   width: 100vw;
   height: 100vh;
 
-  padding: 126px 50px 0px 50px;
+  padding: 50px;
+`;
+
+const NoticeImage = styled("img")`
+  width: 100%;
+  max-width: 500px;
+  height: auto;
 `;
